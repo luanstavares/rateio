@@ -1,0 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Dosis:wght@200;300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap");
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  font-family: "Quicksand", "Dosis", sans-serif;
+  box-sizing: border-box;
+  background: radial-gradient(50% 50% at 50% 50%, #20008d 0%, #320085 100%);
+}
