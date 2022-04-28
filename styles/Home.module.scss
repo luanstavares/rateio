@@ -11,3 +11,23 @@
     margin: 0;
   }
 }
+
+.bg {
+  position: absolute;
+  background: radial-gradient(100% 50% at 50% 50%, #20008d 0%, #320085 100%);
+  z-index: -1;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.homeCard {
+  justify-content: space-around;
+  height: 50%;
+  width: 35%;
+}
+
+.homeButton {
+  width: initial;
+}
