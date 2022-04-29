@@ -11,9 +11,9 @@ export default function Home() {
         {
           <Button
             className={styles.homeButton}
-            onClick={() => window.alert('sua mãe aquela puta')}
+            onClick={() => window.alert("sua mãe aquela puta")}
           >
-            <Text weight="bold">Criar rateio</Text>
+            <Text weight="bold">Criar um novo rateio</Text>
           </Button>
         }
 
