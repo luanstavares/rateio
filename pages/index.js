@@ -10,15 +10,23 @@ export default function Home() {
     <div>
       <Background />
       <div className={styles.main}>
-        <Text weight="light" size="title">
-          Bem vindo(a) ao <Text mode="logo">Rateio</Text>
-        </Text>
+        <div className={styles.mainText}>
+          <Text weight="extra-light" size="title">
+            Bem vindo(a) ao <Text mode="logo">Rateio</Text>
+          </Text>
+          <Text size="large" weight="light">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Aliquam
+            purus sit amet luctus venenatis. Bibendum ut tristique et egestas
+            quis ipsum. Maecenas volutpat blandit aliquam etiam.
+          </Text>
+        </div>
         <div className={styles.homeCard}>
           <Card>
             <Button onClick={() => window.alert("sua mãe de 4")}>
-              <Text weight="bold">Criar um novo rateio</Text>
+              <Text weight="semi-bold">Novo rateio</Text>
             </Button>
-            <Text weight="bold">ou</Text>
+            <Text>ou</Text>
             <Text mode="link">Entrar em um rateio existente</Text>
           </Card>
         </div>

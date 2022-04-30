@@ -12,27 +12,34 @@
   font-size: 24px;
 }
 .textTitle {
-  font-size: 45px;
+  font-size: 56px;
 }
-.textMedium {
-  font-size: 14px;
+.textNormal {
+  font-size: 16px;
 }
 
 // Font Weight
-.textThin {
-  font-weight: 300;
+
+.textExtraLight {
+  font-weight: 200;
 }
 .textLight {
+  font-weight: 300;
+}
+.textRegular {
   font-weight: 400;
 }
+.textMedium {
+  font-weight: 500;
+}
 .textSemiBold {
-  font-weight: 700;
+  font-weight: 600;
 }
 .textBold {
-  font-weight: 800;
+  font-weight: 700;
 }
-.textNormal {
-  font-weight: 600;
+.textExtraBold {
+  font-weight: 800;
 }
 
 //Text Mode
