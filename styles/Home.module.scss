@@ -1,11 +1,26 @@
 .bg {
-  position: absolute;
-  background: radial-gradient(100% 50% at 50% 50%, #20008d 0%, #320085 100%);
   z-index: -1;
+  position: absolute;
+  overflow: hidden;
+}
+
+.bgGradient {
+  position: relative;
+  background: radial-gradient(100% 50% at 50% 50%, #20008d 0%, #320085 100%);
   left: 0;
   top: 0;
   width: 100vw;
   height: 100vh;
+}
+
+.bgCircle {
+  position: absolute;
+  border-radius: 50%;
+  right: calc(100vh / 2.5 * -1);
+  top: calc(100vh / 1.8 * -1);
+  width: 100vh;
+  height: 100vh;
+  background: $primary-color;
 }
 
 .homeCard {

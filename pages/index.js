@@ -6,7 +6,11 @@ import Text from "../components/Text/Text";
 
 export default function Home() {
   return (
-    <div className={styles.bg}>
+    <div>
+      <div className={styles.bg}>
+        <div className={styles.bgGradient}></div>
+        <div className={styles.bgCircle}></div>
+      </div>
       <div className={styles.homeCard}>
         <Card>
           {
