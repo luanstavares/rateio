@@ -6,13 +6,11 @@ import Text from "../components/Text/Text";
 
 export default function Home() {
   return (
-    <div className={styles.bg}>
-      <Card className={styles.homeCard}>
+    <div className={styles.homeCard}>
+      <div className={styles.bg}></div>
+      <Card>
         {
-          <Button
-            className={styles.homeButton}
-            onClick={() => window.alert("sua mãe de 4")}
-          >
+          <Button onClick={() => window.alert("sua mãe de 4")}>
             <Text weight="bold">Criar um novo rateio</Text>
           </Button>
         }
