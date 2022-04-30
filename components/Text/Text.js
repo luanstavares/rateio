@@ -1,18 +1,17 @@
-import * as styles from './Text.module.scss';
+import * as styles from "./Text.module.scss";
 
-export default function Text({ size, weight, children }) {
-
+export default function Text({ mode, size, weight, children }) {
   function sizeClass() {
     switch (size) {
-      case 'nano':
+      case "nano":
         return styles.textNano;
-      case 'small':
+      case "small":
         return styles.textSmall;
-      case 'large':
+      case "large":
         return styles.textLarge;
-      case 'giant':
+      case "giant":
         return styles.textGiant;
-      case 'medium':
+      case "medium":
       default:
         return styles.textMedium;
     }
@@ -20,29 +19,32 @@ export default function Text({ size, weight, children }) {
 
   function weightClass() {
     switch (weight) {
-      case 'thin':
+      case "thin":
         return styles.Thin;
-      case 'light':
+      case "light":
         return styles.textLight;
-      case 'semi-bold':
+      case "semi-bold":
         return styles.textSemiBold;
-      case 'bold':
+      case "bold":
         return styles.textBold;
-      case 'normal':
+      case "normal":
+      default:
+        return styles.textNormal;
+    }
+  }
+
+  function modeClass() {
+    switch (mode) {
+      case "link":
+        return styles.textLink;
       default:
         return styles.textNormal;
     }
   }
 
   function textClass() {
-    return `${weightClass()} ${sizeClass()}`
+    return `${weightClass()} ${sizeClass()} ${modeClass()}`;
   }
 
-  return (
-    <span
-      className={textClass()}
-    >
-      { children }
-    </span>
-  );
+  return <span className={textClass()}>{children}</span>;
 }
