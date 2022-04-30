@@ -31,3 +31,11 @@
 .textNormal {
   font-weight: 600;
 }
+
+//Text Mode
+.textLink {
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
