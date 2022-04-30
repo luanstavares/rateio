@@ -3,14 +3,12 @@ import * as styles from "../styles/Home.module.scss";
 import Button from "../components/Button/Button";
 import Card from "../components/Card/Card";
 import Text from "../components/Text/Text";
+import Background from "../components/Background/Background";
 
 export default function Home() {
   return (
     <div>
-      <div className={styles.bg}>
-        <div className={styles.bgGradient}></div>
-        <div className={styles.bgCircle}></div>
-      </div>
+      <Background />
       <div className={styles.homeCard}>
         <Card>
           {
