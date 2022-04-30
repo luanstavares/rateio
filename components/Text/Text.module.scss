@@ -11,6 +11,9 @@
 .textGiant {
   font-size: 24px;
 }
+.textTitle {
+  font-size: 45px;
+}
 .textMedium {
   font-size: 14px;
 }
@@ -38,4 +41,10 @@
     cursor: pointer;
     text-decoration: underline;
   }
+}
+
+.textLogo {
+  font-size: inherit;
+  font-family: "Pacifico", cursive;
+  color: $primary-color;
 }

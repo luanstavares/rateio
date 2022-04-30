@@ -11,6 +11,8 @@ export default function Text({ mode, size, weight, children }) {
         return styles.textLarge;
       case "giant":
         return styles.textGiant;
+      case "title":
+        return styles.textTitle;
       case "medium":
       default:
         return styles.textMedium;
@@ -37,6 +39,8 @@ export default function Text({ mode, size, weight, children }) {
     switch (mode) {
       case "link":
         return styles.textLink;
+      case "logo":
+        return styles.textLogo;
       default:
         return styles.textNormal;
     }
