@@ -55,4 +55,10 @@
   font-size: inherit;
   font-family: "Pacifico", cursive;
   color: $primary-color;
+  transition: all 500ms ease;
+  &:hover {
+    transform: scale(2);
+    text-shadow: 1px 1px 25px black;
+    cursor: pointer;
+  }
 }
