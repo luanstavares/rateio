@@ -4,18 +4,9 @@
   border-radius: 12px;
   color: $primary-color;
   padding: 8px 16px;
-
+  transition: background-color 275ms ease;
   &:hover {
     background-color: rgba(0, 0, 0, 0.4);
     cursor: pointer;
-    transition: 0.8s;
   }
 }
-
-// .buttonSecondary {
-//   color: #ff9900;
-//   font-weight: 600;
-//   padding: 0.5rem 1em;
-//   border: 1px solid #dddddd;
-//   border-radius: 12px;
-// }

@@ -1,23 +1,27 @@
-.bg {
-  position: absolute;
-  background: radial-gradient(100% 50% at 50% 50%, #20008d 0%, #320085 100%);
-  z-index: -1;
-  left: 0;
-  top: 0;
-  width: 100vw;
+.main {
+  align-items: center;
+  width: 75vw;
+  margin: 0 10%;
   height: 100vh;
+  display: flex;
+  justify-content: space-around;
+}
+
+.mainText {
+  display: flex;
+  flex-direction: column;
+  width: 45%;
+  text-align: center;
 }
 
 .homeCard {
-  width: 45%;
-  height: 250px;
-  transition: transform 500ms ease;
+  border-radius: 18px;
+  width: 25%;
+  height: 350px;
+  //transition: transform 250ms ease-in;
+  transition: all 250ms ease;
   &:hover {
     transform: scale(1.01);
-    box-shadow: 0px 0px 34px 10px rgba(0, 0, 0, 0.55);
+    box-shadow: 0px 0px 34px 5px rgba(0, 0, 0, 0.407);
   }
-}
-
-.homeButton {
-  width: initial;
 }
