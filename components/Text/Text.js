@@ -11,25 +11,31 @@ export default function Text({ mode, size, weight, children }) {
         return styles.textLarge;
       case "giant":
         return styles.textGiant;
+      case "title":
+        return styles.textTitle;
       case "medium":
       default:
-        return styles.textMedium;
+        return styles.textNormal;
     }
   }
 
   function weightClass() {
     switch (weight) {
-      case "thin":
-        return styles.Thin;
+      case "extra-light":
+        return styles.textExtraLight;
       case "light":
         return styles.textLight;
+      case "medium":
+        return styles.textMedium;
       case "semi-bold":
         return styles.textSemiBold;
       case "bold":
         return styles.textBold;
-      case "normal":
+      case "extra-bold":
+        return styles.textExtraBold;
+      case "regular":
       default:
-        return styles.textNormal;
+        return styles.textRegular;
     }
   }
 
@@ -37,8 +43,10 @@ export default function Text({ mode, size, weight, children }) {
     switch (mode) {
       case "link":
         return styles.textLink;
+      case "logo":
+        return styles.textLogo;
       default:
-        return styles.textNormal;
+        return "";
     }
   }
 
