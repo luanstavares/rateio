@@ -1,46 +1,48 @@
 // Font Size
-.textNano {
-  font-size: 10px;
+.textTitle,
+.textH1,
+.textH2,
+.textH3,
+.textH4 {
+  font-weight: map-get($font-weights, bold);
 }
-.textSmall {
-  font-size: 12px;
+
+.bodyLargeRegular,
+.bodyLargeSimeBold {
+  font-size: $font-body-large;
 }
-.textLarge {
-  font-size: 18px;
+
+.bodySmallRegular,
+.bodySmallSemiBold {
+  font-size: $font-body-small;
 }
-.textGiant {
-  font-size: 24px;
-}
+
 .textTitle {
-  padding-bottom: 3rem;
-  font-size: 56px;
+  font-size: $font-title;
 }
-.textNormal {
-  font-size: 16px;
+.textH1 {
+  font-size: $font-h1;
 }
-
-// Font Weight
-
-.textExtraLight {
-  font-weight: 200;
+.textH2 {
+  font-size: $font-h2;
 }
-.textLight {
-  font-weight: 300;
+.textH3 {
+  font-size: $font-h3;
 }
-.textRegular {
-  font-weight: 400;
+.textH4 {
+  font-size: $font-h4;
 }
-.textMedium {
-  font-weight: 500;
+.textH5 {
+  font-weight: map-get($font-weights, regular);
+  font-size: $font-h5;
 }
-.textSemiBold {
-  font-weight: 600;
+.bodySmallRegular,
+.bodyLargeRegular {
+  font-weight: map-get($font-weights, regular);
 }
-.textBold {
-  font-weight: 700;
-}
-.textExtraBold {
-  font-weight: 800;
+.bodySmallSemiBold,
+.bodyLargeSemiBold {
+  font-weight: map-get($font-weights, semi-bold);
 }
 
 //Text Mode

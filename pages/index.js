@@ -1,7 +1,6 @@
 import * as styles from "../styles/Home.module.scss";
 
 import Button from "../components/Button/Button";
-import Card from "../components/Card/Card";
 import Text from "../components/Text/Text";
 import Background from "../components/Background/Background";
 import Navbar from "../components/Navbar/Navbar";
@@ -13,24 +12,28 @@ export default function Home() {
       <Navbar />
       <div className={styles.main}>
         <div className={styles.mainText}>
-          <Text weight="extra-light" size="title">
+          <Text style="title">
             Bem vindo(a) ao <Text mode="logo">Rate.io</Text>
           </Text>
-          <Text size="large" weight="light">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Aliquam
-            purus sit amet luctus venenatis. Bibendum ut tristique et egestas
-            quis ipsum. Maecenas volutpat blandit aliquam etiam.
-          </Text>
+          <Text style="title">Hello World</Text>
+          <Text style="h1">Hello World</Text>
+          <Text style="h2">Hello World</Text>
+          <Text style="h3">Hello World</Text>
+          <Text style="h4">Hello World</Text>
+          <Text style="h5">Hello World</Text>
+          <Text style="body-large-semi-bold">Hello World</Text>
+          <Text style="body-large-regular">Hello World</Text>
+          <Text style="body-small-semi-bold">Hello World</Text>
+          <Text style="body-small-regular">Hello World</Text>
         </div>
         <div className={styles.homeCard}>
-          <Card>
+          <>
             <Button onClick={() => window.alert("sua mãe de 4")}>
               <Text weight="semi-bold">Novo rateio</Text>
             </Button>
             <Text>ou</Text>
             <Text mode="link">Entrar em um rateio existente</Text>
-          </Card>
+          </>
         </div>
       </div>
     </div>
