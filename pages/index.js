@@ -27,15 +27,14 @@ export default function Home() {
           <Text style="body-small-semi-bold">Hello World</Text>
           <Text style="body-small-regular">Hello World</Text>
         </div>
-        <div className={styles.homeCard}>
-          <>
-            <Button onClick={() => window.alert("sua mãe de 4")}>
-              <Text weight="semi-bold">Novo rateio</Text>
-            </Button>
-            <Text>ou</Text>
-            <Text mode="link">Entrar em um rateio existente</Text>
-          </>
-        </div>
+
+        <>
+          <Button onClick={() => window.alert("sua mãe de 4")}>
+            <Text weight="semi-bold">Novo rateio</Text>
+          </Button>
+          <Text>ou</Text>
+          <Text mode="link">Entrar em um rateio existente</Text>
+        </>
       </div>
     </div>
   );
