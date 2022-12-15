@@ -2,13 +2,13 @@
 
 - Task: https://rateio.atlassian.net/browse/
 
-### Changes, decisions, obsvervations
+### Changes, decisions, observations
 
 - List the important things.
 
 ### Required Checklist
 
-Before proceed, mark the follow fields as completed:
+Before proceeding, mark the following fields as completed:
 
-- [ ] Application is running without issues in development environment
+- [ ] Application is running without issues in the development environment
 - [ ] Code is following Figma design patterns
