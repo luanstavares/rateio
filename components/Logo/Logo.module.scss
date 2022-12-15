@@ -1,18 +1,18 @@
 .logoSmall {
   @extend .logo;
-  font-size: map-get($logoSizes, small);
+  font-size: map-get($logo-sizes, small);
 }
 .logoMedium {
   @extend .logo;
-  font-size: map-get($logoSizes, medium);
+  font-size: map-get($logo-sizes, medium);
 }
 .logoLarge {
   @extend .logo;
-  font-size: map-get($logoSizes, large);
+  font-size: map-get($logo-sizes, large);
 }
 .logoExtraLarge {
   @extend .logo;
-  font-size: map-get($logoSizes, extraLarge);
+  font-size: map-get($logo-sizes, extraLarge);
 }
 
 .logo {
