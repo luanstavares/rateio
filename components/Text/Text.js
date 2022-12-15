@@ -1,41 +1,29 @@
 import * as styles from "./Text.module.scss";
 
-export default function Text({ mode, size, weight, children }) {
-  function sizeClass() {
-    switch (size) {
-      case "nano":
-        return styles.textNano;
-      case "small":
-        return styles.textSmall;
-      case "large":
-        return styles.textLarge;
-      case "giant":
-        return styles.textGiant;
+export default function Text({ mode, style, children }) {
+  function styleClass() {
+    switch (style) {
       case "title":
         return styles.textTitle;
-      case "medium":
+      case "h1":
+        return styles.textH1;
+      case "h2":
+        return styles.textH2;
+      case "h3":
+        return styles.textH3;
+      case "h4":
+        return styles.textH4;
+      case "h5":
+        return styles.textH5;
+      case "body-small-regular":
+        return styles.bodySmallRegular;
+      case "body-small-semi-bold":
+        return styles.bodySmallSemiBold;
+      case "body-large-semi-bold":
+        return styles.bodyLargeSemiBold;
+      case "body-large-regular":
       default:
-        return styles.textNormal;
-    }
-  }
-
-  function weightClass() {
-    switch (weight) {
-      case "extra-light":
-        return styles.textExtraLight;
-      case "light":
-        return styles.textLight;
-      case "medium":
-        return styles.textMedium;
-      case "semi-bold":
-        return styles.textSemiBold;
-      case "bold":
-        return styles.textBold;
-      case "extra-bold":
-        return styles.textExtraBold;
-      case "regular":
-      default:
-        return styles.textRegular;
+        return styles.bodyLargeRegular;
     }
   }
 
@@ -51,7 +39,7 @@ export default function Text({ mode, size, weight, children }) {
   }
 
   function textClass() {
-    return `${weightClass()} ${sizeClass()} ${modeClass()}`;
+    return `${styleClass()} ${modeClass()}`;
   }
 
   return <span className={textClass()}>{children}</span>;
