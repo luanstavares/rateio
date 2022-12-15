@@ -1,11 +1,11 @@
 import * as styles from "../Navbar/Navbar.module.scss";
 
-import Text from "../Text/Text";
+import Logo from "../Logo/Logo";
 
 export default function Navbar() {
   return (
     <div className={styles.logo}>
-      <Text mode="logo">Rate.io</Text>
+      <Logo style="logoSmall">Rate.io</Logo>
     </div>
   );
 }

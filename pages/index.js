@@ -4,6 +4,7 @@ import Button from "../components/Button/Button";
 import Text from "../components/Text/Text";
 import Background from "../components/Background/Background";
 import Navbar from "../components/Navbar/Navbar";
+import Logo from "../components/Logo/Logo";
 
 export default function Home() {
   return (
@@ -13,7 +14,7 @@ export default function Home() {
       <div className={styles.main}>
         <div className={styles.mainText}>
           <Text style="title">
-            Bem vindo(a) ao <Text mode="logo">Rate.io</Text>
+            Bem vindo(a) ao <Logo style="logoExtraLarge">Rate.io</Logo>
           </Text>
           <Text style="title">Hello World</Text>
           <Text style="h1">Hello World</Text>
