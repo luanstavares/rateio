@@ -3,36 +3,34 @@ import * as styles from "./Text.module.scss";
 export default function Text({ mode, style, children }) {
   function styleClass() {
     switch (style) {
-      case "title":
-        return styles.textTitle;
-      case "h1":
-        return styles.textH1;
-      case "h2":
-        return styles.textH2;
-      case "h3":
-        return styles.textH3;
-      case "h4":
-        return styles.textH4;
-      case "h5":
-        return styles.textH5;
-      case "body-small-regular":
-        return styles.bodySmallRegular;
-      case "body-small-semi-bold":
-        return styles.bodySmallSemiBold;
-      case "body-large-semi-bold":
-        return styles.bodyLargeSemiBold;
-      case "body-large-regular":
+      case "text__title":
+        return styles.text__title;
+      case "text__h1":
+        return styles.text__h1;
+      case "text__h2":
+        return styles.text__h2;
+      case "text__h3":
+        return styles.text__h3;
+      case "text__h4":
+        return styles.text__h4;
+      case "text__h5":
+        return styles.text__h5;
+      case "text__body__small__regular":
+        return styles.text__body__small__regular;
+      case "text__body__small__semi__bold":
+        return styles.text__body__small__semi__bold;
+      case "text__body__large__semi__bold":
+        return styles.text__body__large__semi__bold;
+      case "text__body__large__regular":
       default:
-        return styles.bodyLargeRegular;
+        return styles.text__body__large__regular;
     }
   }
 
   function modeClass() {
     switch (mode) {
       case "link":
-        return styles.textLink;
-      case "logo":
-        return styles.textLogo;
+        return styles.text__link;
       default:
         return "";
     }

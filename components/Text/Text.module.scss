@@ -1,54 +1,52 @@
-// Font Size
-.textTitle,
-.textH1,
-.textH2,
-.textH3,
-.textH4 {
-  font-weight: map-get($font-weights, bold);
-}
+.text {
+  &__title,
+  &__h1,
+  &__h2,
+  &__h3,
+  &__h4 {
+    font-weight: map-get($font-weights, bold);
+  }
+  &__title {
+    font-size: $font-title;
+  }
+  &__h1 {
+    font-size: $font-h1;
+  }
+  &__h2 {
+    font-size: $font-h2;
+  }
+  &__h3 {
+    font-size: $font-h3;
+  }
+  &__h4 {
+    font-size: $font-h4;
+  }
+  &__h5 {
+    font-weight: map-get($font-weights, regular);
+    font-size: $font-h5;
+  }
+  &__body__large__regular,
+  &__body__large__semi__bold {
+    font-size: $font-body-large;
+  }
 
-.bodyLargeRegular,
-.bodyLargeSimeBold {
-  font-size: $font-body-large;
-}
+  &__body__small__regular,
+  &__body__small__semi__bold {
+    font-size: $font-body-small;
+  }
 
-.bodySmallRegular,
-.bodySmallSemiBold {
-  font-size: $font-body-small;
-}
-
-.textTitle {
-  font-size: $font-title;
-}
-.textH1 {
-  font-size: $font-h1;
-}
-.textH2 {
-  font-size: $font-h2;
-}
-.textH3 {
-  font-size: $font-h3;
-}
-.textH4 {
-  font-size: $font-h4;
-}
-.textH5 {
-  font-weight: map-get($font-weights, regular);
-  font-size: $font-h5;
-}
-.bodySmallRegular,
-.bodyLargeRegular {
-  font-weight: map-get($font-weights, regular);
-}
-.bodySmallSemiBold,
-.bodyLargeSemiBold {
-  font-weight: map-get($font-weights, semi-bold);
-}
-
-//Text Mode
-.textLink {
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
+  &__body__small__regular,
+  &__body__large__regular {
+    font-weight: map-get($font-weights, regular);
+  }
+  &__body__small__semi__bold,
+  &__body__large__semi__bold {
+    font-weight: map-get($font-weights, semi-bold);
+  }
+  &__link {
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
   }
 }
