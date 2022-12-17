@@ -12,7 +12,7 @@ export default function Home() {
       <Background />
       <Navbar />
       <div className={styles.main}>
-        <div className={styles.mainText}>
+        <div className={styles.main__text}>
           <Text style="text__title">
             Bem vindo(a) ao <Logo style="logo__extra__large" />
           </Text>
@@ -26,16 +26,13 @@ export default function Home() {
             Bem vindo(a) ao <Logo style="logo__small" />
           </Text>
         </div>
-
-        <>
-          <Button onClick={() => window.alert("sua mãe de 4")}>
-            <Text style="h5">Novo rateio</Text>
-          </Button>
-          <Text style="h5">ou</Text>
-          <Text style="h5" mode="link">
-            Entrar em um rateio existente
-          </Text>
-        </>
+        <Button onClick={() => window.alert("sua mãe de 4")}>
+          <Text style="h5">Novo rateio</Text>
+        </Button>
+        <Text style="h5">ou</Text>
+        <Text style="h5" mode="link">
+          Entrar em um rateio existente
+        </Text>
       </div>
     </div>
   );
