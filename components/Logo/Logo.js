@@ -22,5 +22,5 @@ export default function Logo({ style, size = 'medium' }) {
     return `${styleClass()}`;
   }
 
-  return <span className={logoClass()}>Rate.io</span>;
+  return <span className={styleClass()}>Rate.io</span>;
 }
