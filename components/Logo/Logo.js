@@ -3,7 +3,10 @@ import React from "react";
 
 export default function Logo({ style, size = 'medium' }) {
   function styleClass() {
-    switch (style) {
+    const baseClass = `logo`;
+    const sizeClass = `logo--${size}`;
+
+    return [styles[baseClass], styles[sizeClass]].join(' ');
       case "logo__small":
         return styles.logo__small;
       case "logo__large":
