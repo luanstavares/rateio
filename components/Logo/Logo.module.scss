@@ -4,20 +4,19 @@
   &:hover {
     cursor: pointer;
   }
-  &__small {
-    @extend .logo;
+  &--small {
     font-size: map-get($logo-sizes, small);
   }
-  &__medium {
-    @extend .logo;
+
+  &--medium {
     font-size: map-get($logo-sizes, medium);
   }
-  &__large {
-    @extend .logo;
+
+  &--large {
     font-size: map-get($logo-sizes, large);
   }
-  &__extra__large {
-    @extend .logo;
+
+  &--extra-large {
     font-size: map-get($logo-sizes, extra-large);
   }
 }
