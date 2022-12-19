@@ -30,9 +30,11 @@ export default function Home() {
           <Text style="h5">Novo rateio</Text>
         </Button>
         <Text style="h5">ou</Text>
-        <Text style="h5" mode="link">
+        <Link
+          href="thedesiredlink.com"
+        >
           Entrar em um rateio existente
-        </Text>
+        </Link>
       </div>
     </div>
   );
