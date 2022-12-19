@@ -1,7 +1,7 @@
 import * as styles from "./Logo.module.scss";
 import React from "react";
 
-export default function Logo({ style }) {
+export default function Logo({ style, size = 'medium' }) {
   function styleClass() {
     switch (style) {
       case "logo__small":
