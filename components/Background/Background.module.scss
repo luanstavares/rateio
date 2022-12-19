@@ -2,7 +2,7 @@
   z-index: -1;
   position: absolute;
   overflow: hidden;
-  &__color {
+  &--neutral {
     position: relative;
     background: $neutral-color-900;
     left: 0;
