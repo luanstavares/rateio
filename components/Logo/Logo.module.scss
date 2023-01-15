@@ -1,27 +1,22 @@
-.logoSmall {
-  @extend .logo;
-  font-size: map-get($logoSizes, small);
-}
-.logoMedium {
-  @extend .logo;
-  font-size: map-get($logoSizes, medium);
-}
-.logoLarge {
-  @extend .logo;
-  font-size: map-get($logoSizes, large);
-}
-.logoExtraLarge {
-  @extend .logo;
-  font-size: map-get($logoSizes, extraLarge);
-}
-
 .logo {
   font-family: "Pacifico", cursive;
   color: $primary-color-400;
-  transition: all 500ms ease;
   &:hover {
-    transform: scale(2);
-    text-shadow: 1px 1px 25px $shade-black;
     cursor: pointer;
+  }
+  &--small {
+    font-size: map-get($logo-sizes, small);
+  }
+
+  &--medium {
+    font-size: map-get($logo-sizes, medium);
+  }
+
+  &--large {
+    font-size: map-get($logo-sizes, large);
+  }
+
+  &--extra-large {
+    font-size: map-get($logo-sizes, extra-large);
   }
 }

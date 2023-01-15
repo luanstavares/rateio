@@ -12,29 +12,29 @@ export default function Home() {
       <Background />
       <Navbar />
       <div className={styles.main}>
-        <div className={styles.mainText}>
-          <Text style="title">
-            Bem vindo(a) ao <Logo style="logoExtraLarge">Rate.io</Logo>
+        <div className={styles.main__text}>
+          <Text style="text__title">
+            Bem vindo(a) ao <Logo style="logo__extra__large" />
           </Text>
-          <Text style="title">Hello World</Text>
-          <Text style="h1">Hello World</Text>
-          <Text style="h2">Hello World</Text>
-          <Text style="h3">Hello World</Text>
-          <Text style="h4">Hello World</Text>
-          <Text style="h5">Hello World</Text>
-          <Text style="body-large-semi-bold">Hello World</Text>
-          <Text style="body-large-regular">Hello World</Text>
-          <Text style="body-small-semi-bold">Hello World</Text>
-          <Text style="body-small-regular">Hello World</Text>
+          <Text style="text__h2">
+            Bem vindo(a) ao <Logo style="logo__large" />
+          </Text>
+          <Text style="text__h3">
+            Bem vindo(a) ao <Logo style="logo__medium" />
+          </Text>
+          <Text style="text__h4">
+            Bem vindo(a) ao <Logo style="logo__small" />
+          </Text>
         </div>
-
-        <>
-          <Button onClick={() => window.alert("sua mãe de 4")}>
-            <Text weight="semi-bold">Novo rateio</Text>
-          </Button>
-          <Text>ou</Text>
-          <Text mode="link">Entrar em um rateio existente</Text>
-        </>
+        <Button onClick={() => window.alert("sua mãe de 4")}>
+          <Text style="h5">Novo rateio</Text>
+        </Button>
+        <Text style="h5">ou</Text>
+        <Link
+          href="thedesiredlink.com"
+        >
+          Entrar em um rateio existente
+        </Link>
       </div>
     </div>
   );

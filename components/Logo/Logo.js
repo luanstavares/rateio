@@ -1,23 +1,13 @@
 import * as styles from "./Logo.module.scss";
 import React from "react";
 
-export default function Logo({ style, children }) {
+export default function Logo({ size = "medium" }) {
   function styleClass() {
-    switch (style) {
-      case "logoSmall":
-        return styles.logoSmall;
-      case "logoLarge":
-        return styles.logoLarge;
-      case "logoExtraLarge":
-        return styles.logoExtraLarge;
-      case "logoMedium":
-      default:
-        return styles.logoMedium;
-    }
-  }
-  function logoClass() {
-    return `${styleClass()}`;
+    const baseClass = `logo`;
+    const sizeClass = `logo--${size}`;
+
+    return [styles[baseClass], styles[sizeClass]].join(" ");
   }
 
-  return <span className={logoClass()}>{children}</span>;
+  return <span className={styleClass()}>Rate.io</span>;
 }

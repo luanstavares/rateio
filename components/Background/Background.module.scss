@@ -1,14 +1,13 @@
-.bg {
+.background {
   z-index: -1;
   position: absolute;
   overflow: hidden;
-}
-
-.bgColor {
-  position: relative;
-  background: $neutral-color-900;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
+  &--neutral {
+    position: relative;
+    background: $neutral-color-900;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+  }
 }
