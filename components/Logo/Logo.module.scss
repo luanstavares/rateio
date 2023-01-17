@@ -4,6 +4,11 @@
   &:hover {
     cursor: pointer;
   }
+
+  &--mini {
+    font-size: map-get($logo-sizes, mini);
+  }
+
   &--small {
     font-size: map-get($logo-sizes, small);
   }
@@ -18,5 +23,14 @@
 
   &--extra-large {
     font-size: map-get($logo-sizes, extra-large);
+  }
+
+  &__glow {
+    &--active {
+      text-shadow: 0px 0px 20px rgba(255, 173, 51, 0.39);
+    }
+    &--disabled {
+      text-shadow: none;
+    }
   }
 }
