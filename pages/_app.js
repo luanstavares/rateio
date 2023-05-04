@@ -29,6 +29,36 @@ function MyApp({ Component, pageProps }) {
         textTransform: "none",
         lineHeight: 1.5,
       },
+      display: {
+        fontSize: 60,
+      },
+      h1: {
+        fontSize: 49,
+      },
+      h2: {
+        fontSize: 39,
+      },
+      h3: {
+        fontSize: 31,
+      },
+      h4: {
+        fontSize: 25,
+      },
+      h5: {
+        fontSize: 20,
+      },
+      body1: { fontSize: 16 },
+      body2: { fontSize: 14 },
+      caption: {},
+    },
+    components: {
+      MuiTypography: {
+        defaultProps: {
+          variantMapping: {
+            display: "h1",
+          },
+        },
+      },
     },
   });
   theme = responsiveFontSizes(theme);
