@@ -49,13 +49,16 @@ function MyApp({ Component, pageProps }) {
       },
       body1: { fontSize: 16 },
       body2: { fontSize: 14 },
-      caption: {},
+      caption1: { fontSize: 12 },
+      caption2: { fontSize: 10 },
     },
     components: {
       MuiTypography: {
         defaultProps: {
           variantMapping: {
             display: "h1",
+            caption1: "body1",
+            caption2: "body2",
           },
         },
       },
