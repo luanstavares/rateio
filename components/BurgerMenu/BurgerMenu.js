@@ -11,7 +11,7 @@ export default function BurgerMenu() {
   return (
     <>
       <DrawerMenu
-        content={<p>test burger menu</p>}
+        content={<MenuList />}
         anchor="left"
         icon={<List />}
       />
