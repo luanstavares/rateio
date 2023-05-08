@@ -1,6 +1,10 @@
 import React from "react";
-import DrawerMenu from "../DrawerMenu/DrawerMenu";
 
+// Local components
+import DrawerMenu from "../DrawerMenu/DrawerMenu";
+import MenuList from "../MenuList/MenuList";
+
+// Icons
 import { List } from "phosphor-react";
 
 export default function BurgerMenu() {
