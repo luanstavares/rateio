@@ -1,48 +1,114 @@
-import * as styles from "../styles/Home.module.scss";
-
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import Navbar from "../components/Navbar/Navbar";
 import Logo from "../components/Logo/Logo";
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
-import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
+import { Grid, Button, Typography, Box } from "@mui/material";
+/* import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded"; */
+
+const mainContent = {
+  title: "Bem vindo ao",
+  subtitle: "O app que te ajuda a dividir a conta entre amigos.",
+  options: [
+    {
+      title: "Novo Rateio",
+      subtitle: "Crie um novo rateio e convide seus amigos.",
+      icon: "ArrowForwardRoundedIcon",
+    },
+    {
+      title: "Entrar em um rateio existente",
+      subtitle: "Entre em um rateio já existente.",
+      icon: "GroupsRoundedIcon",
+    },
+  ],
+};
 
 export default function Home() {
+  const { title, subtitle, options } = mainContent;
+
   return (
-    <div>
+    <>
       <Navbar />
 
-      <div className={styles.main}>
-        <div className={styles.main__text}>
-          <Typography variant="h3">
-            Bem vindo ao <Logo size="medium" />
-          </Typography>
-          <Typography variant="subtitle1">
-            O app que te ajuda a dividir a conta entre amigos.
-          </Typography>
-        </div>
-        <div className={styles.main__options}>
-          <Button
-            color="primary"
-            variant="contained"
-            size="medium"
-            startIcon={<GroupsRoundedIcon fontSize="inherit" />}
-            onClick={() => window.alert("sua mãe de 4")}
-          >
-            Novo Rateio
-          </Button>
+      <Grid
+        height={"100vh"}
+        container
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Grid item>
+          <Box textAlign="center">
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              spacing={1}
+              direction={"column"}
+            >
+              <Grid item>
+                <Typography
+                  fontWeight={"bold"}
+                  variant="h1"
+                >
+                  {title} <Logo size="medium" />
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography variant="subtitle1">{subtitle}</Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        </Grid>
 
-          <Typography variant="subtitle1">ou</Typography>
-          <Button
-            size="medium"
-            variant="outlined"
-            href="#"
-            endIcon={<ArrowForwardRoundedIcon fontSize="inherit" />}
+        <Box>
+          <Grid
+            marginTop={"4rem"}
+            container
+            direction={"column"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            spacing={2}
           >
-            Entrar em um rateio existente
-          </Button>
-        </div>
-      </div>
-    </div>
+            {options.map((option, index) => {
+              if (index === 0) {
+                return (
+                  <Grid item>
+                    <Button
+                      key={option.title}
+                      color="primary"
+                      variant="contained"
+                      size="medium"
+                      onClick={() => window.alert("novo rateio")}
+                    >
+                      {option.title}
+                    </Button>
+                  </Grid>
+                );
+              } else {
+                return (
+                  <>
+                    <Grid item>
+                      <Typography variant="subtitle1">ou</Typography>
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        key={option.title}
+                        color="primary"
+                        variant="outlined"
+                        size="medium"
+                        onClick={() =>
+                          window.alert("entrar em rateio existente")
+                        }
+                      >
+                        {option.title}
+                      </Button>
+                    </Grid>
+                  </>
+                );
+              }
+            })}
+          </Grid>
+        </Box>
+      </Grid>
+    </>
   );
 }
