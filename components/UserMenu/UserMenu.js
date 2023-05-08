@@ -11,7 +11,7 @@ export default function UserMenu() {
   return (
     <>
       <DrawerMenu
-        content={<p>test user menu</p>}
+        content={<UserList />}
         anchor="right"
         icon={<User />}
       />
