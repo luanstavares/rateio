@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-
+      <Illustration />
       <Grid
         height={"100vh"}
         container
