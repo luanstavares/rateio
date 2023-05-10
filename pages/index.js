@@ -1,49 +1,129 @@
-// Style
-import * as styles from "../styles/Home.module.scss";
+import React from "react";
 
 // Material UI Components
-import { Typography, Button } from "@mui/material/";
+import { Grid, Button, Typography, Box } from "@mui/material";
 
 // Local Components
+import Navbar from "../components/Navbar/Navbar";
 import Logo from "../components/Logo/Logo";
+import Illustration from "../public/Illustration";
+import HomeIcons from "../public/HomeIcons";
 
 // Icons
 import { ArrowRight, UsersThree } from "phosphor-react";
 
+const mainContent = {
+  title: "Bem vindo ao",
+  subtitle: "O app que te ajuda a dividir a conta entre amigos.",
+  options: [
+    {
+      title: "Novo Rateio",
+      subtitle: "Crie um novo rateio e convide seus amigos.",
+      icon: <UsersThree />,
+    },
+    {
+      title: "Entrar em um rateio existente",
+      subtitle: "Entre em um rateio já existente.",
+      icon: <ArrowRight />,
+    },
+  ],
+};
+
 export default function Home() {
+  const { title, subtitle, options } = mainContent;
+
   return (
     <>
-      <div className={styles.main}>
-        <div className={styles.main__text}>
-          <Typography variant="h3">
-            Bem vindo ao <Logo size="medium" />
-          </Typography>
-          <Typography variant="subtitle1">
-            O app que te ajuda a dividir a conta entre amigos.
-          </Typography>
-        </div>
-        <div className={styles.main__options}>
-          <Button
-            color="primary"
-            variant="contained"
-            size="medium"
-            startIcon={<UsersThree />}
-            onClick={() => window.alert("sua mãe de 4")}
-          >
-            Novo Rateio
-          </Button>
+      <Illustration />
+      <HomeIcons />
+      <Grid
+        height={"100vh"}
+        container
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Grid item>
+          <Box textAlign="center">
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              spacing={1}
+              direction={"column"}
+            >
+              <Grid item>
+                <Typography
+                  fontWeight={"bold"}
+                  variant="h1"
+                >
+                  {title} <Logo size="medium" />
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography variant="subtitle1">{subtitle}</Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        </Grid>
 
-          <Typography variant="subtitle1">ou</Typography>
-          <Button
-            size="medium"
-            variant="outlined"
-            href="#"
-            endIcon={<ArrowRight />}
+        <Box>
+          <Grid
+            marginTop={"4rem"}
+            container
+            direction={"column"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            spacing={2}
           >
-            Entrar em um rateio existente
-          </Button>
-        </div>
-      </div>
+            {options.map((option, index) => {
+              if (index === 0) {
+                return (
+                  <Grid
+                    key={option.title}
+                    item
+                  >
+                    <Button
+                      key={option.title}
+                      color="primary"
+                      variant="contained"
+                      size="medium"
+                      startIcon={option.icon}
+                      onClick={() => window.alert("novo rateio")}
+                    >
+                      {option.title}
+                    </Button>
+                  </Grid>
+                );
+              } else {
+                return (
+                  <React.Fragment key={option.title}>
+                    <Grid
+                      key={option.title}
+                      item
+                    >
+                      <Typography variant="subtitle1">ou</Typography>
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        size="medium"
+                        endIcon={option.icon}
+                        onClick={() =>
+                          window.alert("entrar em rateio existente")
+                        }
+                      >
+                        {option.title}
+                      </Button>
+                    </Grid>
+                  </React.Fragment>
+                );
+              }
+            })}
+          </Grid>
+        </Box>
+      </Grid>
     </>
   );
 }
