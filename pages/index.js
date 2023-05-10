@@ -1,8 +1,8 @@
+import React from "react";
 import Navbar from "../components/Navbar/Navbar";
 import Logo from "../components/Logo/Logo";
 import { Grid, Button, Typography, Box } from "@mui/material";
-/* import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
-import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded"; */
+import Illustration from "../public/Illustration";
 
 const mainContent = {
   title: "Bem vindo ao",
@@ -71,7 +71,10 @@ export default function Home() {
             {options.map((option, index) => {
               if (index === 0) {
                 return (
-                  <Grid item>
+                  <Grid
+                    key={option.title}
+                    item
+                  >
                     <Button
                       key={option.title}
                       color="primary"
@@ -85,13 +88,15 @@ export default function Home() {
                 );
               } else {
                 return (
-                  <>
-                    <Grid item>
+                  <React.Fragment key={option.title}>
+                    <Grid
+                      key={option.title}
+                      item
+                    >
                       <Typography variant="subtitle1">ou</Typography>
                     </Grid>
                     <Grid item>
                       <Button
-                        key={option.title}
                         color="primary"
                         variant="outlined"
                         size="medium"
@@ -102,7 +107,7 @@ export default function Home() {
                         {option.title}
                       </Button>
                     </Grid>
-                  </>
+                  </React.Fragment>
                 );
               }
             })}
