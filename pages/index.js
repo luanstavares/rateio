@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar/Navbar";
 import Logo from "../components/Logo/Logo";
 import { Grid, Button, Typography, Box } from "@mui/material";
 import Illustration from "../public/Illustration";
+import HomeIcons from "../public/HomeIcons";
 
 const mainContent = {
   title: "Bem vindo ao",
@@ -28,6 +29,7 @@ export default function Home() {
     <>
       <Navbar />
       <Illustration />
+      <HomeIcons />
       <Grid
         height={"100vh"}
         container
