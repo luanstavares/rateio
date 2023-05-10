@@ -1,5 +1,7 @@
-import * as styles from "./Logo.module.scss";
 import React from "react";
+
+// Styles
+import * as styles from "./Logo.module.scss";
 
 export default function Logo({ size = "mini", glow = "disabled" }) {
   function styleClass() {

@@ -1,11 +1,15 @@
+// Style
 import * as styles from "../styles/Home.module.scss";
 
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+// Material UI Components
+import { Typography, Button } from "@mui/material/";
+
+// Local Components
 import Navbar from "../components/Navbar/Navbar";
 import Logo from "../components/Logo/Logo";
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
-import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
+
+// Icons
+import { ArrowRight, UsersThree } from "phosphor-react";
 
 export default function Home() {
   return (
@@ -26,7 +30,7 @@ export default function Home() {
             color="primary"
             variant="contained"
             size="medium"
-            startIcon={<GroupsRoundedIcon fontSize="inherit" />}
+            startIcon={<UsersThree />}
             onClick={() => window.alert("sua mãe de 4")}
           >
             Novo Rateio
@@ -37,7 +41,7 @@ export default function Home() {
             size="medium"
             variant="outlined"
             href="#"
-            endIcon={<ArrowForwardRoundedIcon fontSize="inherit" />}
+            endIcon={<ArrowRight />}
           >
             Entrar em um rateio existente
           </Button>
