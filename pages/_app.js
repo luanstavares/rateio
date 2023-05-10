@@ -2,10 +2,11 @@ import "../styles/globals.scss";
 import {
   createTheme,
   responsiveFontSizes,
-  Paper,
   CssBaseline,
   ThemeProvider,
 } from "@mui/material";
+
+import Layout from "../components/Layouts/MainLayout";
 
 function MyApp({ Component, pageProps }) {
   let theme = createTheme({
@@ -68,8 +69,10 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Component {...pageProps} />
+      <Layout>
+        <CssBaseline />
+        <Component {...pageProps} />
+      </Layout>
     </ThemeProvider>
   );
 }

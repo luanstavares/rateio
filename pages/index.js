@@ -1,9 +1,18 @@
 import React from "react";
+// Style
+import * as styles from "../styles/Home.module.scss";
+
+// Material UI Components
+import { Grid, Button, Typography, Box } from "@mui/material";
+
+// Local Components
 import Navbar from "../components/Navbar/Navbar";
 import Logo from "../components/Logo/Logo";
-import { Grid, Button, Typography, Box } from "@mui/material";
 import Illustration from "../public/Illustration";
 import HomeIcons from "../public/HomeIcons";
+
+// Icons
+import { ArrowRight, UsersThree } from "phosphor-react";
 
 const mainContent = {
   title: "Bem vindo ao",
