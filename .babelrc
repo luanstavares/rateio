@@ -1,4 +1,6 @@
 {
-  "presets": ["next/babel"],
-  "plugins": []
+  "presets": [
+    ["next/babel", "@babel/preset-react", { "throwIfNamespace": false }]
+  ],
+  "plugins": ["react-html-attrs"]
 }
