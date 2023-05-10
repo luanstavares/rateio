@@ -5,7 +5,6 @@ import * as styles from "../styles/Home.module.scss";
 import { Typography, Button } from "@mui/material/";
 
 // Local Components
-import Navbar from "../components/Navbar/Navbar";
 import Logo from "../components/Logo/Logo";
 
 // Icons
@@ -13,9 +12,7 @@ import { ArrowRight, UsersThree } from "phosphor-react";
 
 export default function Home() {
   return (
-    <div>
-      <Navbar />
-
+    <>
       <div className={styles.main}>
         <div className={styles.main__text}>
           <Typography variant="h3">
@@ -47,6 +44,6 @@ export default function Home() {
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
