@@ -1,6 +1,4 @@
 import React from "react";
-// Style
-import * as styles from "../styles/Home.module.scss";
 
 // Material UI Components
 import { Grid, Button, Typography, Box } from "@mui/material";
@@ -21,12 +19,12 @@ const mainContent = {
     {
       title: "Novo Rateio",
       subtitle: "Crie um novo rateio e convide seus amigos.",
-      icon: "ArrowForwardRoundedIcon",
+      icon: <UsersThree />,
     },
     {
       title: "Entrar em um rateio existente",
       subtitle: "Entre em um rateio já existente.",
-      icon: "GroupsRoundedIcon",
+      icon: <ArrowRight />,
     },
   ],
 };
@@ -36,7 +34,6 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
       <Illustration />
       <HomeIcons />
       <Grid
@@ -91,6 +88,7 @@ export default function Home() {
                       color="primary"
                       variant="contained"
                       size="medium"
+                      startIcon={option.icon}
                       onClick={() => window.alert("novo rateio")}
                     >
                       {option.title}
@@ -111,6 +109,7 @@ export default function Home() {
                         color="primary"
                         variant="outlined"
                         size="medium"
+                        endIcon={option.icon}
                         onClick={() =>
                           window.alert("entrar em rateio existente")
                         }
