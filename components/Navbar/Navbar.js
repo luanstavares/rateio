@@ -2,7 +2,7 @@
 import * as styles from "../Navbar/Navbar.module.scss";
 
 // Material UI Components
-import { Grid, Container } from "@mui/material/";
+import { Grid } from "@mui/material/";
 
 //Local Components
 import Logo from "../Logo/Logo";
@@ -12,11 +12,12 @@ import UserMenu from "../UserMenu/UserMenu";
 export default function Navbar() {
   return (
     <Grid
+      className={styles.navbar}
       height={100}
       container
-      direction="row"
       justifyContent="space-around"
-      alignItems="center">
+      alignItems="center"
+    >
       <Grid item>
         <BurgerMenu />
       </Grid>
