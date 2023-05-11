@@ -1,3 +1,5 @@
+import Head from "next/head";
+
 import "../styles/globals.scss";
 import {
   createTheme,
@@ -68,12 +70,22 @@ function MyApp({ Component, pageProps }) {
   theme = responsiveFontSizes(theme);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Layout>
-        <CssBaseline />
-        <Component {...pageProps} />
-      </Layout>
-    </ThemeProvider>
+    <>
+      <Head>
+        <title>rate.io</title>
+        <link
+          rel="icon"
+          href="/favicon.svg"
+        />
+      </Head>
+      <ThemeProvider theme={theme}>
+        <Layout>
+          <CssBaseline />
+
+          <Component {...pageProps} />
+        </Layout>
+      </ThemeProvider>
+    </>
   );
 }
 
