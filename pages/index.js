@@ -4,10 +4,9 @@ import React from "react";
 import { Grid, Button, Typography, Box } from "@mui/material";
 
 // Local Components
-import Navbar from "../components/Navbar/Navbar";
 import Logo from "../components/Logo/Logo";
-import Illustration from "../public/Illustration";
-import HomeIcons from "../public/HomeIcons";
+import Illustration from "../components/Illustration/Illustration";
+import HomeIcons from "../components/HomeIcons/HomeIcons";
 
 // Icons
 import { ArrowRight, UsersThree } from "phosphor-react";
