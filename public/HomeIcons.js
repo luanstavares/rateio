@@ -45,10 +45,10 @@ export default function HomeIcons({ size = "300" }) {
             width="419.048"
             height="364.784"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
             <feFlood
-              flood-opacity="0"
+              floodOpacity="0"
               result="BackgroundImageFix"
             />
             <feColorMatrix
