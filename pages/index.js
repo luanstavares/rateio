@@ -1,7 +1,15 @@
 import React from "react";
 
 // Material UI Components
-import { Grid, Button, Typography, Box } from "@mui/material";
+
+import {
+  Grid,
+  Button,
+  Typography,
+  Box,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 
 // Local Components
 import Logo from "../components/Logo/Logo";
@@ -30,13 +38,23 @@ const mainContent = {
 
 export default function Home() {
   const { title, subtitle, options } = mainContent;
+  const theme = useTheme();
+  const isXl = useMediaQuery(theme.breakpoints.up("xl"));
+  const isLg = useMediaQuery(theme.breakpoints.up("lg"));
+  const isMd = useMediaQuery(theme.breakpoints.up("md"));
+  const isSm = useMediaQuery(theme.breakpoints.up("sm"));
+  const isXs = useMediaQuery(theme.breakpoints.up("xs"));
 
   return (
     <>
-      <Illustration />
-      <HomeIcons />
+      <Illustration
+        size={isXl ? "600" : isLg ? "500" : isMd ? "400" : isSm ? "350" : "0"}
+      />
+      <HomeIcons
+        size={isXl ? "350" : isLg ? "300" : isMd ? "300" : isSm ? "225" : "0"}
+      />
       <Grid
-        height={"100vh"}
+        height={"100dvh"}
         container
         direction="column"
         justifyContent="center"
@@ -49,18 +67,20 @@ export default function Home() {
               justifyContent="center"
               alignItems="center"
               spacing={1}
-              direction={"column"}
+              direction="column"
             >
               <Grid item>
                 <Typography
                   fontWeight={"bold"}
                   variant="h1"
                 >
-                  {title} <Logo size="medium" />
+                  {title} <Logo size={isSm ? "medium" : "small"} />
                 </Typography>
               </Grid>
               <Grid item>
-                <Typography variant="subtitle1">{subtitle}</Typography>
+                <Typography variant={isSm ? "subtitle1" : "subtitle2"}>
+                  {subtitle}
+                </Typography>
               </Grid>
             </Grid>
           </Box>
