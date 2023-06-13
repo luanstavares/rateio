@@ -53,96 +53,86 @@ export default function Home() {
       <HomeIcons
         size={isXl ? "350" : isLg ? "300" : isMd ? "300" : isSm ? "225" : "0"}
       />
-      <Grid
-        height={"100dvh"}
-        container
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Grid item>
-          <Box textAlign="center">
-            <Grid
-              container
-              justifyContent="center"
-              alignItems="center"
-              spacing={1}
-              direction="column"
-            >
-              <Grid item>
-                <Typography
-                  fontWeight={"bold"}
-                  variant="h1"
-                >
-                  {title} <Logo size={isSm ? "medium" : "small"} />
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Typography variant={isSm ? "subtitle1" : "subtitle2"}>
-                  {subtitle}
-                </Typography>
-              </Grid>
-            </Grid>
-          </Box>
-        </Grid>
-
-        <Box>
+      <Grid item>
+        <Box textAlign="center">
           <Grid
-            marginTop={"4rem"}
             container
-            direction={"column"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            spacing={2}
+            justifyContent="center"
+            alignItems="center"
+            spacing={1}
+            direction="column"
           >
-            {options.map((option, index) => {
-              if (index === 0) {
-                return (
+            <Grid item>
+              <Typography
+                fontWeight={"bold"}
+                variant="h1"
+              >
+                {title} <Logo size={isSm ? "medium" : "small"} />
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography variant={isSm ? "subtitle1" : "subtitle2"}>
+                {subtitle}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Box>
+      </Grid>
+
+      <Box>
+        <Grid
+          marginTop={"4rem"}
+          container
+          direction={"column"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          spacing={2}
+        >
+          {options.map((option, index) => {
+            if (index === 0) {
+              return (
+                <Grid
+                  key={option.title}
+                  item
+                >
+                  <Button
+                    key={option.title}
+                    color="primary"
+                    variant="contained"
+                    size="medium"
+                    startIcon={option.icon}
+                    href="/new-rateio"
+                  >
+                    {option.title}
+                  </Button>
+                </Grid>
+              );
+            } else {
+              return (
+                <React.Fragment key={option.title}>
                   <Grid
                     key={option.title}
                     item
                   >
+                    <Typography variant="subtitle1">ou</Typography>
+                  </Grid>
+                  <Grid item>
                     <Button
-                      key={option.title}
                       color="primary"
-                      variant="contained"
+                      variant="outlined"
                       size="medium"
-                      startIcon={option.icon}
-                      onClick={() => window.alert("novo rateio")}
+                      endIcon={option.icon}
+                      onClick={() => window.alert("entrar em rateio existente")}
                     >
                       {option.title}
                     </Button>
                   </Grid>
-                );
-              } else {
-                return (
-                  <React.Fragment key={option.title}>
-                    <Grid
-                      key={option.title}
-                      item
-                    >
-                      <Typography variant="subtitle1">ou</Typography>
-                    </Grid>
-                    <Grid item>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        size="medium"
-                        endIcon={option.icon}
-                        onClick={() =>
-                          window.alert("entrar em rateio existente")
-                        }
-                      >
-                        {option.title}
-                      </Button>
-                    </Grid>
-                  </React.Fragment>
-                );
-              }
-            })}
-          </Grid>
-        </Box>
-      </Grid>
+                </React.Fragment>
+              );
+            }
+          })}
+        </Grid>
+      </Box>
     </>
   );
 }
