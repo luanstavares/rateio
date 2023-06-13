@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+
 // Styles
 import * as styles from "../Navbar/Navbar.module.scss";
 
@@ -9,11 +11,11 @@ import Logo from "../Logo/Logo";
 import BurgerMenu from "../BurgerMenu/BurgerMenu";
 import UserMenu from "../UserMenu/UserMenu";
 
-export default function Navbar() {
+export default function Navbar({ navSize }) {
   return (
     <Grid
       className={styles.navbar}
-      height={100}
+      height={navSize}
       container
       justifyContent="space-around"
       alignItems="center"
@@ -22,7 +24,9 @@ export default function Navbar() {
         <BurgerMenu />
       </Grid>
       <Grid item>
-        <Logo glow="active">Rate.io</Logo>
+        <a href="/">
+          <Logo glow="active">Rate.io</Logo>
+        </a>
       </Grid>
       <Grid item>
         <UserMenu />
