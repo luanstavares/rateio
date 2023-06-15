@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import Link from "next/link";
+
 // Styles
 import * as styles from "../Navbar/Navbar.module.scss";
 
@@ -24,9 +26,9 @@ export default function Navbar({ navSize }) {
         <BurgerMenu />
       </Grid>
       <Grid item>
-        <a href="/">
+        <Link href="/">
           <Logo glow="active">Rate.io</Logo>
-        </a>
+        </Link>
       </Grid>
       <Grid item>
         <UserMenu />

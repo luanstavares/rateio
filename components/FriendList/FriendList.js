@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
@@ -5,15 +6,15 @@ import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
 import { CheckSquare, Square } from "phosphor-react";
 import { Avatar } from "@mui/material";
-
-const icon = <Square />;
-const checkedIcon = <CheckSquare />;
+import Chip from "@mui/material/Chip";
+const icon = <Square weight="light" />;
+const checkedIcon = <CheckSquare weight="light" />;
 
 export default function FriendList(props) {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   const loading = open && options.length === 0;
-
+  const [value, setValue] = useState([]);
   useEffect(() => {
     let active = true;
 
@@ -46,6 +47,7 @@ export default function FriendList(props) {
 
   return (
     <Autocomplete
+      fullWidth={true}
       limitTags={2}
       multiple
       size="small"
@@ -58,15 +60,20 @@ export default function FriendList(props) {
         setOpen(false);
       }}
       onChange={(e, value) => {
+        setValue(value);
         props.users(value);
       }}
-      ChipProps={{ variant: "outlined" }}
+      value={value}
       options={options}
       loading={loading}
       disableCloseOnSelect
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       getOptionLabel={(option) => option.firstName + " " + option.lastName}
       renderOption={(props, option, { selected }) => (
-        <li {...props}>
+        <li
+          {...props}
+          key={option.id}
+        >
           <Checkbox
             size="small"
             name="checkboxes-tags"
@@ -83,6 +90,30 @@ export default function FriendList(props) {
           {option.firstName} {option.lastName}
         </li>
       )}
+      renderTags={(option, getTagProps) => {
+        const numTags = option.length;
+        const limitTags = 2;
+        return (
+          <>
+            {option.slice(0, limitTags).map((option, index) => (
+              <Chip
+                avatar={
+                  <Avatar
+                    alt={option.firstName}
+                    src={option.picture}
+                  />
+                }
+                variant="outlined"
+                {...getTagProps({ index })}
+                key={index}
+                label={option.firstName + " " + option.lastName}
+              />
+            ))}
+
+            {numTags > limitTags && ` +${numTags - limitTags}`}
+          </>
+        );
+      }}
       renderInput={(params) => (
         <TextField
           {...params}
