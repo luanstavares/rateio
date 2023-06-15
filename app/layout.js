@@ -1,5 +1,4 @@
-import Head from "next/head";
-
+"use client";
 import "../styles/globals.scss";
 import {
   createTheme,
@@ -10,7 +9,7 @@ import {
 
 import Layout from "../components/Layouts/MainLayout";
 
-function MyApp({ Component, pageProps }) {
+export default function RootLayout({ children }) {
   let theme = createTheme({
     palette: {
       mode: "dark",
@@ -21,7 +20,11 @@ function MyApp({ Component, pageProps }) {
       secondary: {
         main: "#ffcc80",
       },
+      background: {
+        default: "rgb(13, 13, 13)",
+      },
     },
+
     typography: {
       fontFamily: `Signika Negative`,
       fontSize: 14,
@@ -56,6 +59,13 @@ function MyApp({ Component, pageProps }) {
       caption2: { fontSize: 10 },
     },
     components: {
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            background: "rgba(13, 13, 13,0.97)",
+          },
+        },
+      },
       MuiTypography: {
         defaultProps: {
           variantMapping: {
@@ -70,23 +80,15 @@ function MyApp({ Component, pageProps }) {
   theme = responsiveFontSizes(theme);
 
   return (
-    <>
-      <Head>
-        <title>rate.io</title>
-        <link
-          rel="icon"
-          href="/favicon.svg"
-        />
-      </Head>
+    <html>
       <ThemeProvider theme={theme}>
-        <Layout>
-          <CssBaseline />
-
-          <Component {...pageProps} />
-        </Layout>
+        <body suppressHydrationWarning={true}>
+          <Layout>
+            <CssBaseline />
+            {children}
+          </Layout>
+        </body>
       </ThemeProvider>
-    </>
+    </html>
   );
 }
-
-export default MyApp;

@@ -1,11 +1,12 @@
+"use client";
 import React, { useState } from "react";
 
 // Material UI Components
 import { Grid, Paper, TextField, Typography, Box, Button } from "@mui/material";
-import Logo from "../components/Logo/Logo";
+import Logo from "../../components/Logo/Logo";
 
 // Local components
-import FriendList from "../components/FriendList/FriendList";
+import FriendList from "../../components/FriendList/FriendList";
 
 const content = {
   title: "Criando",
@@ -54,9 +55,7 @@ export default function NewRateio() {
       </Typography>
 
       <Paper
-        sx={{
-          minWidth: "50rem",
-        }}
+        sx={{ minWidth: "600px" }}
         variant="outlined"
       >
         <Grid

@@ -1,7 +1,9 @@
+"use client";
 import React from "react";
 
-// Material UI Components
+import Link from "next/link";
 
+// Material UI Components
 import {
   Grid,
   Button,
@@ -13,8 +15,7 @@ import {
 
 // Local Components
 import Logo from "../components/Logo/Logo";
-import Illustration from "../components/Illustration/Illustration";
-import HomeIcons from "../components/HomeIcons/HomeIcons";
+import Drawings from "../components/Drawings/Drawings";
 
 // Icons
 import { ArrowRight, UsersThree } from "phosphor-react";
@@ -36,6 +37,13 @@ const mainContent = {
   ],
 };
 
+// Metadata
+const metadata = {
+  title: "Rate.io",
+  description: "O app que te ajuda a dividir a conta entre amigos.",
+  author: "Luan Tavares",
+};
+
 export default function Home() {
   const { title, subtitle, options } = mainContent;
   const theme = useTheme();
@@ -47,12 +55,8 @@ export default function Home() {
 
   return (
     <>
-      <Illustration
-        size={isXl ? "600" : isLg ? "500" : isMd ? "400" : isSm ? "350" : "0"}
-      />
-      <HomeIcons
-        size={isXl ? "350" : isLg ? "300" : isMd ? "300" : isSm ? "225" : "0"}
-      />
+      <Drawings />
+
       <Grid item>
         <Box textAlign="center">
           <Grid
@@ -95,16 +99,17 @@ export default function Home() {
                   key={option.title}
                   item
                 >
-                  <Button
-                    key={option.title}
-                    color="primary"
-                    variant="contained"
-                    size="medium"
-                    startIcon={option.icon}
-                    href="/new-rateio"
-                  >
-                    {option.title}
-                  </Button>
+                  <Link href="/new-rateio">
+                    <Button
+                      key={option.title}
+                      color="primary"
+                      variant="contained"
+                      size="medium"
+                      startIcon={option.icon}
+                    >
+                      {option.title}
+                    </Button>
+                  </Link>
                 </Grid>
               );
             } else {
@@ -117,15 +122,16 @@ export default function Home() {
                     <Typography variant="subtitle1">ou</Typography>
                   </Grid>
                   <Grid item>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      size="medium"
-                      endIcon={option.icon}
-                      onClick={() => window.alert("entrar em rateio existente")}
-                    >
-                      {option.title}
-                    </Button>
+                    <Link href="/new-rateio">
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        size="medium"
+                        endIcon={option.icon}
+                      >
+                        {option.title}
+                      </Button>
+                    </Link>
                   </Grid>
                 </React.Fragment>
               );
