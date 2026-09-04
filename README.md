@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a [Next.js](https://nextjs.org/) homepage for Rate.io, styled with Tailwind CSS 4 and shadcn/ui.
 
 ## Getting Started
 
@@ -10,13 +10,35 @@ npm run dev
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the homepage.
 
 You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## API integration
+
+The typed client is generated from the NestJS API OpenAPI document. Start the
+API on its default port in one terminal, then regenerate the client from the
+web app directory:
+
+```bash
+# rateio-api-latest-nestjs
+npm run start:dev
+
+# rateio-web-app
+npm run api:generate
+```
+
+Set `OPENAPI_SOURCE` when the API document is not at the local default:
+
+```bash
+OPENAPI_SOURCE=https://api.example.com/openapi.json npm run api:generate
+```
+
+`NEXT_PUBLIC_API_BASE_URL` controls runtime requests and defaults to
+`http://localhost:3000`. It is separate from `OPENAPI_SOURCE`, which is only
+used while generating `lib/api/generated/`. Generated files are disposable and
+must not be edited manually.
 
 ## Learn More
 

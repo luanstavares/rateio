@@ -1,0 +1,59 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Signika+Negative:wght@300;400;500;600;700&display=swap");
+@import "tailwindcss";
+
+:root {
+  --background: #0d0d0d;
+  --foreground: #eaeaea;
+  --card: rgba(13, 13, 13, 0.97);
+  --card-foreground: #eaeaea;
+  --primary: #ffad33;
+  --primary-foreground: #000000;
+  --secondary: #ffcc80;
+  --secondary-foreground: #000000;
+  --muted: #2e2e2e;
+  --muted-foreground: #bebebe;
+  --border: #585858;
+  --input: #585858;
+  --ring: #ffad33;
+  --radius: 0.25rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: "Signika Negative", sans-serif;
+  --font-logo: "Pacifico", cursive;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Signika Negative", sans-serif;
+}
+
+body:hover {
+  cursor: default;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
