@@ -1,4 +1,4 @@
-import { ArrowRight, UsersThree } from "phosphor-react";
+import { ArrowRightIcon, UsersThreeIcon } from "@phosphor-icons/react";
 
 export const mainContent = () => {
   return {
@@ -10,13 +10,13 @@ export const mainContent = () => {
         title: "Novo Rateio",
         subtitle: "Crie um novo rateio e convide seus amigos.",
         href: "/rateios/novo",
-        icon: <UsersThree />,
+        icon: <UsersThreeIcon />,
       },
       {
         title: "Entrar em rateio existente",
         subtitle: "Entre em um rateio já existente.",
         href: "/rateios/entrar",
-        icon: <ArrowRight />,
+        icon: <ArrowRightIcon />,
       },
     ],
   };

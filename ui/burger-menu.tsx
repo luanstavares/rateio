@@ -1,6 +1,6 @@
 "use client";
 
-import { List } from "phosphor-react";
+import { ListIcon } from "@phosphor-icons/react";
 
 import DrawerMenu from "./drawer-menu";
 import MenuList from "./menu-list";
@@ -10,7 +10,7 @@ export default function BurgerMenu() {
     <DrawerMenu
       anchor="left"
       content={<MenuList />}
-      icon={<List aria-hidden="true" />}
+      icon={<ListIcon aria-hidden="true" />}
     />
   );
 }
