@@ -1,4 +1,5 @@
-// Icons
+"use client";
+
 import { List } from "phosphor-react";
 
 import DrawerMenu from "./drawer-menu";

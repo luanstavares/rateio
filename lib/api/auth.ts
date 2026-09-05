@@ -61,6 +61,7 @@ export function getAuthenticatedApiUser(
 ): Promise<ApiResult<AuthenticatedUser>> {
   return authControllerMe({
     client: createServerApiClient(accessToken),
+    cache: 'no-store',
   }).then((result) => {
     const normalized = normalizeApiResult<AuthenticatedUserDto>(result);
     if ('error' in normalized) return normalized;

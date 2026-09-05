@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import {
@@ -21,13 +22,13 @@ export async function getAccessToken(): Promise<string | null> {
   return (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value ?? null;
 }
 
-export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
+export const getCurrentUser = cache(async (): Promise<AuthenticatedUser | null> => {
   const accessToken = await getAccessToken();
   if (!accessToken) return null;
 
   const result = await getAuthenticatedApiUser(accessToken);
   return 'data' in result ? (result.data ?? null) : null;
-}
+});
 
 export async function rotateSession(): Promise<NextResponse> {
   const response = NextResponse.json({ success: false }, { status: 401 });

@@ -9,6 +9,9 @@ export function createServerApiClient(accessToken?: string): Client {
     baseUrl: getApiBaseUrl(),
     responseStyle: 'fields',
     throwOnError: false,
-    ...(accessToken === undefined ? {} : { auth: accessToken }),
+    // SDK auth injection is disabled; this server-only boundary owns the header.
+    ...(accessToken === undefined
+      ? {}
+      : { headers: { Authorization: `Bearer ${accessToken}` } }),
   });
 }
