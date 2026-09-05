@@ -21,6 +21,7 @@ import { formatMinorAmount } from "../../../lib/format";
 import { Button } from "../../../ui/components/ui/button";
 import ClearAnonymousSession from "../../../ui/clear-anonymous-session";
 import RateioShareLinkDrawer from "../../../ui/rateio-share-link-drawer";
+import RateioMemberManagementDrawer from "../../../ui/rateio-member-management-drawer";
 import ManualExpenseDrawer, {
   type ExpenseMemberOption,
 } from "../../../ui/manual-expense-drawer";
@@ -299,6 +300,9 @@ export default async function RateioDetailPage({
   const rateio = result.data;
   const description = descriptionText(rateio.description);
   const isOwner = currentUser?.sub === rateio.ownerId;
+  const currentMembership = rateio.members.find(
+    (member) => member.userId === currentUser?.sub,
+  );
   const isActive = rateio.status === "ACTIVE";
 
   return (
@@ -368,6 +372,14 @@ export default async function RateioDetailPage({
             <RateioStatusControl rateioId={rateio.id} status={rateio.status} />
             <RateioShareLinkDrawer rateioId={rateio.id} />
           </>
+        ) : null}
+        {currentMembership ? (
+          <RateioMemberManagementDrawer
+            currentMemberId={currentMembership.id}
+            currentRole={currentMembership.role}
+            members={rateio.members}
+            rateioId={rateio.id}
+          />
         ) : null}
       </div>
 

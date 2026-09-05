@@ -7,14 +7,21 @@ import {
   rateiosControllerCreate,
   rateiosControllerCreateShareLink,
   rateiosControllerGet,
+  rateiosControllerInvite,
   rateiosControllerList,
   rateiosControllerListShareLinks,
+  rateiosControllerRemoveMember,
   rateiosControllerRevokeShareLink,
+  rateiosControllerRole,
   type AnonymousJoinDto,
   type AnonymousJoinResponseDto,
   type AnonymousSessionResponseDto,
   type ChangeRateioStatusDto,
+  type ChangeMemberRoleDto,
   type CreateRateioDto,
+  type InvitationResponseDto,
+  type InviteMemberDto,
+  type MemberResponseDto,
   type RateioDetailResponseDto,
   type RateioListResponseDto,
   type RateioResponseDto,
@@ -29,6 +36,8 @@ export type CreateRateioInput = CreateRateioDto;
 export type ListRateiosQuery = RateiosControllerListData["query"];
 export type RateioStatus = ChangeRateioStatusDto["status"];
 export type AnonymousJoinInput = AnonymousJoinDto;
+export type MembershipRole = ChangeMemberRoleDto["role"];
+export type InviteMemberInput = InviteMemberDto;
 
 export function createApiRateio(
   accessToken: string,
@@ -122,4 +131,40 @@ export function getApiAnonymousRateio(
     client: createServerApiClient(sessionToken),
     path: { id: rateioId },
   }).then((result) => normalizeApiResult<AnonymousSessionResponseDto>(result));
+}
+
+export function inviteApiRateioMember(
+  accessToken: string,
+  rateioId: string,
+  input: InviteMemberInput,
+): Promise<ApiResult<InvitationResponseDto>> {
+  return rateiosControllerInvite({
+    client: createServerApiClient(accessToken),
+    path: { id: rateioId },
+    body: input,
+  }).then((result) => normalizeApiResult<InvitationResponseDto>(result));
+}
+
+export function changeApiRateioMemberRole(
+  accessToken: string,
+  rateioId: string,
+  memberId: string,
+  role: MembershipRole,
+): Promise<ApiResult<MemberResponseDto>> {
+  return rateiosControllerRole({
+    client: createServerApiClient(accessToken),
+    path: { id: rateioId, memberId },
+    body: { role },
+  }).then((result) => normalizeApiResult<MemberResponseDto>(result));
+}
+
+export function removeApiRateioMember(
+  accessToken: string,
+  rateioId: string,
+  memberId: string,
+): Promise<ApiResult<MemberResponseDto>> {
+  return rateiosControllerRemoveMember({
+    client: createServerApiClient(accessToken),
+    path: { id: rateioId, memberId },
+  }).then((result) => normalizeApiResult<MemberResponseDto>(result));
 }
