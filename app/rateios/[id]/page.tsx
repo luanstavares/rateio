@@ -12,6 +12,9 @@ import { formatMinorAmount } from "../../../lib/format";
 import { Button } from "../../../ui/components/ui/button";
 import ClearAnonymousSession from "../../../ui/clear-anonymous-session";
 import RateioShareLinkDrawer from "../../../ui/rateio-share-link-drawer";
+import RateioSessionLayout, {
+  type RateioSessionItem,
+} from "../../../ui/rateio-session-layout";
 import RateioStatusControl from "../../../ui/rateio-status-control";
 
 type RateioDetailPageProps = {
@@ -40,6 +43,22 @@ function statusClassName(status: RateioDetailResponseDto["status"]): string {
   return status === "ACTIVE"
     ? "border-primary/50 text-primary"
     : "border-muted-foreground/50 text-muted-foreground";
+}
+
+function sessionItemsForRateio(
+  rateio: RateioDetailResponseDto,
+): RateioSessionItem[] {
+  return rateio.expenses.flatMap((expense) =>
+    expense.items.map((item) => {
+      const payerName = expense.payerMember?.user?.name;
+      return {
+        id: item.id,
+        name: item.name,
+        amountMinor: String(item.baseAmountMinor),
+        payerName: typeof payerName === "string" ? payerName : null,
+      };
+    }),
+  );
 }
 
 function AnonymousSessionView({
@@ -89,27 +108,11 @@ function AnonymousSessionView({
         ) : null}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <section className="rounded-lg border border-dashed border-border p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-            Próxima etapa
-          </p>
-          <h2 className="mt-3 text-xl font-semibold">Itens e despesas</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            A lista de itens e o lançamento de despesas entram em uma próxima
-            feature.
-          </p>
-        </section>
-        <section className="rounded-lg border border-dashed border-border p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-            Divisão e acertos
-          </p>
-          <p className="mt-3 text-sm text-muted-foreground">
-            O cálculo de saldos e a divisão das dívidas serão adicionados em uma
-            próxima feature.
-          </p>
-        </section>
-      </div>
+      <RateioSessionLayout
+        baseCurrency={rateio.baseCurrency}
+        items={[]}
+        totalAmountMinor={null}
+      />
     </section>
   );
 }
@@ -259,28 +262,12 @@ export default async function RateioDetailPage({
         ) : null}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <section className="rounded-lg border border-dashed border-border p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-            Próxima etapa
-          </p>
-          <h2 className="mt-3 text-xl font-semibold">Itens e despesas</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            A lista de itens e o lançamento de despesas entram em uma próxima
-            feature.
-          </p>
-        </section>
-        <section className="rounded-lg border border-dashed border-border p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-            Próxima etapa
-          </p>
-          <h2 className="mt-3 text-xl font-semibold">Divisão e acertos</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            O cálculo de saldos e a divisão das dívidas serão adicionados em uma
-            próxima feature.
-          </p>
-        </section>
-      </div>
+      <RateioSessionLayout
+        baseCurrency={rateio.baseCurrency}
+        items={sessionItemsForRateio(rateio)}
+        participantCount={rateio.members.length}
+        totalAmountMinor={rateio.totalAmountMinor}
+      />
     </section>
   );
 }
