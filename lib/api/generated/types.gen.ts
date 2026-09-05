@@ -501,6 +501,10 @@ export type AnonymousExpenseResponseDto = {
 
 export type AnonymousExpenseSessionResponseDto = {
     members: Array<AnonymousExpenseMemberResponseDto>;
+    /**
+     * Total of active expenses in base-currency minor units.
+     */
+    totalAmountMinor: string;
     expenses: Array<AnonymousExpenseResponseDto>;
 };
 
@@ -571,6 +575,15 @@ export type PaymentResponseDto = {
     } | null;
     createdAt: string;
     updatedAt: string;
+};
+
+export type AnonymousBalanceResponseDto = {
+    memberId: string;
+    displayName: string;
+    /**
+     * Positive means the member should receive money.
+     */
+    balanceMinor: string;
 };
 
 export type ProviderWebhookDto = {
@@ -2295,6 +2308,56 @@ export type SettlementsControllerManualCompleteResponses = {
 };
 
 export type SettlementsControllerManualCompleteResponse = SettlementsControllerManualCompleteResponses[keyof SettlementsControllerManualCompleteResponses];
+
+export type AnonymousSettlementsControllerBalancesData = {
+    body?: never;
+    path: {
+        /**
+         * Rateio identifier
+         */
+        rateioId: string;
+    };
+    query?: never;
+    url: '/anonymous/rateios/{rateioId}/balances';
+};
+
+export type AnonymousSettlementsControllerBalancesErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type AnonymousSettlementsControllerBalancesError = AnonymousSettlementsControllerBalancesErrors[keyof AnonymousSettlementsControllerBalancesErrors];
+
+export type AnonymousSettlementsControllerBalancesResponses = {
+    /**
+     * Safe member balances.
+     */
+    200: Array<AnonymousBalanceResponseDto>;
+};
+
+export type AnonymousSettlementsControllerBalancesResponse = AnonymousSettlementsControllerBalancesResponses[keyof AnonymousSettlementsControllerBalancesResponses];
 
 export type PaymentsControllerWebhookData = {
     body: ProviderWebhookDto;

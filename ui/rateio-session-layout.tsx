@@ -7,9 +7,17 @@ export interface RateioSessionItem {
   payerName: string | null;
 }
 
+export interface RateioSessionBalance {
+  memberId: string;
+  displayName: string;
+  balanceMinor: string;
+}
+
 export interface RateioSessionLayoutProps {
   items: RateioSessionItem[];
   totalAmountMinor: string | null;
+  balances: RateioSessionBalance[];
+  balancesError?: boolean;
   participantCount?: number;
   baseCurrency: string;
 }
@@ -70,8 +78,13 @@ function SessionItems({
 
 function RateioBreakdown({
   totalAmountMinor,
+  balances,
+  balancesError,
   participantCount,
-}: Pick<RateioSessionLayoutProps, "totalAmountMinor" | "participantCount">) {
+}: Pick<
+  RateioSessionLayoutProps,
+  "totalAmountMinor" | "balances" | "balancesError" | "participantCount"
+>) {
   return (
     <section
       aria-labelledby="rateio-breakdown-heading"
@@ -100,12 +113,48 @@ function RateioBreakdown({
         </div>
       ) : null}
 
-      <div className="mt-3 rounded-md border border-dashed border-border p-4">
+      <div className="mt-3 rounded-md border border-border p-4">
         <p className="font-medium">Divisão e acertos</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          O detalhamento de quem deve pagar ou receber será calculado em uma
-          próxima etapa.
-        </p>
+        {balancesError ? (
+          <p className="mt-2 text-sm text-muted-foreground" role="alert">
+            Não foi possível calcular os saldos agora.
+          </p>
+        ) : balances.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            Nenhum saldo calculado ainda.
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-3" aria-label="Saldos dos participantes">
+            {balances.map((balance) => {
+              const isCredit =
+                !balance.balanceMinor.startsWith("-") &&
+                balance.balanceMinor !== "0";
+              const isSettled = balance.balanceMinor === "0";
+              return (
+                <li
+                  className="flex items-center justify-between gap-4"
+                  key={balance.memberId}
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">
+                      {balance.displayName}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {isSettled ? "Acertado" : isCredit ? "Recebe" : "Deve"}
+                    </p>
+                  </div>
+                  <span className="shrink-0 font-semibold">
+                    {formatMinorAmount(
+                      balance.balanceMinor.startsWith("-")
+                        ? balance.balanceMinor.slice(1)
+                        : balance.balanceMinor,
+                    )}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
     </section>
   );
@@ -114,6 +163,8 @@ function RateioBreakdown({
 export default function RateioSessionLayout({
   items,
   totalAmountMinor,
+  balances,
+  balancesError,
   participantCount,
   baseCurrency,
 }: RateioSessionLayoutProps) {
@@ -121,6 +172,8 @@ export default function RateioSessionLayout({
     <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)]">
       <SessionItems baseCurrency={baseCurrency} items={items} />
       <RateioBreakdown
+        balances={balances}
+        balancesError={balancesError}
         participantCount={participantCount}
         totalAmountMinor={totalAmountMinor}
       />

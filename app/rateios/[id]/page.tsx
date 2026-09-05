@@ -2,6 +2,10 @@ import Link from "next/link";
 
 import { listApiAnonymousExpenses } from "../../../lib/api/expenses";
 import { getApiAnonymousRateio, getApiRateio } from "../../../lib/api/rateios";
+import {
+  listApiAnonymousBalances,
+  listApiBalances,
+} from "../../../lib/api/settlements";
 import type {
   AnonymousExpenseSessionResponseDto,
   RateioDetailResponseDto,
@@ -21,6 +25,7 @@ import ManualExpenseDrawer, {
   type ExpenseMemberOption,
 } from "../../../ui/manual-expense-drawer";
 import RateioSessionLayout, {
+  type RateioSessionBalance,
   type RateioSessionItem,
 } from "../../../ui/rateio-session-layout";
 import RateioStatusControl from "../../../ui/rateio-status-control";
@@ -83,17 +88,6 @@ function expenseMembersForRateio(
   }));
 }
 
-function totalForAnonymousSession(
-  session: AnonymousExpenseSessionResponseDto,
-): string {
-  return String(
-    session.expenses.reduce(
-      (total, expense) => total + BigInt(expense.baseAmountMinor),
-      BigInt(0),
-    ),
-  );
-}
-
 function sessionItemsForAnonymousRateio(
   session: AnonymousExpenseSessionResponseDto,
 ): RateioSessionItem[] {
@@ -114,6 +108,8 @@ function AnonymousSessionView({
   participant,
   rateio,
   expenseSession,
+  balances,
+  balancesError,
 }: {
   participant: { displayName: string };
   rateio: {
@@ -124,6 +120,8 @@ function AnonymousSessionView({
     baseCurrency: string;
   };
   expenseSession: AnonymousExpenseSessionResponseDto;
+  balances: RateioSessionBalance[];
+  balancesError: boolean;
 }) {
   const description = descriptionText(rateio.description);
   const isActive = rateio.status === "ACTIVE";
@@ -162,9 +160,11 @@ function AnonymousSessionView({
 
       <RateioSessionLayout
         baseCurrency={rateio.baseCurrency}
+        balances={balances}
+        balancesError={balancesError}
         items={sessionItemsForAnonymousRateio(expenseSession)}
         participantCount={expenseSession.members.length}
-        totalAmountMinor={totalForAnonymousSession(expenseSession)}
+        totalAmountMinor={expenseSession.totalAmountMinor}
       />
       <div className="mt-6 flex justify-end">
         <ManualExpenseDrawer
@@ -187,17 +187,26 @@ export default async function RateioDetailPage({
   const accessToken = await getAccessToken();
   const anonymousSessionToken = await getAnonymousSessionToken();
   const { id } = await params;
-  const [currentUser, result] = accessToken
-    ? await Promise.all([getCurrentUser(), getApiRateio(accessToken, id)])
-    : [null, null];
+  const [currentUser, result, balancesResult] = accessToken
+    ? await Promise.all([
+        getCurrentUser(),
+        getApiRateio(accessToken, id),
+        listApiBalances(accessToken, id),
+      ])
+    : [null, null, null];
   const anonymousResult =
     !accessToken && anonymousSessionToken
       ? await getApiAnonymousRateio(anonymousSessionToken, id)
       : null;
-  const anonymousExpensesResult =
+  const anonymousSessionData =
     !accessToken && anonymousSessionToken && anonymousResult?.data
-      ? await listApiAnonymousExpenses(anonymousSessionToken, id)
+      ? await Promise.all([
+          listApiAnonymousExpenses(anonymousSessionToken, id),
+          listApiAnonymousBalances(anonymousSessionToken, id),
+        ])
       : null;
+  const anonymousExpensesResult = anonymousSessionData?.[0] ?? null;
+  const anonymousBalancesResult = anonymousSessionData?.[1] ?? null;
 
   if (!accessToken && anonymousResult?.data) {
     const fallbackSession: AnonymousExpenseSessionResponseDto = {
@@ -210,12 +219,21 @@ export default async function RateioDetailPage({
           joinedAt: anonymousResult.data.participant.joinedAt,
         },
       ],
+      totalAmountMinor: "0",
       expenses: [],
     };
     return (
       <AnonymousSessionView
         {...anonymousResult.data}
         expenseSession={anonymousExpensesResult?.data ?? fallbackSession}
+        balances={
+          anonymousBalancesResult?.data?.map((balance) => ({
+            memberId: balance.memberId,
+            displayName: balance.displayName,
+            balanceMinor: balance.balanceMinor,
+          })) ?? []
+        }
+        balancesError={anonymousBalancesResult?.error !== undefined}
       />
     );
   }
@@ -349,6 +367,14 @@ export default async function RateioDetailPage({
 
       <RateioSessionLayout
         baseCurrency={rateio.baseCurrency}
+        balances={
+          balancesResult?.data?.map((balance) => ({
+            memberId: balance.memberId,
+            displayName: balance.name,
+            balanceMinor: balance.balanceMinor,
+          })) ?? []
+        }
+        balancesError={balancesResult?.error !== undefined}
         items={sessionItemsForRateio(rateio)}
         participantCount={rateio.members.length}
         totalAmountMinor={rateio.totalAmountMinor}
