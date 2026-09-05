@@ -7,6 +7,7 @@
   --card: rgba(13, 13, 13, 0.97);
   --card-foreground: #eaeaea;
   --primary: #ffad33;
+  --primary-hover: #e88b00;
   --primary-foreground: #000000;
   --secondary: #ffcc80;
   --secondary-foreground: #000000;
@@ -24,6 +25,7 @@
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -54,7 +56,6 @@ body:hover {
 }
 
 a {
-  color: inherit;
   text-decoration: none;
 }
 

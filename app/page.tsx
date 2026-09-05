@@ -18,7 +18,7 @@ export default function Home() {
         <section className="relative isolate flex min-h-[calc(100dvh-6.25rem)] w-full items-center overflow-hidden px-6 py-10 sm:px-10 lg:px-16">
             <Drawings />
 
-            <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center text-center lg:mr-[12vw] lg:max-w-xl">
+            <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center text-center lg:max-w-xl">
                 <div className="flex flex-col items-center gap-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">
                         Divida com clareza
