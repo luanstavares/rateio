@@ -1,12 +1,15 @@
-import { Button } from "./components/ui/button";
-
 // Icons
 import { List } from "phosphor-react";
 
+import DrawerMenu from "./drawer-menu";
+import MenuList from "./menu-list";
+
 export default function BurgerMenu() {
   return (
-    <Button aria-label="Abrir menu" size="icon" variant="ghost" type="button">
-      <List />
-    </Button>
+    <DrawerMenu
+      anchor="left"
+      content={<MenuList />}
+      icon={<List aria-hidden="true" />}
+    />
   );
 }

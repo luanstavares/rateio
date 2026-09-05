@@ -5,11 +5,9 @@ import type { ReactNode } from "react";
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
-    <>
+    <div className="min-h-dvh overflow-x-hidden">
       <Navbar />
-      <main className="flex h-[calc(100dvh-100px)] flex-col items-center justify-center overflow-hidden">
-        {children}
-      </main>
-    </>
+      <main className="min-h-[calc(100dvh-6.25rem)]">{children}</main>
+    </div>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
+
 import React from "react";
+import Link from "next/link";
 
 import { Button } from "../ui/components/ui/button";
 
@@ -13,45 +15,54 @@ export default function Home() {
     const { title, subtitle, options } = mainContent();
 
     return (
-        <>
+        <section className="relative isolate flex min-h-[calc(100dvh-6.25rem)] w-full items-center overflow-hidden px-6 py-10 sm:px-10 lg:px-16">
             <Drawings />
 
-            <div className="text-center">
-                <div className="flex flex-col items-center justify-center gap-2">
-                    <h1 className="text-[39px] font-bold leading-tight sm:text-[49px]">
+            <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center text-center lg:mr-[12vw] lg:max-w-xl">
+                <div className="flex flex-col items-center gap-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">
+                        Divida com clareza
+                    </p>
+                    <h1 className="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
                         {title}{" "}
                         <Logo
                             size="small"
-                            className="sm:text-[50px]"
+                            className="text-4xl sm:text-5xl md:text-6xl"
                         />
                     </h1>
-                    <p className="text-sm sm:text-base">{subtitle}</p>
+                    <p className="max-w-md text-sm text-muted-foreground sm:text-base">
+                        {subtitle}
+                    </p>
                 </div>
-            </div>
 
-            <div className="mt-16">
-                <div className="flex flex-col items-center justify-center gap-4">
+                <div className="mt-12 flex w-full flex-col items-center justify-center gap-4">
                     {options.map((option, index) => {
                         if (index === 0) {
                             return (
                                 <Button
+                                    asChild
                                     key={option.title}
-                                    type="button"
+                                    className="min-w-44"
                                 >
-                                    {option.icon}
-                                    {option.title}
+                                    <Link href={option.href}>
+                                        {option.icon}
+                                        {option.title}
+                                    </Link>
                                 </Button>
                             );
                         } else {
                             return (
                                 <React.Fragment key={option.title}>
-                                    <span className="text-base">ou</span>
+                                    <span className="text-sm text-muted-foreground">ou</span>
                                     <Button
-                                        type="button"
+                                        asChild
+                                        className="min-w-60"
                                         variant="outline"
                                     >
-                                        {option.title}
-                                        {option.icon}
+                                        <Link href={option.href}>
+                                            {option.title}
+                                            {option.icon}
+                                        </Link>
                                     </Button>
                                 </React.Fragment>
                             );
@@ -59,6 +70,6 @@ export default function Home() {
                     })}
                 </div>
             </div>
-        </>
+        </section>
     );
 }

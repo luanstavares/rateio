@@ -9,11 +9,13 @@ export const mainContent = () => {
       {
         title: "Novo Rateio",
         subtitle: "Crie um novo rateio e convide seus amigos.",
+        href: "/rateios/novo",
         icon: <UsersThree />,
       },
       {
-        title: "Entrar em um rateio existente",
+        title: "Entrar em rateio existente",
         subtitle: "Entre em um rateio já existente.",
+        href: "/rateios/entrar",
         icon: <ArrowRight />,
       },
     ],

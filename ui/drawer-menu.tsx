@@ -4,11 +4,12 @@ import type { ReactNode } from "react";
 
 import { Button } from "./components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "./components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+} from "./components/ui/drawer";
 
 type DrawerMenuProps = {
   anchor: "left" | "right";
@@ -20,8 +21,12 @@ export default function DrawerMenu({ anchor, content, icon }: DrawerMenuProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
+    <Drawer
+      direction={anchor}
+      open={open}
+      onOpenChange={setOpen}
+    >
+      <DrawerTrigger asChild>
         <Button
           aria-label={anchor === "left" ? "Abrir menu" : "Abrir usuário"}
           size="icon"
@@ -29,20 +34,24 @@ export default function DrawerMenu({ anchor, content, icon }: DrawerMenuProps) {
         >
           {icon}
         </Button>
-      </SheetTrigger>
-      <SheetContent side={anchor} className="p-0">
-        <SheetTitle className="sr-only">
+      </DrawerTrigger>
+      <DrawerContent className="p-0">
+        <DrawerTitle className="sr-only">
           {anchor === "left" ? "Menu" : "Usuário"}
-        </SheetTitle>
+        </DrawerTitle>
+        <DrawerDescription className="sr-only">
+          {anchor === "left"
+            ? "Navegação principal do Rate.io"
+            : "Opções da conta do Rate.io"}
+        </DrawerDescription>
         <div
-          className="mt-[10px] w-[250px]"
+          className="min-h-full w-full p-6"
           role="presentation"
           onClick={() => setOpen(false)}
-          onKeyDown={() => setOpen(false)}
         >
           {content}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }

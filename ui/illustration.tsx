@@ -6,7 +6,7 @@ export default function Illustration({
   className,
 }: { size?: string } & Pick<SVGProps<SVGSVGElement>, "className">) {
   return (
-    <div className="absolute bottom-0 left-0 z-[-1]">
+    <div className="absolute bottom-0 left-0 z-0">
       <svg
         width={size}
         height={size}
