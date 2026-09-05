@@ -176,6 +176,7 @@ export type ActivityEventResponseDto = {
 };
 
 export type RateioDetailResponseDto = {
+    status: 'ACTIVE' | 'CLOSED';
     id: string;
     ownerId: string;
     title: string;
@@ -193,12 +194,17 @@ export type RateioDetailResponseDto = {
     deletedAt?: {
         [key: string]: unknown;
     } | null;
+    /**
+     * Sum of active item amounts in base-currency minor units, serialized without precision loss.
+     */
+    totalAmountMinor: string;
     members: Array<RateioMemberResponseDto>;
     expenses: Array<ExpenseResponseDto>;
     activityEvents: Array<ActivityEventResponseDto>;
 };
 
 export type RateioListItemResponseDto = {
+    status: 'ACTIVE' | 'CLOSED';
     id: string;
     ownerId: string;
     title: string;
@@ -216,6 +222,10 @@ export type RateioListItemResponseDto = {
     deletedAt?: {
         [key: string]: unknown;
     } | null;
+    /**
+     * Sum of active item amounts in base-currency minor units, serialized without precision loss.
+     */
+    totalAmountMinor: string;
     members: Array<RateioMemberResponseDto>;
 };
 
@@ -235,6 +245,7 @@ export type UpdateRateioDto = {
 };
 
 export type RateioResponseDto = {
+    status: 'ACTIVE' | 'CLOSED';
     id: string;
     ownerId: string;
     title: string;
@@ -252,6 +263,10 @@ export type RateioResponseDto = {
     deletedAt?: {
         [key: string]: unknown;
     } | null;
+};
+
+export type ChangeRateioStatusDto = {
+    status: 'ACTIVE' | 'CLOSED';
 };
 
 export type InviteMemberDto = {
@@ -1035,6 +1050,56 @@ export type RateiosControllerUpdateResponses = {
 };
 
 export type RateiosControllerUpdateResponse = RateiosControllerUpdateResponses[keyof RateiosControllerUpdateResponses];
+
+export type RateiosControllerChangeStatusData = {
+    body: ChangeRateioStatusDto;
+    path: {
+        /**
+         * Rateio identifier
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/rateios/{id}/status';
+};
+
+export type RateiosControllerChangeStatusErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type RateiosControllerChangeStatusError = RateiosControllerChangeStatusErrors[keyof RateiosControllerChangeStatusErrors];
+
+export type RateiosControllerChangeStatusResponses = {
+    /**
+     * Current rateio.
+     */
+    200: RateioResponseDto;
+};
+
+export type RateiosControllerChangeStatusResponse = RateiosControllerChangeStatusResponses[keyof RateiosControllerChangeStatusResponses];
 
 export type RateiosControllerInviteData = {
     body: InviteMemberDto;

@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthControllerGoogleCallbackData, AuthControllerGoogleCallbackErrors, AuthControllerGoogleCallbackResponses, AuthControllerGoogleLoginData, AuthControllerGoogleLoginErrors, AuthControllerLogoutData, AuthControllerLogoutErrors, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ExpensesControllerCreateData, ExpensesControllerCreateErrors, ExpensesControllerCreateResponses, ExpensesControllerGetData, ExpensesControllerGetErrors, ExpensesControllerGetResponses, ExpensesControllerListData, ExpensesControllerListErrors, ExpensesControllerListResponses, ExpensesControllerReverseData, ExpensesControllerReverseErrors, ExpensesControllerReverseResponses, HealthControllerGetHealthData, HealthControllerGetHealthResponses, NotificationsControllerListData, NotificationsControllerListErrors, NotificationsControllerListResponses, NotificationsControllerReadData, NotificationsControllerReadErrors, NotificationsControllerReadResponses, PaymentsControllerWebhookData, PaymentsControllerWebhookErrors, PaymentsControllerWebhookResponses, RateiosControllerArchiveData, RateiosControllerArchiveErrors, RateiosControllerArchiveResponses, RateiosControllerClaimData, RateiosControllerClaimErrors, RateiosControllerClaimResponses, RateiosControllerCreateData, RateiosControllerCreateErrors, RateiosControllerCreateResponses, RateiosControllerGetData, RateiosControllerGetErrors, RateiosControllerGetResponses, RateiosControllerInviteData, RateiosControllerInviteErrors, RateiosControllerInviteResponses, RateiosControllerListData, RateiosControllerListErrors, RateiosControllerListResponses, RateiosControllerRemoveMemberData, RateiosControllerRemoveMemberErrors, RateiosControllerRemoveMemberResponses, RateiosControllerRoleData, RateiosControllerRoleErrors, RateiosControllerRoleResponses, RateiosControllerUpdateData, RateiosControllerUpdateErrors, RateiosControllerUpdateResponses, SettlementsControllerBalancesData, SettlementsControllerBalancesErrors, SettlementsControllerBalancesResponses, SettlementsControllerCreatePaymentData, SettlementsControllerCreatePaymentErrors, SettlementsControllerCreatePaymentResponses, SettlementsControllerManualCompleteData, SettlementsControllerManualCompleteErrors, SettlementsControllerManualCompleteResponses, SettlementsControllerSuggestionsData, SettlementsControllerSuggestionsErrors, SettlementsControllerSuggestionsResponses, UsersControllerMeData, UsersControllerMeErrors, UsersControllerMeResponses, UsersControllerUpdateData, UsersControllerUpdateErrors, UsersControllerUpdateResponses } from './types.gen';
+import type { AuthControllerGoogleCallbackData, AuthControllerGoogleCallbackErrors, AuthControllerGoogleCallbackResponses, AuthControllerGoogleLoginData, AuthControllerGoogleLoginErrors, AuthControllerLogoutData, AuthControllerLogoutErrors, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ExpensesControllerCreateData, ExpensesControllerCreateErrors, ExpensesControllerCreateResponses, ExpensesControllerGetData, ExpensesControllerGetErrors, ExpensesControllerGetResponses, ExpensesControllerListData, ExpensesControllerListErrors, ExpensesControllerListResponses, ExpensesControllerReverseData, ExpensesControllerReverseErrors, ExpensesControllerReverseResponses, HealthControllerGetHealthData, HealthControllerGetHealthResponses, NotificationsControllerListData, NotificationsControllerListErrors, NotificationsControllerListResponses, NotificationsControllerReadData, NotificationsControllerReadErrors, NotificationsControllerReadResponses, PaymentsControllerWebhookData, PaymentsControllerWebhookErrors, PaymentsControllerWebhookResponses, RateiosControllerArchiveData, RateiosControllerArchiveErrors, RateiosControllerArchiveResponses, RateiosControllerChangeStatusData, RateiosControllerChangeStatusErrors, RateiosControllerChangeStatusResponses, RateiosControllerClaimData, RateiosControllerClaimErrors, RateiosControllerClaimResponses, RateiosControllerCreateData, RateiosControllerCreateErrors, RateiosControllerCreateResponses, RateiosControllerGetData, RateiosControllerGetErrors, RateiosControllerGetResponses, RateiosControllerInviteData, RateiosControllerInviteErrors, RateiosControllerInviteResponses, RateiosControllerListData, RateiosControllerListErrors, RateiosControllerListResponses, RateiosControllerRemoveMemberData, RateiosControllerRemoveMemberErrors, RateiosControllerRemoveMemberResponses, RateiosControllerRoleData, RateiosControllerRoleErrors, RateiosControllerRoleResponses, RateiosControllerUpdateData, RateiosControllerUpdateErrors, RateiosControllerUpdateResponses, SettlementsControllerBalancesData, SettlementsControllerBalancesErrors, SettlementsControllerBalancesResponses, SettlementsControllerCreatePaymentData, SettlementsControllerCreatePaymentErrors, SettlementsControllerCreatePaymentResponses, SettlementsControllerManualCompleteData, SettlementsControllerManualCompleteErrors, SettlementsControllerManualCompleteResponses, SettlementsControllerSuggestionsData, SettlementsControllerSuggestionsErrors, SettlementsControllerSuggestionsResponses, UsersControllerMeData, UsersControllerMeErrors, UsersControllerMeResponses, UsersControllerUpdateData, UsersControllerUpdateErrors, UsersControllerUpdateResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -91,7 +91,7 @@ export const usersControllerUpdate = <ThrowOnError extends boolean = false>(opti
 /**
  * List rateios
  *
- * Lists active rateios where the authenticated user has an active membership.
+ * Lists non-archived active and closed rateios for active memberships, newest first, with exact active-item totals.
  */
 export const rateiosControllerList = <ThrowOnError extends boolean = false>(options?: Options<RateiosControllerListData, ThrowOnError>): RequestResult<RateiosControllerListResponses, RateiosControllerListErrors, ThrowOnError> => (options?.client ?? client).get<RateiosControllerListResponses, RateiosControllerListErrors, ThrowOnError>({ url: '/rateios', ...options });
 
@@ -119,7 +119,7 @@ export const rateiosControllerArchive = <ThrowOnError extends boolean = false>(o
 /**
  * Get a rateio
  *
- * Returns a rateio, active members, expenses, and recent activity events.
+ * Returns an active or closed rateio, its exact active-item total, active members, expenses, and recent activity events.
  */
 export const rateiosControllerGet = <ThrowOnError extends boolean = false>(options: Options<RateiosControllerGetData, ThrowOnError>): RequestResult<RateiosControllerGetResponses, RateiosControllerGetErrors, ThrowOnError> => (options.client ?? client).get<RateiosControllerGetResponses, RateiosControllerGetErrors, ThrowOnError>({ url: '/rateios/{id}', ...options });
 
@@ -130,6 +130,20 @@ export const rateiosControllerGet = <ThrowOnError extends boolean = false>(optio
  */
 export const rateiosControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<RateiosControllerUpdateData, ThrowOnError>): RequestResult<RateiosControllerUpdateResponses, RateiosControllerUpdateErrors, ThrowOnError> => (options.client ?? client).patch<RateiosControllerUpdateResponses, RateiosControllerUpdateErrors, ThrowOnError>({
     url: '/rateios/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Close or reopen a rateio
+ *
+ * Only the active owner may change status. Repeating the current status is a no-op. Closed rateios remain readable but reject expense creation and reversal.
+ */
+export const rateiosControllerChangeStatus = <ThrowOnError extends boolean = false>(options: Options<RateiosControllerChangeStatusData, ThrowOnError>): RequestResult<RateiosControllerChangeStatusResponses, RateiosControllerChangeStatusErrors, ThrowOnError> => (options.client ?? client).patch<RateiosControllerChangeStatusResponses, RateiosControllerChangeStatusErrors, ThrowOnError>({
+    url: '/rateios/{id}/status',
     ...options,
     headers: {
         'Content-Type': 'application/json',

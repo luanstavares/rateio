@@ -9,6 +9,8 @@
   --primary: #ffad33;
   --primary-hover: #e88b00;
   --primary-foreground: #000000;
+  --destructive: #e47d7d;
+  --destructive-foreground: #000000;
   --secondary: #ffcc80;
   --secondary-foreground: #000000;
   --muted: #2e2e2e;
@@ -27,6 +29,8 @@
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
