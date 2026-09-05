@@ -1,7 +1,12 @@
 import Link from "next/link";
 
+import { listApiAnonymousExpenses } from "../../../lib/api/expenses";
 import { getApiAnonymousRateio, getApiRateio } from "../../../lib/api/rateios";
-import type { RateioDetailResponseDto } from "../../../lib/api/generated";
+import type {
+  AnonymousExpenseSessionResponseDto,
+  RateioDetailResponseDto,
+  RateioMemberResponseDto,
+} from "../../../lib/api/generated";
 import type { ApiClientError } from "../../../lib/api/errors";
 import {
   getAccessToken,
@@ -12,6 +17,9 @@ import { formatMinorAmount } from "../../../lib/format";
 import { Button } from "../../../ui/components/ui/button";
 import ClearAnonymousSession from "../../../ui/clear-anonymous-session";
 import RateioShareLinkDrawer from "../../../ui/rateio-share-link-drawer";
+import ManualExpenseDrawer, {
+  type ExpenseMemberOption,
+} from "../../../ui/manual-expense-drawer";
 import RateioSessionLayout, {
   type RateioSessionItem,
 } from "../../../ui/rateio-session-layout";
@@ -61,17 +69,61 @@ function sessionItemsForRateio(
   );
 }
 
+function memberDisplayName(member: RateioMemberResponseDto): string {
+  const name: unknown = member.user?.name;
+  return typeof name === "string" && name.trim() ? name : "Participante";
+}
+
+function expenseMembersForRateio(
+  members: RateioMemberResponseDto[],
+): ExpenseMemberOption[] {
+  return members.map((member) => ({
+    id: member.id,
+    displayName: memberDisplayName(member),
+  }));
+}
+
+function totalForAnonymousSession(
+  session: AnonymousExpenseSessionResponseDto,
+): string {
+  return String(
+    session.expenses.reduce(
+      (total, expense) => total + BigInt(expense.baseAmountMinor),
+      BigInt(0),
+    ),
+  );
+}
+
+function sessionItemsForAnonymousRateio(
+  session: AnonymousExpenseSessionResponseDto,
+): RateioSessionItem[] {
+  const payerNames = new Map(
+    session.members.map((member) => [member.id, member.displayName]),
+  );
+  return session.expenses.flatMap((expense) =>
+    expense.items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      amountMinor: item.baseAmountMinor,
+      payerName: payerNames.get(expense.payerMemberId) ?? null,
+    })),
+  );
+}
+
 function AnonymousSessionView({
   participant,
   rateio,
+  expenseSession,
 }: {
   participant: { displayName: string };
   rateio: {
+    id: string;
     title: string;
     description?: unknown;
     status: "ACTIVE" | "CLOSED";
     baseCurrency: string;
   };
+  expenseSession: AnonymousExpenseSessionResponseDto;
 }) {
   const description = descriptionText(rateio.description);
   const isActive = rateio.status === "ACTIVE";
@@ -110,9 +162,21 @@ function AnonymousSessionView({
 
       <RateioSessionLayout
         baseCurrency={rateio.baseCurrency}
-        items={[]}
-        totalAmountMinor={null}
+        items={sessionItemsForAnonymousRateio(expenseSession)}
+        participantCount={expenseSession.members.length}
+        totalAmountMinor={totalForAnonymousSession(expenseSession)}
       />
+      <div className="mt-6 flex justify-end">
+        <ManualExpenseDrawer
+          baseCurrency={rateio.baseCurrency}
+          isActive={isActive}
+          members={expenseSession.members.map((member) => ({
+            id: member.id,
+            displayName: member.displayName,
+          }))}
+          rateioId={rateio.id}
+        />
+      </div>
     </section>
   );
 }
@@ -130,9 +194,30 @@ export default async function RateioDetailPage({
     !accessToken && anonymousSessionToken
       ? await getApiAnonymousRateio(anonymousSessionToken, id)
       : null;
+  const anonymousExpensesResult =
+    !accessToken && anonymousSessionToken && anonymousResult?.data
+      ? await listApiAnonymousExpenses(anonymousSessionToken, id)
+      : null;
 
   if (!accessToken && anonymousResult?.data) {
-    return <AnonymousSessionView {...anonymousResult.data} />;
+    const fallbackSession: AnonymousExpenseSessionResponseDto = {
+      members: [
+        {
+          id: anonymousResult.data.participant.id,
+          displayName: anonymousResult.data.participant.displayName,
+          role: anonymousResult.data.participant.role,
+          status: anonymousResult.data.participant.status,
+          joinedAt: anonymousResult.data.participant.joinedAt,
+        },
+      ],
+      expenses: [],
+    };
+    return (
+      <AnonymousSessionView
+        {...anonymousResult.data}
+        expenseSession={anonymousExpensesResult?.data ?? fallbackSession}
+      />
+    );
   }
 
   if (!accessToken) {
@@ -268,6 +353,14 @@ export default async function RateioDetailPage({
         participantCount={rateio.members.length}
         totalAmountMinor={rateio.totalAmountMinor}
       />
+      <div className="mt-6 flex justify-end">
+        <ManualExpenseDrawer
+          baseCurrency={rateio.baseCurrency}
+          isActive={isActive}
+          members={expenseMembersForRateio(rateio.members)}
+          rateioId={rateio.id}
+        />
+      </div>
     </section>
   );
 }
