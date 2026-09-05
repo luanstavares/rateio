@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthControllerGoogleCallbackData, AuthControllerGoogleCallbackErrors, AuthControllerGoogleCallbackResponses, AuthControllerGoogleLoginData, AuthControllerGoogleLoginErrors, AuthControllerLogoutData, AuthControllerLogoutErrors, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ExpensesControllerCreateData, ExpensesControllerCreateErrors, ExpensesControllerCreateResponses, ExpensesControllerGetData, ExpensesControllerGetErrors, ExpensesControllerGetResponses, ExpensesControllerListData, ExpensesControllerListErrors, ExpensesControllerListResponses, ExpensesControllerReverseData, ExpensesControllerReverseErrors, ExpensesControllerReverseResponses, HealthControllerGetHealthData, HealthControllerGetHealthResponses, NotificationsControllerListData, NotificationsControllerListErrors, NotificationsControllerListResponses, NotificationsControllerReadData, NotificationsControllerReadErrors, NotificationsControllerReadResponses, PaymentsControllerWebhookData, PaymentsControllerWebhookErrors, PaymentsControllerWebhookResponses, RateiosControllerArchiveData, RateiosControllerArchiveErrors, RateiosControllerArchiveResponses, RateiosControllerChangeStatusData, RateiosControllerChangeStatusErrors, RateiosControllerChangeStatusResponses, RateiosControllerClaimData, RateiosControllerClaimErrors, RateiosControllerClaimResponses, RateiosControllerCreateData, RateiosControllerCreateErrors, RateiosControllerCreateResponses, RateiosControllerGetData, RateiosControllerGetErrors, RateiosControllerGetResponses, RateiosControllerInviteData, RateiosControllerInviteErrors, RateiosControllerInviteResponses, RateiosControllerListData, RateiosControllerListErrors, RateiosControllerListResponses, RateiosControllerRemoveMemberData, RateiosControllerRemoveMemberErrors, RateiosControllerRemoveMemberResponses, RateiosControllerRoleData, RateiosControllerRoleErrors, RateiosControllerRoleResponses, RateiosControllerUpdateData, RateiosControllerUpdateErrors, RateiosControllerUpdateResponses, SettlementsControllerBalancesData, SettlementsControllerBalancesErrors, SettlementsControllerBalancesResponses, SettlementsControllerCreatePaymentData, SettlementsControllerCreatePaymentErrors, SettlementsControllerCreatePaymentResponses, SettlementsControllerManualCompleteData, SettlementsControllerManualCompleteErrors, SettlementsControllerManualCompleteResponses, SettlementsControllerSuggestionsData, SettlementsControllerSuggestionsErrors, SettlementsControllerSuggestionsResponses, UsersControllerMeData, UsersControllerMeErrors, UsersControllerMeResponses, UsersControllerUpdateData, UsersControllerUpdateErrors, UsersControllerUpdateResponses } from './types.gen';
+import type { AnonymousRateiosControllerGetData, AnonymousRateiosControllerGetErrors, AnonymousRateiosControllerGetResponses, AnonymousShareLinksControllerJoinData, AnonymousShareLinksControllerJoinErrors, AnonymousShareLinksControllerJoinResponses, AuthControllerGoogleCallbackData, AuthControllerGoogleCallbackErrors, AuthControllerGoogleCallbackResponses, AuthControllerGoogleLoginData, AuthControllerGoogleLoginErrors, AuthControllerLogoutData, AuthControllerLogoutErrors, AuthControllerLogoutResponses, AuthControllerMeData, AuthControllerMeErrors, AuthControllerMeResponses, AuthControllerRefreshData, AuthControllerRefreshErrors, AuthControllerRefreshResponses, ExpensesControllerCreateData, ExpensesControllerCreateErrors, ExpensesControllerCreateResponses, ExpensesControllerGetData, ExpensesControllerGetErrors, ExpensesControllerGetResponses, ExpensesControllerListData, ExpensesControllerListErrors, ExpensesControllerListResponses, ExpensesControllerReverseData, ExpensesControllerReverseErrors, ExpensesControllerReverseResponses, HealthControllerGetHealthData, HealthControllerGetHealthResponses, NotificationsControllerListData, NotificationsControllerListErrors, NotificationsControllerListResponses, NotificationsControllerReadData, NotificationsControllerReadErrors, NotificationsControllerReadResponses, PaymentsControllerWebhookData, PaymentsControllerWebhookErrors, PaymentsControllerWebhookResponses, RateiosControllerArchiveData, RateiosControllerArchiveErrors, RateiosControllerArchiveResponses, RateiosControllerChangeStatusData, RateiosControllerChangeStatusErrors, RateiosControllerChangeStatusResponses, RateiosControllerClaimData, RateiosControllerClaimErrors, RateiosControllerClaimResponses, RateiosControllerCreateData, RateiosControllerCreateErrors, RateiosControllerCreateResponses, RateiosControllerCreateShareLinkData, RateiosControllerCreateShareLinkErrors, RateiosControllerCreateShareLinkResponses, RateiosControllerGetData, RateiosControllerGetErrors, RateiosControllerGetResponses, RateiosControllerInviteData, RateiosControllerInviteErrors, RateiosControllerInviteResponses, RateiosControllerListData, RateiosControllerListErrors, RateiosControllerListResponses, RateiosControllerListShareLinksData, RateiosControllerListShareLinksErrors, RateiosControllerListShareLinksResponses, RateiosControllerRemoveMemberData, RateiosControllerRemoveMemberErrors, RateiosControllerRemoveMemberResponses, RateiosControllerRevokeShareLinkData, RateiosControllerRevokeShareLinkErrors, RateiosControllerRevokeShareLinkResponses, RateiosControllerRoleData, RateiosControllerRoleErrors, RateiosControllerRoleResponses, RateiosControllerUpdateData, RateiosControllerUpdateErrors, RateiosControllerUpdateResponses, SettlementsControllerBalancesData, SettlementsControllerBalancesErrors, SettlementsControllerBalancesResponses, SettlementsControllerCreatePaymentData, SettlementsControllerCreatePaymentErrors, SettlementsControllerCreatePaymentResponses, SettlementsControllerManualCompleteData, SettlementsControllerManualCompleteErrors, SettlementsControllerManualCompleteResponses, SettlementsControllerSuggestionsData, SettlementsControllerSuggestionsErrors, SettlementsControllerSuggestionsResponses, UsersControllerMeData, UsersControllerMeErrors, UsersControllerMeResponses, UsersControllerUpdateData, UsersControllerUpdateErrors, UsersControllerUpdateResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -152,6 +152,27 @@ export const rateiosControllerChangeStatus = <ThrowOnError extends boolean = fal
 });
 
 /**
+ * List share links
+ *
+ * Lists share-link metadata without exposing bearer tokens.
+ */
+export const rateiosControllerListShareLinks = <ThrowOnError extends boolean = false>(options: Options<RateiosControllerListShareLinksData, ThrowOnError>): RequestResult<RateiosControllerListShareLinksResponses, RateiosControllerListShareLinksErrors, ThrowOnError> => (options.client ?? client).get<RateiosControllerListShareLinksResponses, RateiosControllerListShareLinksErrors, ThrowOnError>({ url: '/rateios/{id}/share-links', ...options });
+
+/**
+ * Create or regenerate a share link
+ *
+ * Creates one active bearer share link for the rateio and revokes any previous active link.
+ */
+export const rateiosControllerCreateShareLink = <ThrowOnError extends boolean = false>(options: Options<RateiosControllerCreateShareLinkData, ThrowOnError>): RequestResult<RateiosControllerCreateShareLinkResponses, RateiosControllerCreateShareLinkErrors, ThrowOnError> => (options.client ?? client).post<RateiosControllerCreateShareLinkResponses, RateiosControllerCreateShareLinkErrors, ThrowOnError>({ url: '/rateios/{id}/share-links', ...options });
+
+/**
+ * Revoke a share link
+ *
+ * Revokes one share link without deleting its history.
+ */
+export const rateiosControllerRevokeShareLink = <ThrowOnError extends boolean = false>(options: Options<RateiosControllerRevokeShareLinkData, ThrowOnError>): RequestResult<RateiosControllerRevokeShareLinkResponses, RateiosControllerRevokeShareLinkErrors, ThrowOnError> => (options.client ?? client).delete<RateiosControllerRevokeShareLinkResponses, RateiosControllerRevokeShareLinkErrors, ThrowOnError>({ url: '/rateios/{id}/share-links/{shareLinkId}', ...options });
+
+/**
  * Invite a member
  *
  * Creates a seven-day invitation for an email address.
@@ -199,6 +220,27 @@ export const rateiosControllerRole = <ThrowOnError extends boolean = false>(opti
  * Soft-removes an active member from the rateio. The owner cannot be removed.
  */
 export const rateiosControllerRemoveMember = <ThrowOnError extends boolean = false>(options: Options<RateiosControllerRemoveMemberData, ThrowOnError>): RequestResult<RateiosControllerRemoveMemberResponses, RateiosControllerRemoveMemberErrors, ThrowOnError> => (options.client ?? client).delete<RateiosControllerRemoveMemberResponses, RateiosControllerRemoveMemberErrors, ThrowOnError>({ url: '/rateios/{id}/members/{memberId}', ...options });
+
+/**
+ * Join a rateio anonymously
+ *
+ * Exchanges an active share-link token and display name for a scoped anonymous session token.
+ */
+export const anonymousShareLinksControllerJoin = <ThrowOnError extends boolean = false>(options: Options<AnonymousShareLinksControllerJoinData, ThrowOnError>): RequestResult<AnonymousShareLinksControllerJoinResponses, AnonymousShareLinksControllerJoinErrors, ThrowOnError> => (options.client ?? client).post<AnonymousShareLinksControllerJoinResponses, AnonymousShareLinksControllerJoinErrors, ThrowOnError>({
+    url: '/share-links/join',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get an anonymous rateio session
+ *
+ * Returns the scoped participant and safe rateio summary for an anonymous session.
+ */
+export const anonymousRateiosControllerGet = <ThrowOnError extends boolean = false>(options: Options<AnonymousRateiosControllerGetData, ThrowOnError>): RequestResult<AnonymousRateiosControllerGetResponses, AnonymousRateiosControllerGetErrors, ThrowOnError> => (options.client ?? client).get<AnonymousRateiosControllerGetResponses, AnonymousRateiosControllerGetErrors, ThrowOnError>({ url: '/anonymous/rateios/{id}', ...options });
 
 /**
  * List notifications

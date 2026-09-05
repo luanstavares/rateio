@@ -1,34 +1,44 @@
-import 'server-only';
+import "server-only";
 
-import { cache } from 'react';
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { cache } from "react";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import {
   getAuthenticatedApiUser,
   refreshApiSession,
   revokeApiSession,
-} from '../api/auth';
+} from "../api/auth";
 import {
   ACCESS_TOKEN_COOKIE,
+  ANONYMOUS_SESSION_TOKEN_COOKIE,
+  anonymousSessionTokenSchema,
   authTokenResponseSchema,
   clearSessionCookies,
   isCurrentAuthTokenResponse,
   REFRESH_TOKEN_COOKIE,
   setSessionCookies,
   type AuthenticatedUser,
-} from './session-cookies';
+} from "./session-cookies";
 
 export async function getAccessToken(): Promise<string | null> {
   return (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value ?? null;
 }
 
-export const getCurrentUser = cache(async (): Promise<AuthenticatedUser | null> => {
-  const accessToken = await getAccessToken();
-  if (!accessToken) return null;
+export async function getAnonymousSessionToken(): Promise<string | null> {
+  const token = (await cookies()).get(ANONYMOUS_SESSION_TOKEN_COOKIE)?.value;
+  const parsedToken = anonymousSessionTokenSchema.safeParse(token);
+  return parsedToken.success ? parsedToken.data : null;
+}
 
-  const result = await getAuthenticatedApiUser(accessToken);
-  return 'data' in result ? (result.data ?? null) : null;
-});
+export const getCurrentUser = cache(
+  async (): Promise<AuthenticatedUser | null> => {
+    const accessToken = await getAccessToken();
+    if (!accessToken) return null;
+
+    const result = await getAuthenticatedApiUser(accessToken);
+    return "data" in result ? (result.data ?? null) : null;
+  },
+);
 
 export async function rotateSession(): Promise<NextResponse> {
   const response = NextResponse.json({ success: false }, { status: 401 });
@@ -39,7 +49,7 @@ export async function rotateSession(): Promise<NextResponse> {
   }
 
   const result = await refreshApiSession(refreshToken);
-  if ('error' in result) {
+  if ("error" in result) {
     clearSessionCookies(response);
     return response;
   }

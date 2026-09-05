@@ -269,6 +269,27 @@ export type ChangeRateioStatusDto = {
     status: 'ACTIVE' | 'CLOSED';
 };
 
+export type ShareLinkCreatedResponseDto = {
+    id: string;
+    rateioId: string;
+    status: 'ACTIVE' | 'REVOKED';
+    createdAt: string;
+    revokedAt?: {
+        [key: string]: unknown;
+    } | null;
+    token: string;
+};
+
+export type ShareLinkMetadataResponseDto = {
+    id: string;
+    rateioId: string;
+    status: 'ACTIVE' | 'REVOKED';
+    createdAt: string;
+    revokedAt?: {
+        [key: string]: unknown;
+    } | null;
+};
+
 export type InviteMemberDto = {
     email: string;
 };
@@ -317,6 +338,39 @@ export type MemberResponseDto = {
     createdAt: string;
     updatedAt: string;
     user?: UserResponseDto;
+};
+
+export type AnonymousJoinDto = {
+    token: string;
+    displayName: string;
+};
+
+export type AnonymousParticipantResponseDto = {
+    id: string;
+    rateioId: string;
+    displayName: string;
+    role: 'OWNER' | 'ADMIN' | 'PARTICIPANT';
+    status: 'ACTIVE' | 'REMOVED';
+    joinedAt: string;
+};
+
+export type AnonymousRateioResponseDto = {
+    id: string;
+    title: string;
+    description?: string | null;
+    status: 'ACTIVE' | 'CLOSED';
+    baseCurrency: string;
+};
+
+export type AnonymousJoinResponseDto = {
+    sessionToken: string;
+    participant: AnonymousParticipantResponseDto;
+    rateio: AnonymousRateioResponseDto;
+};
+
+export type AnonymousSessionResponseDto = {
+    participant: AnonymousParticipantResponseDto;
+    rateio: AnonymousRateioResponseDto;
 };
 
 export type NotificationResponseDto = {
@@ -1101,6 +1155,160 @@ export type RateiosControllerChangeStatusResponses = {
 
 export type RateiosControllerChangeStatusResponse = RateiosControllerChangeStatusResponses[keyof RateiosControllerChangeStatusResponses];
 
+export type RateiosControllerListShareLinksData = {
+    body?: never;
+    path: {
+        /**
+         * Rateio identifier
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/rateios/{id}/share-links';
+};
+
+export type RateiosControllerListShareLinksErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type RateiosControllerListShareLinksError = RateiosControllerListShareLinksErrors[keyof RateiosControllerListShareLinksErrors];
+
+export type RateiosControllerListShareLinksResponses = {
+    /**
+     * Share-link metadata.
+     */
+    200: Array<ShareLinkMetadataResponseDto>;
+};
+
+export type RateiosControllerListShareLinksResponse = RateiosControllerListShareLinksResponses[keyof RateiosControllerListShareLinksResponses];
+
+export type RateiosControllerCreateShareLinkData = {
+    body?: never;
+    path: {
+        /**
+         * Rateio identifier
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/rateios/{id}/share-links';
+};
+
+export type RateiosControllerCreateShareLinkErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type RateiosControllerCreateShareLinkError = RateiosControllerCreateShareLinkErrors[keyof RateiosControllerCreateShareLinkErrors];
+
+export type RateiosControllerCreateShareLinkResponses = {
+    /**
+     * Created share link. The raw token is returned once.
+     */
+    201: ShareLinkCreatedResponseDto;
+};
+
+export type RateiosControllerCreateShareLinkResponse = RateiosControllerCreateShareLinkResponses[keyof RateiosControllerCreateShareLinkResponses];
+
+export type RateiosControllerRevokeShareLinkData = {
+    body?: never;
+    path: {
+        /**
+         * Rateio identifier
+         */
+        id: string;
+        /**
+         * Share-link identifier
+         */
+        shareLinkId: string;
+    };
+    query?: never;
+    url: '/rateios/{id}/share-links/{shareLinkId}';
+};
+
+export type RateiosControllerRevokeShareLinkErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type RateiosControllerRevokeShareLinkError = RateiosControllerRevokeShareLinkErrors[keyof RateiosControllerRevokeShareLinkErrors];
+
+export type RateiosControllerRevokeShareLinkResponses = {
+    /**
+     * Revoked share-link metadata.
+     */
+    200: ShareLinkMetadataResponseDto;
+};
+
+export type RateiosControllerRevokeShareLinkResponse = RateiosControllerRevokeShareLinkResponses[keyof RateiosControllerRevokeShareLinkResponses];
+
 export type RateiosControllerInviteData = {
     body: InviteMemberDto;
     path: {
@@ -1303,6 +1511,101 @@ export type RateiosControllerRemoveMemberResponses = {
 };
 
 export type RateiosControllerRemoveMemberResponse = RateiosControllerRemoveMemberResponses[keyof RateiosControllerRemoveMemberResponses];
+
+export type AnonymousShareLinksControllerJoinData = {
+    body: AnonymousJoinDto;
+    path?: never;
+    query?: never;
+    url: '/share-links/join';
+};
+
+export type AnonymousShareLinksControllerJoinErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type AnonymousShareLinksControllerJoinError = AnonymousShareLinksControllerJoinErrors[keyof AnonymousShareLinksControllerJoinErrors];
+
+export type AnonymousShareLinksControllerJoinResponses = {
+    /**
+     * Anonymous participant and scoped session token. The raw session token is returned once.
+     */
+    201: AnonymousJoinResponseDto;
+};
+
+export type AnonymousShareLinksControllerJoinResponse = AnonymousShareLinksControllerJoinResponses[keyof AnonymousShareLinksControllerJoinResponses];
+
+export type AnonymousRateiosControllerGetData = {
+    body?: never;
+    path: {
+        /**
+         * Rateio identifier
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/anonymous/rateios/{id}';
+};
+
+export type AnonymousRateiosControllerGetErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type AnonymousRateiosControllerGetError = AnonymousRateiosControllerGetErrors[keyof AnonymousRateiosControllerGetErrors];
+
+export type AnonymousRateiosControllerGetResponses = {
+    /**
+     * Anonymous session summary.
+     */
+    200: AnonymousSessionResponseDto;
+};
+
+export type AnonymousRateiosControllerGetResponse = AnonymousRateiosControllerGetResponses[keyof AnonymousRateiosControllerGetResponses];
 
 export type NotificationsControllerListData = {
     body?: never;

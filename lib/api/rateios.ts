@@ -1,23 +1,34 @@
-import 'server-only';
+import "server-only";
 
 import {
+  anonymousShareLinksControllerJoin,
+  anonymousRateiosControllerGet,
   rateiosControllerChangeStatus,
   rateiosControllerCreate,
+  rateiosControllerCreateShareLink,
   rateiosControllerGet,
   rateiosControllerList,
+  rateiosControllerListShareLinks,
+  rateiosControllerRevokeShareLink,
+  type AnonymousJoinDto,
+  type AnonymousJoinResponseDto,
+  type AnonymousSessionResponseDto,
   type ChangeRateioStatusDto,
   type CreateRateioDto,
   type RateioDetailResponseDto,
   type RateioListResponseDto,
   type RateioResponseDto,
   type RateiosControllerListData,
-} from './generated';
-import { normalizeApiResult, type ApiResult } from './errors';
-import { createServerApiClient } from './server-client';
+  type ShareLinkCreatedResponseDto,
+  type ShareLinkMetadataResponseDto,
+} from "./generated";
+import { normalizeApiResult, type ApiResult } from "./errors";
+import { createServerApiClient } from "./server-client";
 
 export type CreateRateioInput = CreateRateioDto;
-export type ListRateiosQuery = RateiosControllerListData['query'];
-export type RateioStatus = ChangeRateioStatusDto['status'];
+export type ListRateiosQuery = RateiosControllerListData["query"];
+export type RateioStatus = ChangeRateioStatusDto["status"];
+export type AnonymousJoinInput = AnonymousJoinDto;
 
 export function createApiRateio(
   accessToken: string,
@@ -26,9 +37,7 @@ export function createApiRateio(
   return rateiosControllerCreate({
     client: createServerApiClient(accessToken),
     body: input,
-  }).then((result) =>
-    normalizeApiResult<RateioDetailResponseDto>(result),
-  );
+  }).then((result) => normalizeApiResult<RateioDetailResponseDto>(result));
 }
 
 export function listApiRateios(
@@ -48,9 +57,7 @@ export function getApiRateio(
   return rateiosControllerGet({
     client: createServerApiClient(accessToken),
     path: { id },
-  }).then((result) =>
-    normalizeApiResult<RateioDetailResponseDto>(result),
-  );
+  }).then((result) => normalizeApiResult<RateioDetailResponseDto>(result));
 }
 
 export function changeApiRateioStatus(
@@ -63,4 +70,55 @@ export function changeApiRateioStatus(
     path: { id },
     body: { status },
   }).then((result) => normalizeApiResult<RateioResponseDto>(result));
+}
+
+export function listApiShareLinks(
+  accessToken: string,
+  rateioId: string,
+): Promise<ApiResult<ShareLinkMetadataResponseDto[]>> {
+  return rateiosControllerListShareLinks({
+    client: createServerApiClient(accessToken),
+    path: { id: rateioId },
+  }).then((result) =>
+    normalizeApiResult<ShareLinkMetadataResponseDto[]>(result),
+  );
+}
+
+export function createApiShareLink(
+  accessToken: string,
+  rateioId: string,
+): Promise<ApiResult<ShareLinkCreatedResponseDto>> {
+  return rateiosControllerCreateShareLink({
+    client: createServerApiClient(accessToken),
+    path: { id: rateioId },
+  }).then((result) => normalizeApiResult<ShareLinkCreatedResponseDto>(result));
+}
+
+export function revokeApiShareLink(
+  accessToken: string,
+  rateioId: string,
+  shareLinkId: string,
+): Promise<ApiResult<ShareLinkMetadataResponseDto>> {
+  return rateiosControllerRevokeShareLink({
+    client: createServerApiClient(accessToken),
+    path: { id: rateioId, shareLinkId },
+  }).then((result) => normalizeApiResult<ShareLinkMetadataResponseDto>(result));
+}
+
+export function joinApiRateioAnonymously(
+  input: AnonymousJoinInput,
+): Promise<ApiResult<AnonymousJoinResponseDto>> {
+  return anonymousShareLinksControllerJoin({
+    body: input,
+  }).then((result) => normalizeApiResult<AnonymousJoinResponseDto>(result));
+}
+
+export function getApiAnonymousRateio(
+  sessionToken: string,
+  rateioId: string,
+): Promise<ApiResult<AnonymousSessionResponseDto>> {
+  return anonymousRateiosControllerGet({
+    client: createServerApiClient(sessionToken),
+    path: { id: rateioId },
+  }).then((result) => normalizeApiResult<AnonymousSessionResponseDto>(result));
 }

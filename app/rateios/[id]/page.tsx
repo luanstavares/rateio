@@ -1,23 +1,24 @@
 import Link from "next/link";
 
-import { getApiRateio } from "../../../lib/api/rateios";
+import { getApiAnonymousRateio, getApiRateio } from "../../../lib/api/rateios";
 import type { RateioDetailResponseDto } from "../../../lib/api/generated";
 import type { ApiClientError } from "../../../lib/api/errors";
 import {
   getAccessToken,
+  getAnonymousSessionToken,
   getCurrentUser,
 } from "../../../lib/auth/server-session";
 import { formatMinorAmount } from "../../../lib/format";
 import { Button } from "../../../ui/components/ui/button";
+import ClearAnonymousSession from "../../../ui/clear-anonymous-session";
+import RateioShareLinkDrawer from "../../../ui/rateio-share-link-drawer";
 import RateioStatusControl from "../../../ui/rateio-status-control";
 
 type RateioDetailPageProps = {
   params: Promise<{ id: string }>;
 };
 
-function descriptionText(
-  description: RateioDetailResponseDto["description"],
-): string | null {
+function descriptionText(description: unknown): string | null {
   return typeof description === "string" ? description : null;
 }
 
@@ -41,26 +42,122 @@ function statusClassName(status: RateioDetailResponseDto["status"]): string {
     : "border-muted-foreground/50 text-muted-foreground";
 }
 
+function AnonymousSessionView({
+  participant,
+  rateio,
+}: {
+  participant: { displayName: string };
+  rateio: {
+    title: string;
+    description?: unknown;
+    status: "ACTIVE" | "CLOSED";
+    baseCurrency: string;
+  };
+}) {
+  const description = descriptionText(rateio.description);
+  const isActive = rateio.status === "ACTIVE";
+
+  return (
+    <section className="mx-auto w-full max-w-5xl px-6 py-8 sm:px-10 sm:py-12">
+      <div className="rounded-lg border border-border bg-card p-6 sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
+              Sessão compartilhada
+            </p>
+            <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
+              {rateio.title}
+            </h1>
+            <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+              {description ?? "Sem descrição"}
+            </p>
+          </div>
+          <p className="shrink-0 text-sm text-muted-foreground">
+            {rateio.baseCurrency}
+          </p>
+        </div>
+
+        <div className="mt-6 rounded-md border border-border p-4">
+          <p className="text-sm text-muted-foreground">Você entrou como</p>
+          <p className="mt-1 font-semibold">{participant.displayName}</p>
+        </div>
+
+        {!isActive ? (
+          <div className="mt-4 rounded-md border border-muted-foreground/40 bg-muted/40 p-4 text-sm text-muted-foreground">
+            Este rateio está fechado para novas alterações.
+          </div>
+        ) : null}
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <section className="rounded-lg border border-dashed border-border p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
+            Próxima etapa
+          </p>
+          <h2 className="mt-3 text-xl font-semibold">Itens e despesas</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A lista de itens e o lançamento de despesas entram em uma próxima
+            feature.
+          </p>
+        </section>
+        <section className="rounded-lg border border-dashed border-border p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
+            Divisão e acertos
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            O cálculo de saldos e a divisão das dívidas serão adicionados em uma
+            próxima feature.
+          </p>
+        </section>
+      </div>
+    </section>
+  );
+}
+
 export default async function RateioDetailPage({
   params,
 }: RateioDetailPageProps) {
   const accessToken = await getAccessToken();
+  const anonymousSessionToken = await getAnonymousSessionToken();
   const { id } = await params;
   const [currentUser, result] = accessToken
     ? await Promise.all([getCurrentUser(), getApiRateio(accessToken, id)])
     : [null, null];
+  const anonymousResult =
+    !accessToken && anonymousSessionToken
+      ? await getApiAnonymousRateio(anonymousSessionToken, id)
+      : null;
+
+  if (!accessToken && anonymousResult?.data) {
+    return <AnonymousSessionView {...anonymousResult.data} />;
+  }
 
   if (!accessToken) {
+    const anonymousSessionFailed = anonymousResult?.error !== undefined;
     return (
       <section className="mx-auto w-full max-w-3xl px-6 py-8 sm:px-10 sm:py-12">
         <div className="rounded-lg border border-border bg-card p-6">
-          <h1 className="text-2xl font-bold">Entre para ver este rateio</h1>
+          <h1 className="text-2xl font-bold">
+            {anonymousSessionFailed
+              ? "Sessão indisponível"
+              : "Entre para ver este rateio"}
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Use sua conta do Google para acompanhar este grupo.
+            {anonymousSessionFailed
+              ? "Este acesso anônimo expirou ou foi removido. Entre novamente pelo link compartilhado."
+              : "Use sua conta do Google ou entre pelo link compartilhado para acompanhar este grupo."}
           </p>
-          <Button asChild className="mt-5">
-            <a href="/api/auth/google">Entrar com Google</a>
-          </Button>
+          {anonymousSessionFailed ? <ClearAnonymousSession /> : null}
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            {anonymousSessionFailed ? (
+              <Button asChild variant="outline">
+                <Link href="/rateios/entrar">Usar outro link</Link>
+              </Button>
+            ) : null}
+            <Button asChild>
+              <a href="/api/auth/google">Entrar com Google</a>
+            </Button>
+          </div>
         </div>
       </section>
     );
@@ -69,7 +166,10 @@ export default async function RateioDetailPage({
   if (result?.error) {
     return (
       <section className="mx-auto w-full max-w-3xl px-6 py-8 sm:px-10 sm:py-12">
-        <div className="rounded-lg border border-border bg-card p-6" role="alert">
+        <div
+          className="rounded-lg border border-border bg-card p-6"
+          role="alert"
+        >
           <h1 className="text-2xl font-bold">Rateio indisponível</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {errorMessage(result.error)}
@@ -107,10 +207,14 @@ export default async function RateioDetailPage({
                 {isActive ? "Ativo" : "Fechado"}
               </span>
               {isOwner ? (
-                <span className="text-xs text-muted-foreground">Você é o responsável</span>
+                <span className="text-xs text-muted-foreground">
+                  Você é o responsável
+                </span>
               ) : null}
             </div>
-            <h1 className="mt-4 text-3xl font-bold sm:text-4xl">{rateio.title}</h1>
+            <h1 className="mt-4 text-3xl font-bold sm:text-4xl">
+              {rateio.title}
+            </h1>
             <p className="mt-3 text-sm text-muted-foreground sm:text-base">
               {description ?? "Sem descrição"}
             </p>
@@ -148,7 +252,10 @@ export default async function RateioDetailPage({
         </div>
 
         {isOwner ? (
-          <RateioStatusControl rateioId={rateio.id} status={rateio.status} />
+          <>
+            <RateioStatusControl rateioId={rateio.id} status={rateio.status} />
+            <RateioShareLinkDrawer rateioId={rateio.id} />
+          </>
         ) : null}
       </div>
 
@@ -169,8 +276,8 @@ export default async function RateioDetailPage({
           </p>
           <h2 className="mt-3 text-xl font-semibold">Divisão e acertos</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            O cálculo de saldos e a divisão das dívidas serão adicionados em
-            uma próxima feature.
+            O cálculo de saldos e a divisão das dívidas serão adicionados em uma
+            próxima feature.
           </p>
         </section>
       </div>

@@ -1,20 +1,27 @@
-import 'server-only';
+import "server-only";
 
-import type { NextResponse } from 'next/server';
-import { z } from 'zod';
+import type { NextResponse } from "next/server";
+import { z } from "zod";
 
-export const OAUTH_STATE_COOKIE = 'rateio_oauth_state';
-export const ACCESS_TOKEN_COOKIE = 'rateio_access_token';
-export const REFRESH_TOKEN_COOKIE = 'rateio_refresh_token';
+export const OAUTH_STATE_COOKIE = "rateio_oauth_state";
+export const ACCESS_TOKEN_COOKIE = "rateio_access_token";
+export const REFRESH_TOKEN_COOKIE = "rateio_refresh_token";
+export const ANONYMOUS_SESSION_TOKEN_COOKIE = "rateio_anonymous_session_token";
 
 export const OAUTH_STATE_MAX_AGE_SECONDS = 10 * 60;
 export const ACCESS_TOKEN_MAX_AGE_SECONDS = 15 * 60;
+export const ANONYMOUS_SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
 export const authTokenResponseSchema = z.object({
   accessToken: z.string().min(1),
   refreshToken: z.string().min(20),
   expiresAt: z.iso.datetime(),
 });
+
+export const anonymousSessionTokenSchema = z
+  .string()
+  .length(64)
+  .regex(/^[0-9a-f]+$/i);
 
 export const authenticatedUserSchema = z.object({
   sub: z.string().min(1),
@@ -29,24 +36,37 @@ export const successResponseSchema = z.object({
 });
 
 export type AuthTokenResponse = z.infer<typeof authTokenResponseSchema>;
+export type AnonymousSessionToken = z.infer<typeof anonymousSessionTokenSchema>;
 
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
 
 function isProduction(): boolean {
-  return process.env.NODE_ENV === 'production';
+  return process.env.NODE_ENV === "production";
 }
 
 function sessionCookieOptions(maxAge: number) {
   return {
     httpOnly: true,
     secure: isProduction(),
-    sameSite: 'lax' as const,
-    path: '/',
+    sameSite: "lax" as const,
+    path: "/",
     maxAge,
   };
 }
 
-export function setOAuthStateCookie(response: NextResponse, state: string): void {
+type SessionCookieOptions = ReturnType<typeof sessionCookieOptions> & {
+  name: string;
+  value: string;
+};
+
+type SessionCookieStore = {
+  set(options: SessionCookieOptions): unknown;
+};
+
+export function setOAuthStateCookie(
+  response: NextResponse,
+  state: string,
+): void {
   response.cookies.set({
     name: OAUTH_STATE_COOKIE,
     value: state,
@@ -57,7 +77,7 @@ export function setOAuthStateCookie(response: NextResponse, state: string): void
 export function clearOAuthStateCookie(response: NextResponse): void {
   response.cookies.set({
     name: OAUTH_STATE_COOKIE,
-    value: '',
+    value: "",
     ...sessionCookieOptions(0),
   });
 }
@@ -87,18 +107,53 @@ export function setSessionCookies(
 export function clearSessionCookies(response: NextResponse): void {
   response.cookies.set({
     name: ACCESS_TOKEN_COOKIE,
-    value: '',
+    value: "",
     ...sessionCookieOptions(0),
   });
   response.cookies.set({
     name: REFRESH_TOKEN_COOKIE,
-    value: '',
+    value: "",
     ...sessionCookieOptions(0),
   });
 }
 
-export function isCurrentAuthTokenResponse(
-  tokens: AuthTokenResponse,
-): boolean {
+export function setAnonymousSessionCookie(
+  response: NextResponse,
+  sessionToken: string,
+): void {
+  setAnonymousSessionCookieStore(response.cookies, sessionToken);
+}
+
+export function setAnonymousSessionCookieStore(
+  cookieStore: SessionCookieStore,
+  sessionToken: string,
+): void {
+  const parsedToken = anonymousSessionTokenSchema.safeParse(sessionToken);
+  if (!parsedToken.success) {
+    throw new Error("Invalid anonymous session token");
+  }
+
+  cookieStore.set({
+    name: ANONYMOUS_SESSION_TOKEN_COOKIE,
+    value: parsedToken.data,
+    ...sessionCookieOptions(ANONYMOUS_SESSION_MAX_AGE_SECONDS),
+  });
+}
+
+export function clearAnonymousSessionCookie(response: NextResponse): void {
+  clearAnonymousSessionCookieStore(response.cookies);
+}
+
+export function clearAnonymousSessionCookieStore(
+  cookieStore: SessionCookieStore,
+): void {
+  cookieStore.set({
+    name: ANONYMOUS_SESSION_TOKEN_COOKIE,
+    value: "",
+    ...sessionCookieOptions(0),
+  });
+}
+
+export function isCurrentAuthTokenResponse(tokens: AuthTokenResponse): boolean {
   return Date.parse(tokens.expiresAt) > Date.now();
 }
