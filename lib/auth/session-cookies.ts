@@ -1,0 +1,104 @@
+import 'server-only';
+
+import type { NextResponse } from 'next/server';
+import { z } from 'zod';
+
+export const OAUTH_STATE_COOKIE = 'rateio_oauth_state';
+export const ACCESS_TOKEN_COOKIE = 'rateio_access_token';
+export const REFRESH_TOKEN_COOKIE = 'rateio_refresh_token';
+
+export const OAUTH_STATE_MAX_AGE_SECONDS = 10 * 60;
+export const ACCESS_TOKEN_MAX_AGE_SECONDS = 15 * 60;
+
+export const authTokenResponseSchema = z.object({
+  accessToken: z.string().min(1),
+  refreshToken: z.string().min(20),
+  expiresAt: z.iso.datetime(),
+});
+
+export const authenticatedUserSchema = z.object({
+  sub: z.string().min(1),
+  email: z.email(),
+  name: z.string().nullable(),
+  pictureUrl: z.url().nullable(),
+  preferredLocale: z.string().min(2),
+});
+
+export const successResponseSchema = z.object({
+  success: z.literal(true),
+});
+
+export type AuthTokenResponse = z.infer<typeof authTokenResponseSchema>;
+
+export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
+
+function isProduction(): boolean {
+  return process.env.NODE_ENV === 'production';
+}
+
+function sessionCookieOptions(maxAge: number) {
+  return {
+    httpOnly: true,
+    secure: isProduction(),
+    sameSite: 'lax' as const,
+    path: '/',
+    maxAge,
+  };
+}
+
+export function setOAuthStateCookie(response: NextResponse, state: string): void {
+  response.cookies.set({
+    name: OAUTH_STATE_COOKIE,
+    value: state,
+    ...sessionCookieOptions(OAUTH_STATE_MAX_AGE_SECONDS),
+  });
+}
+
+export function clearOAuthStateCookie(response: NextResponse): void {
+  response.cookies.set({
+    name: OAUTH_STATE_COOKIE,
+    value: '',
+    ...sessionCookieOptions(0),
+  });
+}
+
+export function setSessionCookies(
+  response: NextResponse,
+  tokens: AuthTokenResponse,
+): void {
+  const refreshExpiresAt = Date.parse(tokens.expiresAt);
+  const refreshMaxAge = Math.max(
+    0,
+    Math.floor((refreshExpiresAt - Date.now()) / 1000),
+  );
+
+  response.cookies.set({
+    name: ACCESS_TOKEN_COOKIE,
+    value: tokens.accessToken,
+    ...sessionCookieOptions(ACCESS_TOKEN_MAX_AGE_SECONDS),
+  });
+  response.cookies.set({
+    name: REFRESH_TOKEN_COOKIE,
+    value: tokens.refreshToken,
+    ...sessionCookieOptions(refreshMaxAge),
+  });
+}
+
+export function clearSessionCookies(response: NextResponse): void {
+  response.cookies.set({
+    name: ACCESS_TOKEN_COOKIE,
+    value: '',
+    ...sessionCookieOptions(0),
+  });
+  response.cookies.set({
+    name: REFRESH_TOKEN_COOKIE,
+    value: '',
+    ...sessionCookieOptions(0),
+  });
+}
+
+export function isCurrentAuthTokenResponse(
+  tokens: AuthTokenResponse,
+): boolean {
+  return Date.parse(tokens.expiresAt) > Date.now();
+}

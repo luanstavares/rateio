@@ -35,6 +35,9 @@ export type SuccessResponseDto = {
 export type AuthenticatedUserDto = {
     sub: string;
     email: string;
+    name: string | null;
+    pictureUrl: string | null;
+    preferredLocale: string;
 };
 
 export type UserResponseDto = {
@@ -498,6 +501,10 @@ export type AuthControllerGoogleLoginErrors = {
      * An unexpected server error occurred.
      */
     500: ApiErrorResponseDto;
+    /**
+     * Google OAuth is unavailable or not configured.
+     */
+    503: unknown;
 };
 
 export type AuthControllerGoogleLoginError = AuthControllerGoogleLoginErrors[keyof AuthControllerGoogleLoginErrors];
@@ -505,7 +512,20 @@ export type AuthControllerGoogleLoginError = AuthControllerGoogleLoginErrors[key
 export type AuthControllerGoogleCallbackData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * OAuth provider error.
+         */
+        error?: string;
+        /**
+         * OAuth state value.
+         */
+        state?: string;
+        /**
+         * OAuth callback code.
+         */
+        code?: string;
+    };
     url: '/auth/google/callback';
 };
 
