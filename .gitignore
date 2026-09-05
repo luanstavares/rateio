@@ -11,6 +11,10 @@
 # next.js
 /.next/
 /out/
+/next-env.d.ts
+
+# generated TypeScript cache
+*.tsbuildinfo
 
 # production
 /build
