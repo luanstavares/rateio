@@ -109,6 +109,7 @@ export function joinApiRateioAnonymously(
   input: AnonymousJoinInput,
 ): Promise<ApiResult<AnonymousJoinResponseDto>> {
   return anonymousShareLinksControllerJoin({
+    client: createServerApiClient(),
     body: input,
   }).then((result) => normalizeApiResult<AnonymousJoinResponseDto>(result));
 }

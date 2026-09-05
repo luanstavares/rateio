@@ -442,6 +442,68 @@ export type ExpenseReversalResponseDto = {
     authorizedBy: string;
 };
 
+export type AnonymousExpenseMemberResponseDto = {
+    id: string;
+    displayName: string;
+    role: string;
+    status: string;
+    joinedAt: string;
+};
+
+export type AnonymousExpenseAllocationResponseDto = {
+    id: string;
+    itemId: string;
+    memberId: string;
+    splitType: 'EQUAL' | 'PERCENTAGE' | 'CUSTOM';
+    percentageBasisPoints?: {
+        [key: string]: unknown;
+    };
+    /**
+     * Amount in base-currency minor units, serialized as text.
+     */
+    baseAmountMinor: string;
+    createdAt: string;
+};
+
+export type AnonymousExpenseItemResponseDto = {
+    id: string;
+    expenseId: string;
+    name: string;
+    /**
+     * Amount in minor currency units, serialized as text.
+     */
+    originalAmountMinor: string;
+    originalCurrency: string;
+    baseAmountMinor: string;
+    baseCurrency: string;
+    allocations: Array<AnonymousExpenseAllocationResponseDto>;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type AnonymousExpenseResponseDto = {
+    id: string;
+    rateioId: string;
+    createdByMemberId: string;
+    payerMemberId: string;
+    description: string;
+    originalAmountMinor: string;
+    originalCurrency: string;
+    baseAmountMinor: string;
+    baseCurrency: string;
+    createdAt: string;
+    updatedAt: string;
+    voidedAt?: {
+        [key: string]: unknown;
+    } | null;
+    items: Array<AnonymousExpenseItemResponseDto>;
+};
+
+export type AnonymousExpenseSessionResponseDto = {
+    members: Array<AnonymousExpenseMemberResponseDto>;
+    expenses: Array<AnonymousExpenseResponseDto>;
+};
+
 export type HealthResponseDto = {
     status: string;
     service: string;
@@ -1916,6 +1978,106 @@ export type ExpensesControllerReverseResponses = {
 };
 
 export type ExpensesControllerReverseResponse = ExpensesControllerReverseResponses[keyof ExpensesControllerReverseResponses];
+
+export type AnonymousExpensesControllerListData = {
+    body?: never;
+    path: {
+        /**
+         * Rateio identifier
+         */
+        rateioId: string;
+    };
+    query?: never;
+    url: '/anonymous/rateios/{rateioId}/expenses';
+};
+
+export type AnonymousExpensesControllerListErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type AnonymousExpensesControllerListError = AnonymousExpensesControllerListErrors[keyof AnonymousExpensesControllerListErrors];
+
+export type AnonymousExpensesControllerListResponses = {
+    /**
+     * Safe anonymous expense session data.
+     */
+    200: AnonymousExpenseSessionResponseDto;
+};
+
+export type AnonymousExpensesControllerListResponse = AnonymousExpensesControllerListResponses[keyof AnonymousExpensesControllerListResponses];
+
+export type AnonymousExpensesControllerCreateData = {
+    body: CreateExpenseDto;
+    path: {
+        /**
+         * Rateio identifier
+         */
+        rateioId: string;
+    };
+    query?: never;
+    url: '/anonymous/rateios/{rateioId}/expenses';
+};
+
+export type AnonymousExpensesControllerCreateErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type AnonymousExpensesControllerCreateError = AnonymousExpensesControllerCreateErrors[keyof AnonymousExpensesControllerCreateErrors];
+
+export type AnonymousExpensesControllerCreateResponses = {
+    /**
+     * Created expense with safe member references.
+     */
+    201: AnonymousExpenseResponseDto;
+};
+
+export type AnonymousExpensesControllerCreateResponse = AnonymousExpensesControllerCreateResponses[keyof AnonymousExpensesControllerCreateResponses];
 
 export type HealthControllerGetHealthData = {
     body?: never;
