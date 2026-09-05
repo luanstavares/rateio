@@ -40,6 +40,12 @@ OPENAPI_SOURCE=https://api.example.com/openapi.json npm run api:generate
 used while generating `lib/api/generated/`. Generated files are disposable and
 must not be edited manually.
 
+Realtime browser sessions use the HttpOnly session cookies directly. When the
+frontend and API use sibling hosts in production, set
+`RATEIO_COOKIE_DOMAIN=.example.com` so the browser can send the cookies to both
+hosts. Leave it unset when both services use the exact same host. The API's
+`CORS_ORIGIN` must be the exact frontend origin, not `*`.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

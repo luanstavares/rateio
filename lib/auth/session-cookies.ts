@@ -12,6 +12,8 @@ export const OAUTH_STATE_MAX_AGE_SECONDS = 10 * 60;
 export const ACCESS_TOKEN_MAX_AGE_SECONDS = 15 * 60;
 export const ANONYMOUS_SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
+const sessionCookieDomain = process.env.RATEIO_COOKIE_DOMAIN?.trim();
+
 export const authTokenResponseSchema = z.object({
   accessToken: z.string().min(1),
   refreshToken: z.string().min(20),
@@ -51,6 +53,7 @@ function sessionCookieOptions(maxAge: number) {
     sameSite: "lax" as const,
     path: "/",
     maxAge,
+    ...(sessionCookieDomain ? { domain: sessionCookieDomain } : {}),
   };
 }
 

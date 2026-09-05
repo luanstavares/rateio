@@ -24,10 +24,11 @@ import RateioShareLinkDrawer from "../../../ui/rateio-share-link-drawer";
 import ManualExpenseDrawer, {
   type ExpenseMemberOption,
 } from "../../../ui/manual-expense-drawer";
-import RateioSessionLayout, {
-  type RateioSessionBalance,
-  type RateioSessionItem,
+import type {
+  RateioSessionBalance,
+  RateioSessionItem,
 } from "../../../ui/rateio-session-layout";
+import RateioRealtimeSession from "../../../ui/rateio-realtime-session";
 import RateioStatusControl from "../../../ui/rateio-status-control";
 
 type RateioDetailPageProps = {
@@ -158,13 +159,18 @@ function AnonymousSessionView({
         ) : null}
       </div>
 
-      <RateioSessionLayout
-        baseCurrency={rateio.baseCurrency}
-        balances={balances}
-        balancesError={balancesError}
-        items={sessionItemsForAnonymousRateio(expenseSession)}
-        participantCount={expenseSession.members.length}
-        totalAmountMinor={expenseSession.totalAmountMinor}
+      <RateioRealtimeSession
+        authenticated={false}
+        initial={{
+          baseCurrency: rateio.baseCurrency,
+          status: rateio.status,
+          balances,
+          balancesError,
+          items: sessionItemsForAnonymousRateio(expenseSession),
+          participantCount: expenseSession.members.length,
+          totalAmountMinor: expenseSession.totalAmountMinor,
+        }}
+        rateioId={rateio.id}
       />
       <div className="mt-6 flex justify-end">
         <ManualExpenseDrawer
@@ -365,19 +371,23 @@ export default async function RateioDetailPage({
         ) : null}
       </div>
 
-      <RateioSessionLayout
-        baseCurrency={rateio.baseCurrency}
-        balances={
-          balancesResult?.data?.map((balance) => ({
-            memberId: balance.memberId,
-            displayName: balance.name,
-            balanceMinor: balance.balanceMinor,
-          })) ?? []
-        }
-        balancesError={balancesResult?.error !== undefined}
-        items={sessionItemsForRateio(rateio)}
-        participantCount={rateio.members.length}
-        totalAmountMinor={rateio.totalAmountMinor}
+      <RateioRealtimeSession
+        authenticated
+        initial={{
+          baseCurrency: rateio.baseCurrency,
+          status: rateio.status,
+          balances:
+            balancesResult?.data?.map((balance) => ({
+              memberId: balance.memberId,
+              displayName: balance.name,
+              balanceMinor: balance.balanceMinor,
+            })) ?? [],
+          balancesError: balancesResult?.error !== undefined,
+          items: sessionItemsForRateio(rateio),
+          participantCount: rateio.members.length,
+          totalAmountMinor: rateio.totalAmountMinor,
+        }}
+        rateioId={rateio.id}
       />
       <div className="mt-6 flex justify-end">
         <ManualExpenseDrawer
