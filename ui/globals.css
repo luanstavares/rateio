@@ -9,13 +9,13 @@
     --primary: #ffad33;
     --primary-hover: #e88b00;
     --primary-foreground: #000000;
-    --destructive: #e47d7d;
+    --destructive: #ef5555;
     --destructive-foreground: #000000;
     --secondary: #ffcc80;
     --secondary-foreground: #000000;
     --muted: #2e2e2e;
     --muted-foreground: #bebebe;
-    --border: #585858;
+    --border: #292929;
     --input: #585858;
     --ring: #ffad33;
     --radius: 0.25rem;

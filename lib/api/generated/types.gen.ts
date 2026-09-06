@@ -135,6 +135,7 @@ export type ExpenseResponseDto = {
     id: string;
     rateioId: string;
     createdById: string;
+    createdByMemberId: string;
     payerMemberId: string;
     description: string;
     originalAmountMinor: number;
@@ -440,6 +441,12 @@ export type ExpenseReversalResponseDto = {
     reversalId: string;
     rateioId: string;
     authorizedBy: string;
+};
+
+export type ExpenseItemDeletionResponseDto = {
+    id: string;
+    expenseId: string;
+    deletedAt: string;
 };
 
 export type AnonymousExpenseMemberResponseDto = {
@@ -1991,6 +1998,64 @@ export type ExpensesControllerReverseResponses = {
 };
 
 export type ExpensesControllerReverseResponse = ExpensesControllerReverseResponses[keyof ExpensesControllerReverseResponses];
+
+export type ExpensesControllerRemoveItemData = {
+    body?: never;
+    path: {
+        /**
+         * Rateio identifier
+         */
+        rateioId: string;
+        /**
+         * Expense identifier
+         */
+        expenseId: string;
+        /**
+         * Expense item identifier
+         */
+        itemId: string;
+    };
+    query?: never;
+    url: '/rateios/{rateioId}/expenses/{expenseId}/items/{itemId}';
+};
+
+export type ExpensesControllerRemoveItemErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type ExpensesControllerRemoveItemError = ExpensesControllerRemoveItemErrors[keyof ExpensesControllerRemoveItemErrors];
+
+export type ExpensesControllerRemoveItemResponses = {
+    /**
+     * Soft-deleted expense item.
+     */
+    200: ExpenseItemDeletionResponseDto;
+};
+
+export type ExpensesControllerRemoveItemResponse = ExpensesControllerRemoveItemResponses[keyof ExpensesControllerRemoveItemResponses];
 
 export type AnonymousExpensesControllerListData = {
     body?: never;

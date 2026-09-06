@@ -22,6 +22,7 @@ import { Button } from "../../../ui/components/ui/button";
 import ClearAnonymousSession from "../../../ui/clear-anonymous-session";
 import RateioShareLinkDrawer from "../../../ui/rateio-share-link-drawer";
 import RateioMemberManagementDrawer from "../../../ui/rateio-member-management-drawer";
+import RateioActivityDrawer from "../../../ui/rateio-activity-drawer";
 import ManualExpenseDrawer, {
   type ExpenseMemberOption,
 } from "../../../ui/manual-expense-drawer";
@@ -68,6 +69,8 @@ function sessionItemsForRateio(
       const payerName = expense.payerMember?.user?.name;
       return {
         id: item.id,
+        expenseId: item.expenseId,
+        createdByMemberId: expense.createdByMemberId,
         name: item.name,
         amountMinor: String(item.baseAmountMinor),
         payerName: typeof payerName === "string" ? payerName : null,
@@ -99,6 +102,8 @@ function sessionItemsForAnonymousRateio(
   return session.expenses.flatMap((expense) =>
     expense.items.map((item) => ({
       id: item.id,
+      expenseId: item.expenseId,
+      createdByMemberId: expense.createdByMemberId,
       name: item.name,
       amountMinor: item.baseAmountMinor,
       payerName: payerNames.get(expense.payerMemberId) ?? null,
@@ -370,10 +375,25 @@ export default async function RateioDetailPage({
         {isOwner ? (
           <>
             <RateioStatusControl rateioId={rateio.id} status={rateio.status} />
-            <RateioShareLinkDrawer rateioId={rateio.id} />
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <RateioShareLinkDrawer rateioId={rateio.id} />
+              {currentMembership ? (
+                <RateioMemberManagementDrawer
+                  currentMemberId={currentMembership.id}
+                  currentRole={currentMembership.role}
+                  members={rateio.members}
+                  rateioId={rateio.id}
+                />
+              ) : null}
+              {currentMembership &&
+              (currentMembership.role === "OWNER" ||
+                currentMembership.role === "ADMIN") ? (
+                <RateioActivityDrawer events={rateio.activityEvents} />
+              ) : null}
+            </div>
           </>
         ) : null}
-        {currentMembership ? (
+        {!isOwner && currentMembership ? (
           <RateioMemberManagementDrawer
             currentMemberId={currentMembership.id}
             currentRole={currentMembership.role}
@@ -381,10 +401,17 @@ export default async function RateioDetailPage({
             rateioId={rateio.id}
           />
         ) : null}
+        {!isOwner && currentMembership &&
+        (currentMembership.role === "OWNER" ||
+          currentMembership.role === "ADMIN") ? (
+          <RateioActivityDrawer events={rateio.activityEvents} />
+        ) : null}
       </div>
 
       <RateioRealtimeSession
         authenticated
+        currentMemberId={currentMembership?.id}
+        currentRole={currentMembership?.role}
         initial={{
           baseCurrency: rateio.baseCurrency,
           status: rateio.status,

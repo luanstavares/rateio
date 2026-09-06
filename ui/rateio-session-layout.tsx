@@ -1,7 +1,10 @@
 import { formatMinorAmount } from "../lib/format";
+import RateioItemDeleteButton from "./rateio-item-delete-button";
 
 export interface RateioSessionItem {
     id: string;
+    expenseId: string;
+    createdByMemberId: string;
     name: string;
     amountMinor: string;
     payerName: string | null;
@@ -14,18 +17,27 @@ export interface RateioSessionBalance {
 }
 
 export interface RateioSessionLayoutProps {
+    rateioId: string;
     items: RateioSessionItem[];
     totalAmountMinor: string | null;
     balances: RateioSessionBalance[];
     balancesError?: boolean;
     participantCount?: number;
     baseCurrency: string;
+    currentMemberId?: string;
+    currentRole?: "OWNER" | "ADMIN" | "PARTICIPANT";
 }
 
 function SessionItems({
     items,
     baseCurrency,
-}: Pick<RateioSessionLayoutProps, "items" | "baseCurrency">) {
+    currentMemberId,
+    currentRole,
+    rateioId,
+}: Pick<
+    RateioSessionLayoutProps,
+    "items" | "baseCurrency" | "currentMemberId" | "currentRole" | "rateioId"
+>) {
     return (
         <section
             aria-labelledby="rateio-items-heading"
@@ -75,9 +87,24 @@ function SessionItems({
                                         {item.payerName ?? "participante"}
                                     </p>
                                 </div>
-                                <span className="shrink-0 font-semibold">
-                                    {formatMinorAmount(item.amountMinor)}
-                                </span>
+                                <div className="flex shrink-0 items-center gap-2">
+                                    <span className="font-semibold">
+                                        {formatMinorAmount(item.amountMinor)}
+                                    </span>
+                                    {currentMemberId && currentRole ? (
+                                        <RateioItemDeleteButton
+                                            createdByMemberId={
+                                                item.createdByMemberId
+                                            }
+                                            currentMemberId={currentMemberId}
+                                            currentRole={currentRole}
+                                            expenseId={item.expenseId}
+                                            itemId={item.id}
+                                            itemName={item.name}
+                                            rateioId={rateioId}
+                                        />
+                                    ) : null}
+                                </div>
                             </li>
                         ))}
                     </ul>
@@ -191,18 +218,24 @@ function RateioBreakdown({
 }
 
 export default function RateioSessionLayout({
+    rateioId,
     items,
     totalAmountMinor,
     balances,
     balancesError,
     participantCount,
     baseCurrency,
+    currentMemberId,
+    currentRole,
 }: RateioSessionLayoutProps) {
     return (
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)]">
             <SessionItems
                 baseCurrency={baseCurrency}
+                currentMemberId={currentMemberId}
+                currentRole={currentRole}
                 items={items}
+                rateioId={rateioId}
             />
             <RateioBreakdown
                 balances={balances}

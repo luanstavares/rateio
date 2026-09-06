@@ -6,10 +6,12 @@ import { z } from "zod";
 import {
   createApiAnonymousExpense,
   createApiExpense,
+  removeApiExpenseItem,
 } from "../../lib/api/expenses";
 import type {
   AnonymousExpenseResponseDto,
   CreateExpenseDto,
+  ExpenseItemDeletionResponseDto,
   ExpenseResponseDto,
 } from "../../lib/api/generated";
 import type { ApiClientError } from "../../lib/api/errors";
@@ -39,7 +41,9 @@ const createExpenseSchema = z
     allocations: z.array(allocationSchema).min(1),
   })
   .superRefine((input, context) => {
-    const memberIds = input.allocations.map((allocation) => allocation.memberId);
+    const memberIds = input.allocations.map(
+      (allocation) => allocation.memberId,
+    );
     if (new Set(memberIds).size !== memberIds.length) {
       context.addIssue({
         code: "custom",
@@ -96,6 +100,10 @@ export type CreateManualExpenseResult =
   | { success: true; data: ExpenseResponseDto | AnonymousExpenseResponseDto }
   | { success: false; error: string };
 
+export type RemoveExpenseItemResult =
+  | { success: true; data: ExpenseItemDeletionResponseDto }
+  | { success: false; error: string };
+
 function errorMessage(error: ApiClientError): string {
   if (error.kind === "api" && error.statusCode === 400) {
     return "Confira o item e a divisão dos participantes.";
@@ -115,12 +123,80 @@ function errorMessage(error: ApiClientError): string {
   return "Não foi possível adicionar o item agora. Tente novamente.";
 }
 
+function removeItemErrorMessage(error: ApiClientError): string {
+  if (error.kind === "api" && error.statusCode === 401) {
+    return "Sua sessão expirou. Entre novamente para continuar.";
+  }
+  if (error.kind === "api" && error.statusCode === 403) {
+    return "Você não pode remover este item.";
+  }
+  if (error.kind === "api" && error.statusCode === 404) {
+    return "Este item não foi encontrado ou já foi removido.";
+  }
+  if (error.kind === "api" && error.statusCode === 409) {
+    return "Este rateio não aceita alterações agora.";
+  }
+  return "Não foi possível remover o item agora. Tente novamente.";
+}
+
+const removeExpenseItemSchema = z.object({
+  rateioId: z.string().trim().min(1),
+  expenseId: z.string().trim().min(1),
+  itemId: z.string().trim().min(1),
+});
+
+export async function removeExpenseItem(
+  rateioId: string,
+  expenseId: string,
+  itemId: string,
+): Promise<RemoveExpenseItemResult> {
+  const parsed = removeExpenseItemSchema.safeParse({
+    rateioId,
+    expenseId,
+    itemId,
+  });
+  if (!parsed.success) {
+    return { success: false, error: "Este item não é válido." };
+  }
+
+  const accessToken = await getAccessToken();
+  if (!accessToken) {
+    return {
+      success: false,
+      error: "Entre na sua conta para remover este item.",
+    };
+  }
+
+  try {
+    const result = await removeApiExpenseItem(
+      accessToken,
+      parsed.data.rateioId,
+      parsed.data.expenseId,
+      parsed.data.itemId,
+    );
+    if (result.error !== undefined) {
+      return { success: false, error: removeItemErrorMessage(result.error) };
+    }
+
+    revalidatePath(`/rateios/${parsed.data.rateioId}`);
+    return { success: true, data: result.data };
+  } catch {
+    return {
+      success: false,
+      error: "Não foi possível remover o item agora. Tente novamente.",
+    };
+  }
+}
+
 export async function createManualExpense(
   input: CreateManualExpenseInput,
 ): Promise<CreateManualExpenseResult> {
   const parsed = createExpenseSchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, error: "Confira o item e a divisão dos participantes." };
+    return {
+      success: false,
+      error: "Confira o item e a divisão dos participantes.",
+    };
   }
 
   const body: CreateExpenseDto = {
@@ -144,7 +220,11 @@ export async function createManualExpense(
       : await (async () => {
           const sessionToken = await getAnonymousSessionToken();
           return sessionToken
-            ? createApiAnonymousExpense(sessionToken, parsed.data.rateioId, body)
+            ? createApiAnonymousExpense(
+                sessionToken,
+                parsed.data.rateioId,
+                body,
+              )
             : { error: { kind: "api", statusCode: 401 } as ApiClientError };
         })();
 
@@ -155,6 +235,9 @@ export async function createManualExpense(
     revalidatePath(`/rateios/${parsed.data.rateioId}`);
     return { success: true, data: result.data };
   } catch {
-    return { success: false, error: "Não foi possível adicionar o item agora. Tente novamente." };
+    return {
+      success: false,
+      error: "Não foi possível adicionar o item agora. Tente novamente.",
+    };
   }
 }

@@ -5,11 +5,13 @@ import {
   anonymousExpensesControllerList,
   expensesControllerCreate,
   expensesControllerList,
+  expensesControllerRemoveItem,
   type AnonymousExpenseResponseDto,
   type AnonymousExpenseSessionResponseDto,
   type CreateExpenseDto,
   type ExpenseResponseDto,
   type ExpenseListResponseDto,
+  type ExpenseItemDeletionResponseDto,
   type ExpensesControllerListData,
 } from "./generated";
 import { normalizeApiResult, type ApiResult } from "./errors";
@@ -42,6 +44,20 @@ export function listApiExpenses(
   }).then((result) => normalizeApiResult<ExpenseListResponseDto>(result));
 }
 
+export function removeApiExpenseItem(
+  accessToken: string,
+  rateioId: string,
+  expenseId: string,
+  itemId: string,
+): Promise<ApiResult<ExpenseItemDeletionResponseDto>> {
+  return expensesControllerRemoveItem({
+    client: createServerApiClient(accessToken),
+    path: { rateioId, expenseId, itemId },
+  }).then((result) =>
+    normalizeApiResult<ExpenseItemDeletionResponseDto>(result),
+  );
+}
+
 export function listApiAnonymousExpenses(
   sessionToken: string,
   rateioId: string,
@@ -63,7 +79,5 @@ export function createApiAnonymousExpense(
     client: createServerApiClient(sessionToken),
     path: { rateioId },
     body: input,
-  }).then((result) =>
-    normalizeApiResult<AnonymousExpenseResponseDto>(result),
-  );
+  }).then((result) => normalizeApiResult<AnonymousExpenseResponseDto>(result));
 }

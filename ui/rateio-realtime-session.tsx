@@ -31,6 +31,8 @@ type RealtimeSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 export interface RateioRealtimeSessionProps {
   rateioId: string;
   authenticated: boolean;
+  currentMemberId?: string;
+  currentRole?: "OWNER" | "ADMIN" | "PARTICIPANT";
   initial: {
     baseCurrency: string;
     status: "ACTIVE" | "CLOSED";
@@ -55,6 +57,8 @@ function sessionFromSnapshot(
     items: snapshot.expenses.flatMap((expense) =>
       expense.items.map((item) => ({
         id: item.id,
+        expenseId: item.expenseId,
+        createdByMemberId: expense.createdByMemberId,
         name: item.name,
         amountMinor: item.baseAmountMinor,
         payerName: memberNames.get(expense.payerMemberId) ?? null,
@@ -106,6 +110,8 @@ async function refreshAuthenticatedSession(): Promise<boolean> {
 export default function RateioRealtimeSession({
   rateioId,
   authenticated,
+  currentMemberId,
+  currentRole,
   initial,
 }: RateioRealtimeSessionProps) {
   const [session, setSession] = useState(initial);
@@ -195,7 +201,12 @@ export default function RateioRealtimeSession({
           ? "Rateio aberto para novas alterações."
           : "Rateio fechado para novas alterações."}
       </p>
-      <RateioSessionLayout {...session} />
+      <RateioSessionLayout
+        {...session}
+        currentMemberId={currentMemberId}
+        currentRole={currentRole}
+        rateioId={rateioId}
+      />
     </>
   );
 }
