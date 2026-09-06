@@ -14,9 +14,9 @@ import {
     listApiBalances,
 } from "../../../lib/api/settlements";
 import {
-    getRefreshAwareAccessToken,
     getAnonymousSessionToken,
     getCurrentUser,
+    getRefreshAwareAccessToken,
 } from "../../../lib/auth/server-session";
 import { formatMinorAmount } from "../../../lib/format";
 import ClearAnonymousSession from "../../../ui/clear-anonymous-session";
@@ -37,7 +37,19 @@ import RateioStatusControl from "../../../ui/rateio-status-control";
 
 type RateioDetailPageProps = {
     params: Promise<{ id: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
+
+function searchParamValue(
+    value: string | string[] | undefined,
+): string | undefined {
+    return Array.isArray(value) ? value[0] : value;
+}
+
+function claimReturnHref(rateioId: string): string {
+    const returnTo = encodeURIComponent(`/rateios/${rateioId}`);
+    return `/api/auth/google?returnTo=${returnTo}`;
+}
 
 function descriptionText(description: unknown): string | null {
     return typeof description === "string" ? description : null;
@@ -119,6 +131,7 @@ function AnonymousSessionView({
     expenseSession,
     balances,
     balancesError,
+    authError,
 }: {
     participant: { displayName: string };
     rateio: {
@@ -131,6 +144,7 @@ function AnonymousSessionView({
     expenseSession: AnonymousExpenseSessionResponseDto;
     balances: RateioSessionBalance[];
     balancesError: boolean;
+    authError: boolean;
 }) {
     const description = descriptionText(rateio.description);
     const isActive = rateio.status === "ACTIVE";
@@ -162,6 +176,32 @@ function AnonymousSessionView({
                     <p className="mt-1 font-semibold">
                         {participant.displayName}
                     </p>
+                </div>
+
+                {authError ? (
+                    <div
+                        className="mt-4 rounded-md border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive"
+                        role="alert"
+                    >
+                        Não foi possível entrar com o Google agora. Sua sessão
+                        compartilhada continua disponível.
+                    </div>
+                ) : null}
+
+                <div className="mt-4 rounded-md border border-border bg-primary/5 p-4">
+                    <p className="text-sm text-muted-foreground">
+                        Quer guardar sua participação e este histórico na sua
+                        conta?
+                    </p>
+                    <Button
+                        asChild
+                        className="mt-4"
+                        variant="outline"
+                    >
+                        <a href={claimReturnHref(rateio.id)}>
+                            Vincular à minha conta Google
+                        </a>
+                    </Button>
                 </div>
 
                 {!isActive ? (
@@ -201,7 +241,11 @@ function AnonymousSessionView({
 
 export default async function RateioDetailPage({
     params,
+    searchParams,
 }: RateioDetailPageProps) {
+    const resolvedSearchParams = searchParams ? await searchParams : {};
+    const claimStatus = searchParamValue(resolvedSearchParams.claim);
+    const authError = searchParamValue(resolvedSearchParams.authError);
     const accessToken = await getRefreshAwareAccessToken();
     const anonymousSessionToken = await getAnonymousSessionToken();
     const { id } = await params;
@@ -254,6 +298,7 @@ export default async function RateioDetailPage({
                     })) ?? []
                 }
                 balancesError={anonymousBalancesResult?.error !== undefined}
+                authError={authError === "oauth"}
             />
         );
     }
@@ -302,13 +347,31 @@ export default async function RateioDetailPage({
                     role="alert"
                 >
                     <h1 className="text-2xl font-bold">Rateio indisponível</h1>
+                    {claimStatus === "error" ? (
+                        <p className="mt-2 text-sm text-destructive">
+                            Não foi possível vincular sua participação anônima à
+                            conta. Você pode tentar novamente pelo mesmo
+                            navegador.
+                        </p>
+                    ) : null}
                     <p className="mt-2 text-sm text-muted-foreground">
                         {errorMessage(result.error)}
                     </p>
+                    {claimStatus === "error" ? (
+                        <Button
+                            asChild
+                            className="mt-5"
+                            variant="outline"
+                        >
+                            <a href={claimReturnHref(id)}>
+                                Tentar vincular novamente
+                            </a>
+                        </Button>
+                    ) : null}
                     <Button
                         asChild
                         variant="outline"
-                        className="mt-5"
+                        className={claimStatus === "error" ? "mt-3" : "mt-5"}
                     >
                         <Link href="/rateios">Voltar para meus rateios</Link>
                     </Button>
@@ -340,6 +403,31 @@ export default async function RateioDetailPage({
             </div>
 
             <div className="rounded-lg border border-border bg-card p-6 sm:p-8">
+                {claimStatus === "success" ? (
+                    <div
+                        className="mb-6 rounded-md border border-primary/40 bg-primary/5 p-4 text-sm text-primary"
+                        role="status"
+                    >
+                        Sua participação anônima foi vinculada à sua conta. Este
+                        rateio agora faz parte do seu histórico.
+                    </div>
+                ) : null}
+                {claimStatus === "error" ? (
+                    <div
+                        className="mb-6 rounded-md border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive"
+                        role="alert"
+                    >
+                        Não foi possível vincular sua participação anônima à
+                        conta. Sua sessão compartilhada não foi alterada; você
+                        pode tentar novamente.
+                        <a
+                            className="mt-2 block font-medium underline underline-offset-4"
+                            href={claimReturnHref(rateio.id)}
+                        >
+                            Tentar vincular novamente
+                        </a>
+                    </div>
+                ) : null}
                 <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <div className="flex flex-wrap items-center gap-3">

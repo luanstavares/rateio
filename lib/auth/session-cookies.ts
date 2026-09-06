@@ -4,6 +4,7 @@ import type { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const OAUTH_STATE_COOKIE = "rateio_oauth_state";
+export const OAUTH_RETURN_TO_COOKIE = "rateio_oauth_return_to";
 export const ACCESS_TOKEN_COOKIE = "rateio_access_token";
 export const REFRESH_TOKEN_COOKIE = "rateio_refresh_token";
 export const ANONYMOUS_SESSION_TOKEN_COOKIE = "rateio_anonymous_session_token";
@@ -80,6 +81,25 @@ export function setOAuthStateCookie(
 export function clearOAuthStateCookie(response: NextResponse): void {
   response.cookies.set({
     name: OAUTH_STATE_COOKIE,
+    value: "",
+    ...sessionCookieOptions(0),
+  });
+}
+
+export function setOAuthReturnToCookie(
+  response: NextResponse,
+  returnTo: string,
+): void {
+  response.cookies.set({
+    name: OAUTH_RETURN_TO_COOKIE,
+    value: returnTo,
+    ...sessionCookieOptions(OAUTH_STATE_MAX_AGE_SECONDS),
+  });
+}
+
+export function clearOAuthReturnToCookie(response: NextResponse): void {
+  response.cookies.set({
+    name: OAUTH_RETURN_TO_COOKIE,
     value: "",
     ...sessionCookieOptions(0),
   });
