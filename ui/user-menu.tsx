@@ -21,22 +21,15 @@ interface UserMenuProps {
 export default function UserMenu({ profile }: UserMenuProps) {
     return (
         <Drawer direction="right">
-            <DrawerTrigger asChild>
-                <Button
-                    aria-label="Abrir menu da conta"
-                    size="icon"
-                    variant="ghost"
-                    type="button"
-                >
-                    {profile ? (
-                        <AccountAvatar
-                            profile={profile}
-                            className="size-8"
-                        />
-                    ) : (
-                        <UserIcon aria-hidden="true" />
-                    )}
-                </Button>
+            <DrawerTrigger className="hover:cursor-pointer">
+                {profile ? (
+                    <AccountAvatar
+                        profile={profile}
+                        className="size-8"
+                    />
+                ) : (
+                    <UserIcon aria-hidden="true" />
+                )}
             </DrawerTrigger>
             <DrawerContent className="p-6">
                 <DrawerTitle>Minha conta</DrawerTitle>
