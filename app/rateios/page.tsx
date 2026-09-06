@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { getAccessToken } from "../../lib/auth/server-session";
+import { getRefreshAwareAccessToken } from "../../lib/auth/server-session";
 import { listApiRateios } from "../../lib/api/rateios";
 import type { ApiClientError } from "../../lib/api/errors";
 import RateioCard from "../../ui/rateio-card";
@@ -28,7 +28,7 @@ function errorMessage(error: ApiClientError): string {
 export default async function RateiosPage({
   searchParams,
 }: RateiosPageProps) {
-  const accessToken = await getAccessToken();
+  const accessToken = await getRefreshAwareAccessToken();
   const page = parsePage((await searchParams).page);
   const result = accessToken
     ? await listApiRateios(accessToken, { page, pageSize: PAGE_SIZE })

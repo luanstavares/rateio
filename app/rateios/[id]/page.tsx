@@ -14,7 +14,7 @@ import {
     listApiBalances,
 } from "../../../lib/api/settlements";
 import {
-    getAccessToken,
+    getRefreshAwareAccessToken,
     getAnonymousSessionToken,
     getCurrentUser,
 } from "../../../lib/auth/server-session";
@@ -202,7 +202,7 @@ function AnonymousSessionView({
 export default async function RateioDetailPage({
     params,
 }: RateioDetailPageProps) {
-    const accessToken = await getAccessToken();
+    const accessToken = await getRefreshAwareAccessToken();
     const anonymousSessionToken = await getAnonymousSessionToken();
     const { id } = await params;
     const [currentUser, result, balancesResult] = accessToken

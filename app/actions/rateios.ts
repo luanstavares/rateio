@@ -28,7 +28,7 @@ import type {
   MemberResponseDto,
 } from "../../lib/api/generated";
 import type { ApiClientError } from "../../lib/api/errors";
-import { getAccessToken } from "../../lib/auth/server-session";
+import { getRefreshAwareAccessToken } from "../../lib/auth/server-session";
 import { cookies } from "next/headers";
 import {
   clearAnonymousSessionCookieStore,
@@ -161,7 +161,7 @@ function safeMembershipErrorMessage(
 async function getRequiredAccessToken(): Promise<
   { success: true; token: string } | { success: false; error: string }
 > {
-  const accessToken = await getAccessToken();
+  const accessToken = await getRefreshAwareAccessToken();
   return accessToken
     ? { success: true, token: accessToken }
     : {
@@ -189,7 +189,7 @@ export async function createRateio(
     return { success: false, error: "Confira os dados do rateio." };
   }
 
-  const accessToken = await getAccessToken();
+  const accessToken = await getRefreshAwareAccessToken();
   if (!accessToken) {
     return {
       success: false,
@@ -219,7 +219,7 @@ export async function changeRateioStatus(
     return { success: false, error: "Não foi possível alterar o status." };
   }
 
-  const accessToken = await getAccessToken();
+  const accessToken = await getRefreshAwareAccessToken();
   if (!accessToken) {
     return {
       success: false,

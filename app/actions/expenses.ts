@@ -16,7 +16,7 @@ import type {
 } from "../../lib/api/generated";
 import type { ApiClientError } from "../../lib/api/errors";
 import {
-  getAccessToken,
+  getRefreshAwareAccessToken,
   getAnonymousSessionToken,
 } from "../../lib/auth/server-session";
 
@@ -159,7 +159,7 @@ export async function removeExpenseItem(
     return { success: false, error: "Este item não é válido." };
   }
 
-  const accessToken = await getAccessToken();
+  const accessToken = await getRefreshAwareAccessToken();
   if (!accessToken) {
     return {
       success: false,
@@ -214,7 +214,7 @@ export async function createManualExpense(
   };
 
   try {
-    const accessToken = await getAccessToken();
+    const accessToken = await getRefreshAwareAccessToken();
     const result = accessToken
       ? await createApiExpense(accessToken, parsed.data.rateioId, body)
       : await (async () => {

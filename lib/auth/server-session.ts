@@ -5,22 +5,24 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
   getAuthenticatedApiUser,
-  refreshApiSession,
   revokeApiSession,
 } from "../api/auth";
+import { refreshSessionTokens } from "./session-refresh";
 import {
   ACCESS_TOKEN_COOKIE,
   ANONYMOUS_SESSION_TOKEN_COOKIE,
   anonymousSessionTokenSchema,
-  authTokenResponseSchema,
   clearSessionCookies,
-  isCurrentAuthTokenResponse,
   REFRESH_TOKEN_COOKIE,
   setSessionCookies,
   type AuthenticatedUser,
 } from "./session-cookies";
 
-export async function getAccessToken(): Promise<string | null> {
+/**
+ * Reads the access token prepared by the request proxy.
+ * Expired sessions are rotated before server components or actions read it.
+ */
+export async function getRefreshAwareAccessToken(): Promise<string | null> {
   return (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value ?? null;
 }
 
@@ -32,7 +34,7 @@ export async function getAnonymousSessionToken(): Promise<string | null> {
 
 export const getCurrentUser = cache(
   async (): Promise<AuthenticatedUser | null> => {
-    const accessToken = await getAccessToken();
+    const accessToken = await getRefreshAwareAccessToken();
     if (!accessToken) return null;
 
     const result = await getAuthenticatedApiUser(accessToken);
@@ -48,20 +50,14 @@ export async function rotateSession(): Promise<NextResponse> {
     return response;
   }
 
-  const result = await refreshApiSession(refreshToken);
-  if ("error" in result) {
-    clearSessionCookies(response);
-    return response;
-  }
-
-  const tokens = authTokenResponseSchema.safeParse(result.data);
-  if (!tokens.success || !isCurrentAuthTokenResponse(tokens.data)) {
+  const tokens = await refreshSessionTokens(refreshToken);
+  if (!tokens) {
     clearSessionCookies(response);
     return response;
   }
 
   const successResponse = NextResponse.json({ success: true });
-  setSessionCookies(successResponse, tokens.data);
+  setSessionCookies(successResponse, tokens);
   return successResponse;
 }
 
