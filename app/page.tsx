@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
+import React from "react";
 
 import { Button } from "../ui/components/ui/button";
 
@@ -20,11 +20,8 @@ export default function Home() {
 
             <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center text-center lg:max-w-xl">
                 <div className="flex flex-col items-center gap-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/80">
-                        Divida com clareza
-                    </p>
                     <h1 className="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">
-                        {title}{" "}
+                        {title}
                         <Logo
                             size="small"
                             className="text-4xl sm:text-5xl md:text-6xl"
@@ -53,7 +50,9 @@ export default function Home() {
                         } else {
                             return (
                                 <React.Fragment key={option.title}>
-                                    <span className="text-sm text-muted-foreground">ou</span>
+                                    <span className="text-sm text-muted-foreground">
+                                        ou
+                                    </span>
                                     <Button
                                         asChild
                                         className="min-w-60"
