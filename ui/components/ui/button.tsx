@@ -11,6 +11,8 @@ const buttonVariants = cva(
             variant: {
                 default:
                     "bg-primary text-primary-foreground shadow-xs hover:bg-primary-hover",
+                secondary:
+                    "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
                 outline:
                     "border border-primary bg-transparent text-primary hover:bg-primary/10",
                 destructive:
@@ -18,7 +20,7 @@ const buttonVariants = cva(
                 ghost: "text-foreground hover:bg-foreground/10",
             },
             size: {
-                default: "h-9 px-4 py-2",
+                default: "h-8 px-4 py-2",
                 sm: "h-8 rounded-[4px] px-3 text-xs",
                 lg: "h-10 px-6",
                 icon: "size-10",

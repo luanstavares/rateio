@@ -7,12 +7,14 @@
     --card: rgba(13, 13, 13, 0.97);
     --card-foreground: #eaeaea;
     --primary: #ffad33;
-    --primary-hover: #e88b00;
+    --primary-hover: #e89a26;
     --primary-foreground: #000000;
     --destructive: #ef5555;
     --destructive-foreground: #000000;
-    --secondary: #ffcc80;
-    --secondary-foreground: #000000;
+    --success: #04bb38;
+    --success-foreground: #000000;
+    --secondary: #161616;
+    --secondary-foreground: #ffffff;
     --muted: #2e2e2e;
     --muted-foreground: #bebebe;
     --border: #292929;
@@ -31,6 +33,8 @@
     --color-primary-foreground: var(--primary-foreground);
     --color-destructive: var(--destructive);
     --color-destructive-foreground: var(--destructive-foreground);
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
     --color-muted: var(--muted);

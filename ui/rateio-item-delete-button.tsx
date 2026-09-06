@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import {
+    removeExpenseItem,
+    type RemoveExpenseItemResult,
+} from "../app/actions/expenses";
+import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -15,10 +19,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "./components/ui/alert-dialog";
-import {
-    removeExpenseItem,
-    type RemoveExpenseItemResult,
-} from "../app/actions/expenses";
 import { Button } from "./components/ui/button";
 
 interface RateioItemDeleteButtonProps {
@@ -99,7 +99,7 @@ export default function RateioItemDeleteButton({
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel
-                            variant="ghost"
+                            variant="secondary"
                             disabled={isPending}
                         >
                             Cancelar
