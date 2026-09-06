@@ -35,6 +35,16 @@ Set `OPENAPI_SOURCE` when the API document is not at the local default:
 OPENAPI_SOURCE=https://api.example.com/openapi.json npm run api:generate
 ```
 
+Run the contract drift check after starting the API locally:
+
+```bash
+npm run api:check
+```
+
+The check regenerates `lib/api/generated/` and fails when the generated output
+differs from the committed client. Review and commit regenerated output when
+the API contract intentionally changes; do not edit generated files by hand.
+
 `NEXT_PUBLIC_API_BASE_URL` controls runtime requests and defaults to
 `http://localhost:3000`. It is separate from `OPENAPI_SOURCE`, which is only
 used while generating `lib/api/generated/`. Generated files are disposable and
