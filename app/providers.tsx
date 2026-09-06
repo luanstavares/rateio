@@ -4,8 +4,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import ApiClientProvider from "../lib/api/api-client-provider";
+import UserProvider from "../ui/user-provider";
+import type { UserSession } from "../lib/auth/user-session";
 
-export default function Providers({ children }: { children: ReactNode }) {
+export default function Providers({
+    children,
+    initialUser,
+}: {
+    children: ReactNode;
+    initialUser: UserSession | null;
+}) {
     const [queryClient] = useState(
         () =>
             new QueryClient({
@@ -21,7 +29,7 @@ export default function Providers({ children }: { children: ReactNode }) {
     return (
         <ApiClientProvider>
             <QueryClientProvider client={queryClient}>
-                {children}
+                <UserProvider initialUser={initialUser}>{children}</UserProvider>
             </QueryClientProvider>
         </ApiClientProvider>
     );

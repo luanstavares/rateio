@@ -1,16 +1,11 @@
 import Link from "next/link";
-import { getCurrentUser } from "../lib/auth/server-session";
 
 //Local Components
 import BurgerMenu from "./burger-menu";
 import Logo from "./logo";
 import UserMenu from "./user-menu";
 
-export default async function Navbar() {
-  const user = await getCurrentUser();
-  const profile = user
-    ? { name: user.name, email: user.email, pictureUrl: user.pictureUrl }
-    : null;
+export default function Navbar() {
   return (
     <nav
       aria-label="Navegação principal"
@@ -27,7 +22,7 @@ export default async function Navbar() {
         <Logo glow="active" />
       </Link>
       <div className="justify-self-end">
-        <UserMenu profile={profile} />
+        <UserMenu />
       </div>
     </nav>
   );

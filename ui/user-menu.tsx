@@ -2,7 +2,7 @@
 
 import { GoogleLogoIcon, UserIcon } from "@phosphor-icons/react";
 import Link from "next/link";
-import AccountAvatar, { type AccountProfile } from "./account-avatar";
+import AccountAvatar from "./account-avatar";
 import { Button } from "./components/ui/button";
 import {
     Drawer,
@@ -15,12 +15,14 @@ import {
     DrawerTrigger,
 } from "./components/ui/drawer";
 import SignOutButton from "./sign-out-button";
+import { useUser } from "./user-provider";
 
-interface UserMenuProps {
-    profile: AccountProfile | null;
-}
+export default function UserMenu() {
+    const { user } = useUser();
+    const profile = user
+        ? { name: user.name, email: user.email, pictureUrl: user.pictureUrl }
+        : null;
 
-export default function UserMenu({ profile }: UserMenuProps) {
     return (
         <Drawer direction="right">
             <DrawerTrigger className="hover:cursor-pointer">
