@@ -291,6 +291,24 @@ export type ShareLinkMetadataResponseDto = {
     } | null;
 };
 
+export type ClaimAnonymousParticipantDto = {
+    token: string;
+};
+
+export type ClaimAnonymousParticipantResponseDto = {
+    id: string;
+    rateioId: string;
+    userId: string;
+    role: 'OWNER' | 'ADMIN' | 'PARTICIPANT';
+    joinedAt: string;
+    leftAt?: {
+        [key: string]: unknown;
+    } | null;
+    createdAt: string;
+    updatedAt: string;
+    user?: UserResponseDto;
+};
+
 export type InviteMemberDto = {
     email: string;
 };
@@ -1390,6 +1408,51 @@ export type RateiosControllerRevokeShareLinkResponses = {
 };
 
 export type RateiosControllerRevokeShareLinkResponse = RateiosControllerRevokeShareLinkResponses[keyof RateiosControllerRevokeShareLinkResponses];
+
+export type RateiosControllerClaimAnonymousParticipantData = {
+    body: ClaimAnonymousParticipantDto;
+    path?: never;
+    query?: never;
+    url: '/rateios/anonymous/claim';
+};
+
+export type RateiosControllerClaimAnonymousParticipantErrors = {
+    /**
+     * The request is invalid or failed validation.
+     */
+    400: ApiErrorResponseDto;
+    /**
+     * Authentication is required or the credentials are invalid.
+     */
+    401: ApiErrorResponseDto;
+    /**
+     * The authenticated user is not allowed to perform this operation.
+     */
+    403: ApiErrorResponseDto;
+    /**
+     * The requested resource was not found.
+     */
+    404: ApiErrorResponseDto;
+    /**
+     * The request conflicts with the current resource state.
+     */
+    409: ApiErrorResponseDto;
+    /**
+     * An unexpected server error occurred.
+     */
+    500: ApiErrorResponseDto;
+};
+
+export type RateiosControllerClaimAnonymousParticipantError = RateiosControllerClaimAnonymousParticipantErrors[keyof RateiosControllerClaimAnonymousParticipantErrors];
+
+export type RateiosControllerClaimAnonymousParticipantResponses = {
+    /**
+     * Claimed anonymous participant membership.
+     */
+    200: ClaimAnonymousParticipantResponseDto;
+};
+
+export type RateiosControllerClaimAnonymousParticipantResponse = RateiosControllerClaimAnonymousParticipantResponses[keyof RateiosControllerClaimAnonymousParticipantResponses];
 
 export type RateiosControllerInviteData = {
     body: InviteMemberDto;
