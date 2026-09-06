@@ -1,10 +1,10 @@
-"use client";
-import type { SVGProps } from "react";
+'use client';
+import type { SVGProps } from 'react';
 
 export default function HomeIcons({
-  size = "300",
+  size = '300',
   className,
-}: { size?: string } & Pick<SVGProps<SVGSVGElement>, "className">) {
+}: { size?: string } & Pick<SVGProps<SVGSVGElement>, 'className'>) {
   return (
     <div className="absolute bottom-[2vh] right-[10vw] z-0">
       <svg
@@ -51,10 +51,7 @@ export default function HomeIcons({
             filterUnits="userSpaceOnUse"
             colorInterpolationFilters="sRGB"
           >
-            <feFlood
-              floodOpacity="0"
-              result="BackgroundImageFix"
-            />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feColorMatrix
               in="SourceAlpha"
               type="matrix"
@@ -63,10 +60,7 @@ export default function HomeIcons({
             />
             <feOffset />
             <feGaussianBlur stdDeviation="11.5" />
-            <feComposite
-              in2="hardAlpha"
-              operator="out"
-            />
+            <feComposite in2="hardAlpha" operator="out" />
             <feColorMatrix
               type="matrix"
               values="0 0 0 0 1 0 0 0 0 0.733333 0 0 0 0 0.329412 0 0 0 0.53 0"

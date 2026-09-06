@@ -1,13 +1,13 @@
-import "server-only";
+import 'server-only';
 
 import {
   anonymousSettlementsControllerBalances,
   settlementsControllerBalances,
   type AnonymousBalanceResponseDto,
   type BalanceResponseDto,
-} from "./generated";
-import { normalizeApiResult, type ApiResult } from "./errors";
-import { createServerApiClient } from "./server-client";
+} from './generated';
+import { normalizeApiResult, type ApiResult } from './errors';
+import { createServerApiClient } from './server-client';
 
 export function listApiBalances(
   accessToken: string,

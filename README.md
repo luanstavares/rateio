@@ -14,7 +14,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
-
 ## API integration
 
 The typed client is generated from the NestJS API OpenAPI document. Start the

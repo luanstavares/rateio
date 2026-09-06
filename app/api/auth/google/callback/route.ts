@@ -1,9 +1,9 @@
-import { timingSafeEqual } from "node:crypto";
-import { NextRequest, NextResponse } from "next/server";
-import { authControllerGoogleCallback } from "../../../../../lib/api/generated";
-import { createServerApiClient } from "../../../../../lib/api/server-client";
-import { normalizeApiResult } from "../../../../../lib/api/errors";
-import { claimApiAnonymousParticipant } from "../../../../../lib/api/rateios";
+import { timingSafeEqual } from 'node:crypto';
+import { NextRequest, NextResponse } from 'next/server';
+import { authControllerGoogleCallback } from '../../../../../lib/api/generated';
+import { createServerApiClient } from '../../../../../lib/api/server-client';
+import { normalizeApiResult } from '../../../../../lib/api/errors';
+import { claimApiAnonymousParticipant } from '../../../../../lib/api/rateios';
 import {
   anonymousSessionTokenSchema,
   authTokenResponseSchema,
@@ -14,9 +14,9 @@ import {
   OAUTH_RETURN_TO_COOKIE,
   OAUTH_STATE_COOKIE,
   setSessionCookies,
-} from "../../../../../lib/auth/session-cookies";
+} from '../../../../../lib/auth/session-cookies';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 
 function statesMatch(expected: string, received: string): boolean {
   const expectedBuffer = Buffer.from(expected);
@@ -29,22 +29,22 @@ function statesMatch(expected: string, received: string): boolean {
 
 function safeReturnTo(request: NextRequest): string {
   const returnTo = request.cookies.get(OAUTH_RETURN_TO_COOKIE)?.value;
-  if (!returnTo || !returnTo.startsWith("/") || returnTo.startsWith("//")) {
-    return "/";
+  if (!returnTo || !returnTo.startsWith('/') || returnTo.startsWith('//')) {
+    return '/';
   }
 
   try {
     const destination = new URL(returnTo, request.nextUrl.origin);
-    if (destination.origin !== request.nextUrl.origin) return "/";
+    if (destination.origin !== request.nextUrl.origin) return '/';
     return `${destination.pathname}${destination.search}`;
   } catch {
-    return "/";
+    return '/';
   }
 }
 
 function errorRedirect(request: NextRequest, returnTo: string): NextResponse {
   const destination = new URL(returnTo, request.url);
-  destination.searchParams.set("authError", "oauth");
+  destination.searchParams.set('authError', 'oauth');
   return NextResponse.redirect(destination);
 }
 
@@ -52,8 +52,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const returnTo = safeReturnTo(request);
   const response = errorRedirect(request, returnTo);
   const expectedState = request.cookies.get(OAUTH_STATE_COOKIE)?.value;
-  const receivedState = request.nextUrl.searchParams.get("state");
-  const code = request.nextUrl.searchParams.get("code");
+  const receivedState = request.nextUrl.searchParams.get('state');
+  const code = request.nextUrl.searchParams.get('code');
 
   clearOAuthStateCookie(response);
   clearOAuthReturnToCookie(response);
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     query: { code, state: receivedState },
   });
   const normalized = normalizeApiResult(result);
-  if ("error" in normalized) return response;
+  if ('error' in normalized) return response;
 
   const tokens = authTokenResponseSchema.safeParse(normalized.data);
   if (!tokens.success || Date.parse(tokens.data.expiresAt) <= Date.now()) {
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const destination = new URL(returnTo, request.url);
   if (anonymousTokenValue !== undefined) {
-    destination.searchParams.set("claim", claimSucceeded ? "success" : "error");
+    destination.searchParams.set('claim', claimSucceeded ? 'success' : 'error');
   }
 
   const successResponse = NextResponse.redirect(destination);

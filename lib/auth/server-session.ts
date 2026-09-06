@@ -1,13 +1,10 @@
-import "server-only";
+import 'server-only';
 
-import { cache } from "react";
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import {
-  getAuthenticatedApiUser,
-  revokeApiSession,
-} from "../api/auth";
-import { refreshSessionTokens } from "./session-refresh";
+import { cache } from 'react';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
+import { getAuthenticatedApiUser, revokeApiSession } from '../api/auth';
+import { refreshSessionTokens } from './session-refresh';
 import {
   ACCESS_TOKEN_COOKIE,
   ANONYMOUS_SESSION_TOKEN_COOKIE,
@@ -16,7 +13,7 @@ import {
   REFRESH_TOKEN_COOKIE,
   setSessionCookies,
   type AuthenticatedUser,
-} from "./session-cookies";
+} from './session-cookies';
 
 /**
  * Reads the access token prepared by the request proxy.
@@ -38,7 +35,7 @@ export const getCurrentUser = cache(
     if (!accessToken) return null;
 
     const result = await getAuthenticatedApiUser(accessToken);
-    return "data" in result ? (result.data ?? null) : null;
+    return 'data' in result ? (result.data ?? null) : null;
   },
 );
 

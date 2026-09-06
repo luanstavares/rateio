@@ -1,7 +1,7 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import RateioJoinForm from "../../../ui/rateio-join-form";
-import { Button } from "../../../ui/components/ui/button";
+import RateioJoinForm from '../../../ui/rateio-join-form';
+import { Button } from '../../../ui/components/ui/button';
 
 type JoinRateioPageProps = {
   searchParams: Promise<{ token?: string | string[] }>;
@@ -11,7 +11,7 @@ export default async function JoinRateioPage({
   searchParams,
 }: JoinRateioPageProps) {
   const params = await searchParams;
-  const initialToken = typeof params.token === "string" ? params.token : "";
+  const initialToken = typeof params.token === 'string' ? params.token : '';
 
   return (
     <section className="mx-auto w-full max-w-xl px-6 py-8 sm:px-10 sm:py-12">

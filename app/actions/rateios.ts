@@ -1,6 +1,6 @@
-"use server";
+'use server';
 
-import { z } from "zod";
+import { z } from 'zod';
 import {
   changeApiRateioStatus,
   changeApiRateioMemberRole,
@@ -16,24 +16,24 @@ import {
   type InviteMemberInput,
   type MembershipRole,
   type RateioStatus,
-} from "../../lib/api/rateios";
-import type { RateioDetailResponseDto } from "../../lib/api/generated";
+} from '../../lib/api/rateios';
+import type { RateioDetailResponseDto } from '../../lib/api/generated';
 import type {
   RateioResponseDto,
   ShareLinkCreatedResponseDto,
   ShareLinkMetadataResponseDto,
-} from "../../lib/api/generated";
+} from '../../lib/api/generated';
 import type {
   InvitationResponseDto,
   MemberResponseDto,
-} from "../../lib/api/generated";
-import type { ApiClientError } from "../../lib/api/errors";
-import { getRefreshAwareAccessToken } from "../../lib/auth/server-session";
-import { cookies } from "next/headers";
+} from '../../lib/api/generated';
+import type { ApiClientError } from '../../lib/api/errors';
+import { getRefreshAwareAccessToken } from '../../lib/auth/server-session';
+import { cookies } from 'next/headers';
 import {
   clearAnonymousSessionCookieStore,
   setAnonymousSessionCookieStore,
-} from "../../lib/auth/session-cookies";
+} from '../../lib/auth/session-cookies';
 
 const createRateioSchema = z.object({
   title: z.string().trim().min(1).max(160),
@@ -92,70 +92,70 @@ export type RemoveMemberResult =
   | { success: false; error: string };
 
 function safeErrorMessage(error: ApiClientError): string {
-  if (error.kind === "api" && error.statusCode === 401) {
-    return "Sua sessão expirou. Entre novamente para criar um rateio.";
+  if (error.kind === 'api' && error.statusCode === 401) {
+    return 'Sua sessão expirou. Entre novamente para criar um rateio.';
   }
-  if (error.kind === "api" && error.statusCode === 400) {
-    return "Confira os dados do rateio e tente novamente.";
+  if (error.kind === 'api' && error.statusCode === 400) {
+    return 'Confira os dados do rateio e tente novamente.';
   }
-  return "Não foi possível criar o rateio agora. Tente novamente.";
+  return 'Não foi possível criar o rateio agora. Tente novamente.';
 }
 
 function safeStatusErrorMessage(error: ApiClientError): string {
-  if (error.kind === "api" && error.statusCode === 401) {
-    return "Sua sessão expirou. Entre novamente para alterar o rateio.";
+  if (error.kind === 'api' && error.statusCode === 401) {
+    return 'Sua sessão expirou. Entre novamente para alterar o rateio.';
   }
-  if (error.kind === "api" && error.statusCode === 403) {
-    return "Somente o responsável pelo rateio pode alterar o status.";
+  if (error.kind === 'api' && error.statusCode === 403) {
+    return 'Somente o responsável pelo rateio pode alterar o status.';
   }
-  if (error.kind === "api" && error.statusCode === 404) {
-    return "Este rateio não foi encontrado.";
+  if (error.kind === 'api' && error.statusCode === 404) {
+    return 'Este rateio não foi encontrado.';
   }
-  if (error.kind === "api" && error.statusCode === 409) {
-    return "O rateio não pode ter o status alterado agora.";
+  if (error.kind === 'api' && error.statusCode === 409) {
+    return 'O rateio não pode ter o status alterado agora.';
   }
-  return "Não foi possível alterar o status do rateio. Tente novamente.";
+  return 'Não foi possível alterar o status do rateio. Tente novamente.';
 }
 
 function safeShareLinkErrorMessage(error: ApiClientError): string {
-  if (error.kind === "api" && error.statusCode === 401) {
-    return "Sua sessão expirou. Entre novamente para gerenciar o link.";
+  if (error.kind === 'api' && error.statusCode === 401) {
+    return 'Sua sessão expirou. Entre novamente para gerenciar o link.';
   }
-  if (error.kind === "api" && error.statusCode === 403) {
-    return "Somente o responsável pelo rateio pode gerenciar o link.";
+  if (error.kind === 'api' && error.statusCode === 403) {
+    return 'Somente o responsável pelo rateio pode gerenciar o link.';
   }
-  if (error.kind === "api" && error.statusCode === 404) {
-    return "Este rateio ou link não foi encontrado.";
+  if (error.kind === 'api' && error.statusCode === 404) {
+    return 'Este rateio ou link não foi encontrado.';
   }
-  if (error.kind === "api" && error.statusCode === 409) {
-    return "O link não pode ser alterado neste momento.";
+  if (error.kind === 'api' && error.statusCode === 409) {
+    return 'O link não pode ser alterado neste momento.';
   }
-  return "Não foi possível gerenciar o link agora. Tente novamente.";
+  return 'Não foi possível gerenciar o link agora. Tente novamente.';
 }
 
 function safeMembershipErrorMessage(
   error: ApiClientError,
-  operation: "invite" | "role" | "remove",
+  operation: 'invite' | 'role' | 'remove',
 ): string {
-  if (error.kind === "api" && error.statusCode === 401) {
-    return "Sua sessão expirou. Entre novamente para gerenciar os membros.";
+  if (error.kind === 'api' && error.statusCode === 401) {
+    return 'Sua sessão expirou. Entre novamente para gerenciar os membros.';
   }
-  if (error.kind === "api" && error.statusCode === 403) {
-    if (operation === "invite") {
-      return "Somente responsáveis e administradores podem convidar membros.";
+  if (error.kind === 'api' && error.statusCode === 403) {
+    if (operation === 'invite') {
+      return 'Somente responsáveis e administradores podem convidar membros.';
     }
-    if (operation === "role") {
-      return "Somente o responsável pode alterar os papéis.";
+    if (operation === 'role') {
+      return 'Somente o responsável pode alterar os papéis.';
     }
-    return "Você não pode remover este membro.";
+    return 'Você não pode remover este membro.';
   }
-  if (error.kind === "api" && error.statusCode === 404) {
-    return "Este rateio ou membro não foi encontrado.";
+  if (error.kind === 'api' && error.statusCode === 404) {
+    return 'Este rateio ou membro não foi encontrado.';
   }
-  if (error.kind === "api" && error.statusCode === 409) {
-    return "A alteração não pode ser feita neste momento.";
+  if (error.kind === 'api' && error.statusCode === 409) {
+    return 'A alteração não pode ser feita neste momento.';
   }
-  return "Não foi possível atualizar os membros agora. Tente novamente.";
+  return 'Não foi possível atualizar os membros agora. Tente novamente.';
 }
 
 async function getRequiredAccessToken(): Promise<
@@ -166,7 +166,7 @@ async function getRequiredAccessToken(): Promise<
     ? { success: true, token: accessToken }
     : {
         success: false,
-        error: "Entre na sua conta para gerenciar este rateio.",
+        error: 'Entre na sua conta para gerenciar este rateio.',
       };
 }
 
@@ -186,14 +186,14 @@ export async function createRateio(
 ): Promise<CreateRateioResult> {
   const parsed = createRateioSchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, error: "Confira os dados do rateio." };
+    return { success: false, error: 'Confira os dados do rateio.' };
   }
 
   const accessToken = await getRefreshAwareAccessToken();
   if (!accessToken) {
     return {
       success: false,
-      error: "Entre na sua conta para criar um rateio.",
+      error: 'Entre na sua conta para criar um rateio.',
     };
   }
 
@@ -207,7 +207,7 @@ export async function createRateio(
 
 const changeRateioStatusSchema = z.object({
   id: z.string().trim().min(1),
-  status: z.enum(["ACTIVE", "CLOSED"]),
+  status: z.enum(['ACTIVE', 'CLOSED']),
 });
 
 export async function changeRateioStatus(
@@ -216,14 +216,14 @@ export async function changeRateioStatus(
 ): Promise<ChangeRateioStatusResult> {
   const parsed = changeRateioStatusSchema.safeParse({ id, status });
   if (!parsed.success) {
-    return { success: false, error: "Não foi possível alterar o status." };
+    return { success: false, error: 'Não foi possível alterar o status.' };
   }
 
   const accessToken = await getRefreshAwareAccessToken();
   if (!accessToken) {
     return {
       success: false,
-      error: "Entre na sua conta para alterar o status do rateio.",
+      error: 'Entre na sua conta para alterar o status do rateio.',
     };
   }
 
@@ -244,7 +244,7 @@ export async function listShareLinks(
 ): Promise<ShareLinkMetadataResult> {
   const parsedRateioId = rateioIdSchema.safeParse(rateioId);
   if (!parsedRateioId.success) {
-    return { success: false, error: "Este rateio não é válido." };
+    return { success: false, error: 'Este rateio não é válido.' };
   }
 
   const session = await getRequiredAccessToken();
@@ -263,7 +263,7 @@ export async function createShareLink(
 ): Promise<CreateShareLinkResult> {
   const parsedRateioId = rateioIdSchema.safeParse(rateioId);
   if (!parsedRateioId.success) {
-    return { success: false, error: "Este rateio não é válido." };
+    return { success: false, error: 'Este rateio não é válido.' };
   }
 
   const session = await getRequiredAccessToken();
@@ -285,7 +285,7 @@ export async function revokeShareLink(
     .object({ rateioId: rateioIdSchema, shareLinkId: rateioIdSchema })
     .safeParse({ rateioId, shareLinkId });
   if (!parsedIds.success) {
-    return { success: false, error: "Este link não é válido." };
+    return { success: false, error: 'Este link não é válido.' };
   }
 
   const session = await getRequiredAccessToken();
@@ -314,7 +314,7 @@ export async function inviteRateioMember(
 ): Promise<InviteMemberResult> {
   const parsed = inviteMemberSchema.safeParse({ rateioId, ...input });
   if (!parsed.success) {
-    return { success: false, error: "Informe um e-mail válido." };
+    return { success: false, error: 'Informe um e-mail válido.' };
   }
 
   const session = await getRequiredAccessToken();
@@ -328,7 +328,7 @@ export async function inviteRateioMember(
   if (result.error !== undefined) {
     return {
       success: false,
-      error: safeMembershipErrorMessage(result.error, "invite"),
+      error: safeMembershipErrorMessage(result.error, 'invite'),
     };
   }
   return { success: true, data: result.data };
@@ -337,7 +337,7 @@ export async function inviteRateioMember(
 const memberRoleSchema = z.object({
   rateioId: rateioIdSchema,
   memberId: rateioIdSchema,
-  role: z.enum(["ADMIN", "PARTICIPANT"]),
+  role: z.enum(['ADMIN', 'PARTICIPANT']),
 });
 
 export async function changeRateioMemberRole(
@@ -347,7 +347,7 @@ export async function changeRateioMemberRole(
 ): Promise<ChangeMemberRoleResult> {
   const parsed = memberRoleSchema.safeParse({ rateioId, memberId, role });
   if (!parsed.success) {
-    return { success: false, error: "Escolha um papel válido para o membro." };
+    return { success: false, error: 'Escolha um papel válido para o membro.' };
   }
 
   const session = await getRequiredAccessToken();
@@ -362,7 +362,7 @@ export async function changeRateioMemberRole(
   if (result.error !== undefined) {
     return {
       success: false,
-      error: safeMembershipErrorMessage(result.error, "role"),
+      error: safeMembershipErrorMessage(result.error, 'role'),
     };
   }
   return { success: true, data: result.data };
@@ -379,7 +379,7 @@ export async function removeRateioMember(
 ): Promise<RemoveMemberResult> {
   const parsed = removeMemberSchema.safeParse({ rateioId, memberId });
   if (!parsed.success) {
-    return { success: false, error: "Este membro não é válido." };
+    return { success: false, error: 'Este membro não é válido.' };
   }
 
   const session = await getRequiredAccessToken();
@@ -393,20 +393,20 @@ export async function removeRateioMember(
   if (result.error !== undefined) {
     return {
       success: false,
-      error: safeMembershipErrorMessage(result.error, "remove"),
+      error: safeMembershipErrorMessage(result.error, 'remove'),
     };
   }
   return { success: true, data: result.data };
 }
 
 function safeJoinErrorMessage(error: ApiClientError): string {
-  if (error.kind === "api" && error.statusCode === 400) {
-    return "Confira o link e seu nome para entrar no rateio.";
+  if (error.kind === 'api' && error.statusCode === 400) {
+    return 'Confira o link e seu nome para entrar no rateio.';
   }
-  if (error.kind === "api" && error.statusCode === 404) {
-    return "Este link não é válido ou já foi revogado.";
+  if (error.kind === 'api' && error.statusCode === 404) {
+    return 'Este link não é válido ou já foi revogado.';
   }
-  return "Não foi possível entrar neste rateio agora. Tente novamente.";
+  return 'Não foi possível entrar neste rateio agora. Tente novamente.';
 }
 
 export async function joinRateioAnonymously(
@@ -414,7 +414,7 @@ export async function joinRateioAnonymously(
 ): Promise<JoinRateioResult> {
   const parsed = anonymousJoinSchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, error: "Confira o link e seu nome para entrar." };
+    return { success: false, error: 'Confira o link e seu nome para entrar.' };
   }
 
   const result = await joinApiRateioAnonymously(parsed.data);

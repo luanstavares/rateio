@@ -1,9 +1,9 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 //Local Components
-import BurgerMenu from "./burger-menu";
-import Logo from "./logo";
-import UserMenu from "./user-menu";
+import BurgerMenu from './burger-menu';
+import Logo from './logo';
+import UserMenu from './user-menu';
 
 export default function Navbar() {
   return (

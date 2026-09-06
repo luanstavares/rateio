@@ -1,4 +1,4 @@
-import AccountPageContent from "../../ui/account-page-content";
+import AccountPageContent from '../../ui/account-page-content';
 
 export default function AccountPage() {
   return (

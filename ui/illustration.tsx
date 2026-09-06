@@ -1,10 +1,10 @@
-"use client";
-import type { SVGProps } from "react";
+'use client';
+import type { SVGProps } from 'react';
 
 export default function Illustration({
-  size = "550",
+  size = '550',
   className,
-}: { size?: string } & Pick<SVGProps<SVGSVGElement>, "className">) {
+}: { size?: string } & Pick<SVGProps<SVGSVGElement>, 'className'>) {
   return (
     <div className="absolute bottom-0 left-0 z-0">
       <svg

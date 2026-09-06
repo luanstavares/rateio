@@ -1,11 +1,11 @@
-import "server-only";
+import 'server-only';
 
-import { refreshApiSession } from "../api/auth";
+import { refreshApiSession } from '../api/auth';
 import {
   authTokenResponseSchema,
   isCurrentAuthTokenResponse,
   type AuthTokenResponse,
-} from "./session-cookies";
+} from './session-cookies';
 
 const refreshTokenSchema = /^.{20,}$/;
 
@@ -22,7 +22,7 @@ export async function refreshSessionTokens(
 
   try {
     const result = await refreshApiSession(refreshToken);
-    if ("error" in result) return null;
+    if ('error' in result) return null;
 
     const tokens = authTokenResponseSchema.safeParse(result.data);
     return tokens.success && isCurrentAuthTokenResponse(tokens.data)

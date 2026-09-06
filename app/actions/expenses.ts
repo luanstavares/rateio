@@ -1,28 +1,28 @@
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
 
 import {
   createApiAnonymousExpense,
   createApiExpense,
   removeApiExpenseItem,
-} from "../../lib/api/expenses";
+} from '../../lib/api/expenses';
 import type {
   AnonymousExpenseResponseDto,
   CreateExpenseDto,
   ExpenseItemDeletionResponseDto,
   ExpenseResponseDto,
-} from "../../lib/api/generated";
-import type { ApiClientError } from "../../lib/api/errors";
+} from '../../lib/api/generated';
+import type { ApiClientError } from '../../lib/api/errors';
 import {
   getRefreshAwareAccessToken,
   getAnonymousSessionToken,
-} from "../../lib/auth/server-session";
+} from '../../lib/auth/server-session';
 
 const allocationSchema = z.object({
   memberId: z.string().trim().min(1),
-  splitType: z.enum(["EQUAL", "PERCENTAGE", "CUSTOM"]),
+  splitType: z.enum(['EQUAL', 'PERCENTAGE', 'CUSTOM']),
   percentageBasisPoints: z.number().int().min(0).max(10000).optional(),
   baseAmountMinor: z.number().int().positive().safe().optional(),
 });
@@ -46,9 +46,9 @@ const createExpenseSchema = z
     );
     if (new Set(memberIds).size !== memberIds.length) {
       context.addIssue({
-        code: "custom",
-        path: ["allocations"],
-        message: "Os participantes não podem se repetir.",
+        code: 'custom',
+        path: ['allocations'],
+        message: 'Os participantes não podem se repetir.',
       });
     }
 
@@ -57,38 +57,38 @@ const createExpenseSchema = z
     );
     if (splitTypes.size !== 1) {
       context.addIssue({
-        code: "custom",
-        path: ["allocations"],
-        message: "Escolha apenas uma forma de divisão.",
+        code: 'custom',
+        path: ['allocations'],
+        message: 'Escolha apenas uma forma de divisão.',
       });
       return;
     }
 
     const splitType = input.allocations[0]?.splitType;
-    if (splitType === "PERCENTAGE") {
+    if (splitType === 'PERCENTAGE') {
       const total = input.allocations.reduce(
         (sum, allocation) => sum + (allocation.percentageBasisPoints ?? 0),
         0,
       );
       if (total !== 10000) {
         context.addIssue({
-          code: "custom",
-          path: ["allocations"],
-          message: "As porcentagens devem totalizar 100%.",
+          code: 'custom',
+          path: ['allocations'],
+          message: 'As porcentagens devem totalizar 100%.',
         });
       }
     }
 
-    if (splitType === "CUSTOM") {
+    if (splitType === 'CUSTOM') {
       const total = input.allocations.reduce(
         (sum, allocation) => sum + (allocation.baseAmountMinor ?? 0),
         0,
       );
       if (total !== input.originalAmountMinor) {
         context.addIssue({
-          code: "custom",
-          path: ["allocations"],
-          message: "Os valores individuais devem totalizar o item.",
+          code: 'custom',
+          path: ['allocations'],
+          message: 'Os valores individuais devem totalizar o item.',
         });
       }
     }
@@ -105,38 +105,38 @@ export type RemoveExpenseItemResult =
   | { success: false; error: string };
 
 function errorMessage(error: ApiClientError): string {
-  if (error.kind === "api" && error.statusCode === 400) {
-    return "Confira o item e a divisão dos participantes.";
+  if (error.kind === 'api' && error.statusCode === 400) {
+    return 'Confira o item e a divisão dos participantes.';
   }
-  if (error.kind === "api" && error.statusCode === 401) {
-    return "Sua sessão expirou. Entre novamente para continuar.";
+  if (error.kind === 'api' && error.statusCode === 401) {
+    return 'Sua sessão expirou. Entre novamente para continuar.';
   }
-  if (error.kind === "api" && error.statusCode === 403) {
-    return "Você não pode adicionar itens neste rateio.";
+  if (error.kind === 'api' && error.statusCode === 403) {
+    return 'Você não pode adicionar itens neste rateio.';
   }
-  if (error.kind === "api" && error.statusCode === 404) {
-    return "Este rateio ou participante não foi encontrado.";
+  if (error.kind === 'api' && error.statusCode === 404) {
+    return 'Este rateio ou participante não foi encontrado.';
   }
-  if (error.kind === "api" && error.statusCode === 409) {
-    return "Este rateio foi fechado e não aceita novos itens.";
+  if (error.kind === 'api' && error.statusCode === 409) {
+    return 'Este rateio foi fechado e não aceita novos itens.';
   }
-  return "Não foi possível adicionar o item agora. Tente novamente.";
+  return 'Não foi possível adicionar o item agora. Tente novamente.';
 }
 
 function removeItemErrorMessage(error: ApiClientError): string {
-  if (error.kind === "api" && error.statusCode === 401) {
-    return "Sua sessão expirou. Entre novamente para continuar.";
+  if (error.kind === 'api' && error.statusCode === 401) {
+    return 'Sua sessão expirou. Entre novamente para continuar.';
   }
-  if (error.kind === "api" && error.statusCode === 403) {
-    return "Você não pode remover este item.";
+  if (error.kind === 'api' && error.statusCode === 403) {
+    return 'Você não pode remover este item.';
   }
-  if (error.kind === "api" && error.statusCode === 404) {
-    return "Este item não foi encontrado ou já foi removido.";
+  if (error.kind === 'api' && error.statusCode === 404) {
+    return 'Este item não foi encontrado ou já foi removido.';
   }
-  if (error.kind === "api" && error.statusCode === 409) {
-    return "Este rateio não aceita alterações agora.";
+  if (error.kind === 'api' && error.statusCode === 409) {
+    return 'Este rateio não aceita alterações agora.';
   }
-  return "Não foi possível remover o item agora. Tente novamente.";
+  return 'Não foi possível remover o item agora. Tente novamente.';
 }
 
 const removeExpenseItemSchema = z.object({
@@ -156,14 +156,14 @@ export async function removeExpenseItem(
     itemId,
   });
   if (!parsed.success) {
-    return { success: false, error: "Este item não é válido." };
+    return { success: false, error: 'Este item não é válido.' };
   }
 
   const accessToken = await getRefreshAwareAccessToken();
   if (!accessToken) {
     return {
       success: false,
-      error: "Entre na sua conta para remover este item.",
+      error: 'Entre na sua conta para remover este item.',
     };
   }
 
@@ -183,7 +183,7 @@ export async function removeExpenseItem(
   } catch {
     return {
       success: false,
-      error: "Não foi possível remover o item agora. Tente novamente.",
+      error: 'Não foi possível remover o item agora. Tente novamente.',
     };
   }
 }
@@ -195,7 +195,7 @@ export async function createManualExpense(
   if (!parsed.success) {
     return {
       success: false,
-      error: "Confira o item e a divisão dos participantes.",
+      error: 'Confira o item e a divisão dos participantes.',
     };
   }
 
@@ -225,7 +225,7 @@ export async function createManualExpense(
                 parsed.data.rateioId,
                 body,
               )
-            : { error: { kind: "api", statusCode: 401 } as ApiClientError };
+            : { error: { kind: 'api', statusCode: 401 } as ApiClientError };
         })();
 
     if (result.error !== undefined) {
@@ -237,7 +237,7 @@ export async function createManualExpense(
   } catch {
     return {
       success: false,
-      error: "Não foi possível adicionar o item agora. Tente novamente.",
+      error: 'Não foi possível adicionar o item agora. Tente novamente.',
     };
   }
 }

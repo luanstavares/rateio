@@ -1,10 +1,10 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { getRefreshAwareAccessToken } from "../../lib/auth/server-session";
-import { listApiRateios } from "../../lib/api/rateios";
-import type { ApiClientError } from "../../lib/api/errors";
-import RateioCard from "../../ui/rateio-card";
-import { Button } from "../../ui/components/ui/button";
+import { getRefreshAwareAccessToken } from '../../lib/auth/server-session';
+import { listApiRateios } from '../../lib/api/rateios';
+import type { ApiClientError } from '../../lib/api/errors';
+import RateioCard from '../../ui/rateio-card';
+import { Button } from '../../ui/components/ui/button';
 
 const PAGE_SIZE = 12;
 
@@ -14,20 +14,18 @@ type RateiosPageProps = {
 
 function parsePage(value: string | string[] | undefined): number {
   const rawValue = Array.isArray(value) ? value[0] : value;
-  const page = Number.parseInt(rawValue ?? "1", 10);
+  const page = Number.parseInt(rawValue ?? '1', 10);
   return Number.isInteger(page) && page > 0 ? page : 1;
 }
 
 function errorMessage(error: ApiClientError): string {
-  if (error.kind === "api" && error.statusCode === 401) {
-    return "Sua sessão expirou. Entre novamente para ver seus rateios.";
+  if (error.kind === 'api' && error.statusCode === 401) {
+    return 'Sua sessão expirou. Entre novamente para ver seus rateios.';
   }
-  return "Não foi possível carregar seus rateios agora. Tente novamente.";
+  return 'Não foi possível carregar seus rateios agora. Tente novamente.';
 }
 
-export default async function RateiosPage({
-  searchParams,
-}: RateiosPageProps) {
+export default async function RateiosPage({ searchParams }: RateiosPageProps) {
   const accessToken = await getRefreshAwareAccessToken();
   const page = parsePage((await searchParams).page);
   const result = accessToken
@@ -62,7 +60,10 @@ export default async function RateiosPage({
           </Button>
         </div>
       ) : result?.error ? (
-        <div className="mt-8 rounded-lg border border-border bg-card p-6" role="alert">
+        <div
+          className="mt-8 rounded-lg border border-border bg-card p-6"
+          role="alert"
+        >
           <h2 className="text-xl font-semibold">Não foi possível carregar</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             {errorMessage(result.error)}

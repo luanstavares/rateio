@@ -1,9 +1,9 @@
-import nextVitals from "eslint-config-next/core-web-vitals";
+import nextVitals from 'eslint-config-next/core-web-vitals';
 
 const eslintConfig = [
   ...nextVitals,
   {
-    ignores: ["node_modules/**", ".next/**", "next-env.d.ts"],
+    ignores: ['node_modules/**', '.next/**', 'next-env.d.ts'],
   },
 ];
 

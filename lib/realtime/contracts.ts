@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const timestampSchema = z.iso.datetime();
 
@@ -6,8 +6,8 @@ const memberSchema = z.object({
   id: z.string(),
   userId: z.string().nullable(),
   displayName: z.string(),
-  role: z.enum(["OWNER", "ADMIN", "PARTICIPANT"]),
-  status: z.enum(["ACTIVE", "REMOVED"]),
+  role: z.enum(['OWNER', 'ADMIN', 'PARTICIPANT']),
+  status: z.enum(['ACTIVE', 'REMOVED']),
   joinedAt: timestampSchema,
 });
 
@@ -15,7 +15,7 @@ const allocationSchema = z.object({
   id: z.string(),
   itemId: z.string(),
   memberId: z.string(),
-  splitType: z.enum(["EQUAL", "PERCENTAGE", "CUSTOM"]),
+  splitType: z.enum(['EQUAL', 'PERCENTAGE', 'CUSTOM']),
   percentageBasisPoints: z.number().int().nullable(),
   baseAmountMinor: z.string(),
   createdAt: timestampSchema,
@@ -58,16 +58,16 @@ const paymentSchema = z.object({
   amountMinor: z.string(),
   currencyCode: z.string(),
   countryCode: z.string(),
-  rail: z.enum(["PIX", "MANUAL_BANK_TRANSFER"]),
+  rail: z.enum(['PIX', 'MANUAL_BANK_TRANSFER']),
   status: z.enum([
-    "PENDING",
-    "PROCESSING",
-    "COMPLETED",
-    "FAILED",
-    "EXPIRED",
-    "CANCELLED",
-    "MANUALLY_COMPLETED",
-    "DISPUTED",
+    'PENDING',
+    'PROCESSING',
+    'COMPLETED',
+    'FAILED',
+    'EXPIRED',
+    'CANCELLED',
+    'MANUALLY_COMPLETED',
+    'DISPUTED',
   ]),
   expiresAt: timestampSchema.nullable(),
   completedAt: timestampSchema.nullable(),
@@ -79,10 +79,10 @@ const rateioSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string().nullable(),
-  status: z.enum(["ACTIVE", "CLOSED"]),
+  status: z.enum(['ACTIVE', 'CLOSED']),
   baseCurrency: z.string(),
   settlementCountry: z.string(),
-  preferredPaymentRail: z.enum(["PIX", "MANUAL_BANK_TRANSFER"]),
+  preferredPaymentRail: z.enum(['PIX', 'MANUAL_BANK_TRANSFER']),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });
@@ -103,27 +103,19 @@ export const realtimeStateSnapshotSchema = z.object({
   totalAmountMinor: z.string(),
 });
 
-export const realtimeJoinResponseSchema = z.discriminatedUnion("event", [
+export const realtimeJoinResponseSchema = z.discriminatedUnion('event', [
   z.object({
-    event: z.literal("rateio.joined"),
+    event: z.literal('rateio.joined'),
     data: z.object({ rateioId: z.string(), memberId: z.string() }),
   }),
   z.object({
-    event: z.literal("rateio.error"),
-    data: z.object({ message: z.enum(["Unauthorized", "Rateio not found"]) }),
+    event: z.literal('rateio.error'),
+    data: z.object({ message: z.enum(['Unauthorized', 'Rateio not found']) }),
   }),
 ]);
 
-export type RealtimeStateSnapshot = z.infer<
-  typeof realtimeStateSnapshotSchema
->;
-export type RealtimeJoinResponse = z.infer<
-  typeof realtimeJoinResponseSchema
->;
+export type RealtimeStateSnapshot = z.infer<typeof realtimeStateSnapshotSchema>;
+export type RealtimeJoinResponse = z.infer<typeof realtimeJoinResponseSchema>;
 
 export type RealtimeConnectionStatus =
-  | "connecting"
-  | "connected"
-  | "reconnecting"
-  | "disconnected"
-  | "error";
+  'connecting' | 'connected' | 'reconnecting' | 'disconnected' | 'error';

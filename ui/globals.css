@@ -1,79 +1,79 @@
-@import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Signika+Negative:wght@300;400;500;600;700&display=swap");
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Signika+Negative:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
 
 :root {
-    --background: #0d0d0d;
-    --foreground: #eaeaea;
-    --card: rgba(13, 13, 13, 0.97);
-    --card-foreground: #eaeaea;
-    --primary: #ffad33;
-    --primary-hover: #e89a26;
-    --primary-foreground: #000000;
-    --destructive: #ef5555;
-    --destructive-foreground: #000000;
-    --success: #04bb38;
-    --success-foreground: #000000;
-    --secondary: #161616;
-    --secondary-foreground: #ffffff;
-    --muted: #2e2e2e;
-    --muted-foreground: #bebebe;
-    --border: #292929;
-    --input: #585858;
-    --ring: #ffad33;
-    --radius: 0.25rem;
+  --background: #0d0d0d;
+  --foreground: #eaeaea;
+  --card: rgba(13, 13, 13, 0.97);
+  --card-foreground: #eaeaea;
+  --primary: #ffad33;
+  --primary-hover: #e89a26;
+  --primary-foreground: #000000;
+  --destructive: #ef5555;
+  --destructive-foreground: #000000;
+  --success: #04bb38;
+  --success-foreground: #000000;
+  --secondary: #161616;
+  --secondary-foreground: #ffffff;
+  --muted: #2e2e2e;
+  --muted-foreground: #bebebe;
+  --border: #292929;
+  --input: #585858;
+  --ring: #ffad33;
+  --radius: 0.25rem;
 }
 
 @theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-primary: var(--primary);
-    --color-primary-hover: var(--primary-hover);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
-    --color-success: var(--success);
-    --color-success-foreground: var(--success-foreground);
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-    --font-sans: "Signika Negative", sans-serif;
-    --font-logo: "Pacifico", cursive;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: 'Signika Negative', sans-serif;
+  --font-logo: 'Pacifico', cursive;
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html,
 body {
-    margin: 0;
-    min-height: 100%;
-    background: var(--background);
-    color: var(--foreground);
-    font-family: "Signika Negative", sans-serif;
+  margin: 0;
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Signika Negative', sans-serif;
 }
 
 body:hover {
-    cursor: default;
+  cursor: default;
 }
 
 a {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-    }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,13 +1,13 @@
-import "server-only";
+import 'server-only';
 
-import type { NextResponse } from "next/server";
-import { z } from "zod";
+import type { NextResponse } from 'next/server';
+import { z } from 'zod';
 
-export const OAUTH_STATE_COOKIE = "rateio_oauth_state";
-export const OAUTH_RETURN_TO_COOKIE = "rateio_oauth_return_to";
-export const ACCESS_TOKEN_COOKIE = "rateio_access_token";
-export const REFRESH_TOKEN_COOKIE = "rateio_refresh_token";
-export const ANONYMOUS_SESSION_TOKEN_COOKIE = "rateio_anonymous_session_token";
+export const OAUTH_STATE_COOKIE = 'rateio_oauth_state';
+export const OAUTH_RETURN_TO_COOKIE = 'rateio_oauth_return_to';
+export const ACCESS_TOKEN_COOKIE = 'rateio_access_token';
+export const REFRESH_TOKEN_COOKIE = 'rateio_refresh_token';
+export const ANONYMOUS_SESSION_TOKEN_COOKIE = 'rateio_anonymous_session_token';
 
 export const OAUTH_STATE_MAX_AGE_SECONDS = 10 * 60;
 export const ACCESS_TOKEN_MAX_AGE_SECONDS = 15 * 60;
@@ -44,15 +44,15 @@ export type AnonymousSessionToken = z.infer<typeof anonymousSessionTokenSchema>;
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
 
 function isProduction(): boolean {
-  return process.env.NODE_ENV === "production";
+  return process.env.NODE_ENV === 'production';
 }
 
 function sessionCookieOptions(maxAge: number) {
   return {
     httpOnly: true,
     secure: isProduction(),
-    sameSite: "lax" as const,
-    path: "/",
+    sameSite: 'lax' as const,
+    path: '/',
     maxAge,
     ...(sessionCookieDomain ? { domain: sessionCookieDomain } : {}),
   };
@@ -81,7 +81,7 @@ export function setOAuthStateCookie(
 export function clearOAuthStateCookie(response: NextResponse): void {
   response.cookies.set({
     name: OAUTH_STATE_COOKIE,
-    value: "",
+    value: '',
     ...sessionCookieOptions(0),
   });
 }
@@ -100,7 +100,7 @@ export function setOAuthReturnToCookie(
 export function clearOAuthReturnToCookie(response: NextResponse): void {
   response.cookies.set({
     name: OAUTH_RETURN_TO_COOKIE,
-    value: "",
+    value: '',
     ...sessionCookieOptions(0),
   });
 }
@@ -130,12 +130,12 @@ export function setSessionCookies(
 export function clearSessionCookies(response: NextResponse): void {
   response.cookies.set({
     name: ACCESS_TOKEN_COOKIE,
-    value: "",
+    value: '',
     ...sessionCookieOptions(0),
   });
   response.cookies.set({
     name: REFRESH_TOKEN_COOKIE,
-    value: "",
+    value: '',
     ...sessionCookieOptions(0),
   });
 }
@@ -153,7 +153,7 @@ export function setAnonymousSessionCookieStore(
 ): void {
   const parsedToken = anonymousSessionTokenSchema.safeParse(sessionToken);
   if (!parsedToken.success) {
-    throw new Error("Invalid anonymous session token");
+    throw new Error('Invalid anonymous session token');
   }
 
   cookieStore.set({
@@ -172,7 +172,7 @@ export function clearAnonymousSessionCookieStore(
 ): void {
   cookieStore.set({
     name: ANONYMOUS_SESSION_TOKEN_COOKIE,
-    value: "",
+    value: '',
     ...sessionCookieOptions(0),
   });
 }

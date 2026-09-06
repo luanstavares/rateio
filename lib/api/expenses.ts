@@ -1,4 +1,4 @@
-import "server-only";
+import 'server-only';
 
 import {
   anonymousExpensesControllerCreate,
@@ -13,12 +13,12 @@ import {
   type ExpenseListResponseDto,
   type ExpenseItemDeletionResponseDto,
   type ExpensesControllerListData,
-} from "./generated";
-import { normalizeApiResult, type ApiResult } from "./errors";
-import { createServerApiClient } from "./server-client";
+} from './generated';
+import { normalizeApiResult, type ApiResult } from './errors';
+import { createServerApiClient } from './server-client';
 
 export type CreateExpenseInput = CreateExpenseDto;
-export type ListExpensesQuery = ExpensesControllerListData["query"];
+export type ListExpensesQuery = ExpensesControllerListData['query'];
 
 export function createApiExpense(
   accessToken: string,

@@ -1,4 +1,4 @@
-import "server-only";
+import 'server-only';
 
 import {
   anonymousShareLinksControllerJoin,
@@ -31,15 +31,15 @@ import {
   type RateiosControllerListData,
   type ShareLinkCreatedResponseDto,
   type ShareLinkMetadataResponseDto,
-} from "./generated";
-import { normalizeApiResult, type ApiResult } from "./errors";
-import { createServerApiClient } from "./server-client";
+} from './generated';
+import { normalizeApiResult, type ApiResult } from './errors';
+import { createServerApiClient } from './server-client';
 
 export type CreateRateioInput = CreateRateioDto;
-export type ListRateiosQuery = RateiosControllerListData["query"];
-export type RateioStatus = ChangeRateioStatusDto["status"];
+export type ListRateiosQuery = RateiosControllerListData['query'];
+export type RateioStatus = ChangeRateioStatusDto['status'];
 export type AnonymousJoinInput = AnonymousJoinDto;
-export type MembershipRole = ChangeMemberRoleDto["role"];
+export type MembershipRole = ChangeMemberRoleDto['role'];
 export type InviteMemberInput = InviteMemberDto;
 export type ClaimAnonymousParticipantInput = ClaimAnonymousParticipantDto;
 

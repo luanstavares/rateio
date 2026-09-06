@@ -20,8 +20,7 @@ export type ApiClientError =
     };
 
 export type ApiResult<T> =
-  | { data: T; error?: undefined }
-  | { data?: undefined; error: ApiClientError };
+  { data: T; error?: undefined } | { data?: undefined; error: ApiClientError };
 
 function isApiErrorResponse(value: unknown): value is ApiErrorResponseDto {
   if (typeof value !== 'object' || value === null) return false;
@@ -29,7 +28,8 @@ function isApiErrorResponse(value: unknown): value is ApiErrorResponseDto {
   const candidate = value as Record<string, unknown>;
   return (
     typeof candidate.statusCode === 'number' &&
-    (typeof candidate.message === 'string' || Array.isArray(candidate.message)) &&
+    (typeof candidate.message === 'string' ||
+      Array.isArray(candidate.message)) &&
     typeof candidate.error === 'string' &&
     typeof candidate.path === 'string' &&
     typeof candidate.timestamp === 'string'

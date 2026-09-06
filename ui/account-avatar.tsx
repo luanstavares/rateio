@@ -1,21 +1,33 @@
-"use client";
+'use client';
 
-import { UserIcon } from "@phosphor-icons/react";
-import type { AuthenticatedUserDto } from "../lib/api/generated";
-import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
+import { UserIcon } from '@phosphor-icons/react';
+import type { AuthenticatedUserDto } from '../lib/api/generated';
+import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
 
-export type AccountProfile = Pick<AuthenticatedUserDto, "name" | "email" | "pictureUrl">;
+export type AccountProfile = Pick<
+  AuthenticatedUserDto,
+  'name' | 'email' | 'pictureUrl'
+>;
 
 interface AccountAvatarProps {
   profile: AccountProfile;
   className?: string;
 }
 
-export default function AccountAvatar({ profile, className }: AccountAvatarProps) {
+export default function AccountAvatar({
+  profile,
+  className,
+}: AccountAvatarProps) {
   return (
     <Avatar className={className} aria-hidden="true">
-      <AvatarImage src={profile.pictureUrl ?? undefined} alt="" referrerPolicy="no-referrer" />
-      <AvatarFallback><UserIcon size={20} /></AvatarFallback>
+      <AvatarImage
+        src={profile.pictureUrl ?? undefined}
+        alt=""
+        referrerPolicy="no-referrer"
+      />
+      <AvatarFallback>
+        <UserIcon size={20} />
+      </AvatarFallback>
     </Avatar>
   );
 }

@@ -1,7 +1,7 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import RateioForm from "../../../ui/rateio-form";
-import { Button } from "../../../ui/components/ui/button";
+import RateioForm from '../../../ui/rateio-form';
+import { Button } from '../../../ui/components/ui/button';
 
 export default function NewRateioPage() {
   return (

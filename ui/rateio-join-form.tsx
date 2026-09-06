@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import {
   joinRateioAnonymously,
   type JoinRateioResult,
-} from "../app/actions/rateios";
-import { Button } from "./components/ui/button";
+} from '../app/actions/rateios';
+import { Button } from './components/ui/button';
 
 interface RateioJoinFormProps {
   initialToken: string;
@@ -16,25 +17,32 @@ interface RateioJoinFormProps {
 export default function RateioJoinForm({ initialToken }: RateioJoinFormProps) {
   const router = useRouter();
   const [token, setToken] = useState(initialToken);
-  const [displayName, setDisplayName] = useState("");
+  const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
-    startTransition(async () => {
-      const result: JoinRateioResult = await joinRateioAnonymously({
-        token,
-        displayName,
-      });
+  const joinRateioMutation = useMutation<
+    JoinRateioResult,
+    Error,
+    { token: string; displayName: string }
+  >({
+    mutationFn: joinRateioAnonymously,
+    onError: () => {
+      setError('Não foi possível entrar neste rateio agora. Tente novamente.');
+    },
+    onSuccess: (result) => {
       if (!result.success) {
         setError(result.error);
         return;
       }
 
       router.replace(`/rateios/${result.data.rateioId}`);
-    });
+    },
+  });
+  const isPending = joinRateioMutation.isPending;
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    joinRateioMutation.mutate({ token, displayName });
   }
 
   return (
@@ -83,7 +91,7 @@ export default function RateioJoinForm({ initialToken }: RateioJoinFormProps) {
       ) : null}
 
       <Button className="w-full" disabled={isPending} type="submit">
-        {isPending ? "Entrando..." : "Entrar no rateio"}
+        {isPending ? 'Entrando...' : 'Entrar no rateio'}
       </Button>
     </form>
   );

@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { refreshSessionTokens } from "./lib/auth/session-refresh";
+import { NextRequest, NextResponse } from 'next/server';
+import { refreshSessionTokens } from './lib/auth/session-refresh';
 import {
   ACCESS_TOKEN_COOKIE,
   clearSessionCookies,
   REFRESH_TOKEN_COOKIE,
   setSessionCookies,
-} from "./lib/auth/session-cookies";
+} from './lib/auth/session-cookies';
 
 export const config = {
   matcher: [
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)",
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
   ],
 };
 
@@ -18,16 +18,16 @@ type AccessTokenPayload = {
 };
 
 function accessTokenExpiresAt(accessToken: string): number | null {
-  const payload = accessToken.split(".")[1];
+  const payload = accessToken.split('.')[1];
   if (!payload) return null;
 
   try {
-    const decoded = Buffer.from(payload, "base64url").toString("utf8");
+    const decoded = Buffer.from(payload, 'base64url').toString('utf8');
     const parsed: unknown = JSON.parse(decoded);
-    if (typeof parsed !== "object" || parsed === null) return null;
+    if (typeof parsed !== 'object' || parsed === null) return null;
 
     const expiration = (parsed as AccessTokenPayload).exp;
-    return typeof expiration === "number" && Number.isFinite(expiration)
+    return typeof expiration === 'number' && Number.isFinite(expiration)
       ? expiration * 1000
       : null;
   } catch {
@@ -47,16 +47,16 @@ function requestWithSessionCookies(
   requestCookies.set(ACCESS_TOKEN_COOKIE, accessToken);
   requestCookies.set(REFRESH_TOKEN_COOKIE, refreshToken);
   requestHeaders.set(
-    "cookie",
-    [...requestCookies]
-      .map(([name, value]) => `${name}=${value}`)
-      .join("; "),
+    'cookie',
+    [...requestCookies].map(([name, value]) => `${name}=${value}`).join('; '),
   );
 
   return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
-export default async function proxy(request: NextRequest): Promise<NextResponse> {
+export default async function proxy(
+  request: NextRequest,
+): Promise<NextResponse> {
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const accessTokenExpiry =
     accessToken === undefined ? null : accessTokenExpiresAt(accessToken);
