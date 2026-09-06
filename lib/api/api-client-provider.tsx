@@ -28,7 +28,7 @@ function createBrowserApiClients(): ApiClients {
     }),
     sameOrigin: createClient({
       ...sharedConfig,
-      baseUrl: '',
+      baseUrl: '/api',
     }),
   };
 }

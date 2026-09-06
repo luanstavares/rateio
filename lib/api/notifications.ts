@@ -1,6 +1,7 @@
 import {
   notificationsControllerList,
   notificationsControllerRead,
+  type NotificationActorDto,
   type NotificationListResponseDto,
   type NotificationResponseDto,
 } from './generated';
@@ -9,6 +10,14 @@ import { normalizeApiResult, type ApiClientError } from './errors';
 import type { RealtimeNotificationCreated } from '../realtime/contracts';
 
 export const NOTIFICATION_PAGE_SIZE = 50;
+
+export type NotificationActor = Omit<
+  NotificationActorDto,
+  'userId' | 'profileImageUrl'
+> & {
+  userId: string | null;
+  profileImageUrl: string | null;
+};
 
 export interface Notification {
   id: string;
@@ -21,6 +30,7 @@ export interface Notification {
   readAt: string | null;
   createdAt: string;
   updatedAt: string;
+  actor: NotificationActor | null;
 }
 
 export interface NotificationList {
@@ -52,6 +62,21 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function normalizeActor(value: unknown): NotificationActor | null {
+  if (value === null || value === undefined) return null;
+  if (!isRecord(value)) throw new Error('Notificação inválida: actor.');
+
+  return {
+    memberId: asString(value.memberId, 'actor.memberId'),
+    userId: asNullableString(value.userId, 'actor.userId'),
+    displayName: asString(value.displayName, 'actor.displayName'),
+    profileImageUrl: asNullableString(
+      value.profileImageUrl,
+      'actor.profileImageUrl',
+    ),
+  };
+}
+
 function normalizeNotification(value: NotificationResponseDto): Notification {
   const payload = value.payload;
   if (typeof payload !== 'object' || payload === null || Array.isArray(payload))
@@ -68,6 +93,7 @@ function normalizeNotification(value: NotificationResponseDto): Notification {
     readAt: asNullableString(value.readAt, 'readAt'),
     createdAt: asString(value.createdAt, 'createdAt'),
     updatedAt: asString(value.updatedAt, 'updatedAt'),
+    actor: normalizeActor(value.actor),
   };
 }
 
@@ -113,6 +139,7 @@ export function normalizeRealtimeNotification(
     title: value.title,
     body: value.body,
     payload: value.payload,
+    actor: normalizeActor(value.actor),
     readAt: value.readAt,
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,

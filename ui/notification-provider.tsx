@@ -17,7 +17,6 @@ import {
 } from 'react';
 import { useApiClient } from '../lib/api/api-client-provider';
 import {
-  compareNotifications,
   listNotifications,
   mergeNotification,
   normalizeRealtimeNotification,
@@ -37,6 +36,25 @@ export function notificationsQueryKey(userId: string | null) {
   return ['notifications', userId] as const;
 }
 const EMPTY_NOTIFICATIONS: Notification[] = [];
+type NotificationMutationContext = {
+  previous: NotificationList | undefined;
+};
+
+function removeNotifications(
+  current: NotificationList | undefined,
+  notificationIds: string[],
+): NotificationList | undefined {
+  if (!current) return current;
+  const ids = new Set(notificationIds);
+  const items = current.items.filter(
+    (notification) => !ids.has(notification.id),
+  );
+  return {
+    ...current,
+    total: Math.max(0, current.total - (current.items.length - items.length)),
+    items,
+  };
+}
 
 interface NotificationProviderValue {
   notifications: Notification[];
@@ -47,7 +65,18 @@ interface NotificationProviderValue {
   error: Error | null;
   realtimeStatus: RealtimeConnectionStatus;
   refetch: () => Promise<unknown>;
-  markRead: UseMutationResult<Notification, Error, string>;
+  markRead: UseMutationResult<
+    Notification,
+    Error,
+    string,
+    NotificationMutationContext
+  >;
+  markAllRead: UseMutationResult<
+    Notification[],
+    Error,
+    string[],
+    NotificationMutationContext
+  >;
 }
 
 const NotificationContext = createContext<NotificationProviderValue | null>(
@@ -60,7 +89,7 @@ export default function NotificationProvider({
   children: ReactNode;
 }) {
   const { userId } = useUser();
-  const client = useApiClient('api');
+  const client = useApiClient('sameOrigin');
   const queryClient = useQueryClient();
   const [realtimeStatus, setRealtimeStatus] =
     useState<RealtimeConnectionStatus>('disconnected');
@@ -72,22 +101,56 @@ export default function NotificationProvider({
     enabled: userId !== null,
     structuralSharing: true,
   });
-  const markRead = useMutation({
+  const markRead = useMutation<
+    Notification,
+    Error,
+    string,
+    NotificationMutationContext
+  >({
     mutationFn: (notificationId: string) =>
       readNotification(client, notificationId),
-    onSuccess: async (notification) => {
-      queryClient.setQueryData<NotificationList>(queryKey, (current) => {
-        if (!current) return current;
-        return {
-          ...current,
-          items: current.items
-            .map((item) => (item.id === notification.id ? notification : item))
-            .sort(compareNotifications),
-        };
-      });
-      await queryClient.invalidateQueries({
-        queryKey,
-      });
+    onMutate: async (notificationId) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<NotificationList>(queryKey);
+      queryClient.setQueryData<NotificationList>(queryKey, (current) =>
+        removeNotifications(current, [notificationId]),
+      );
+      return { previous };
+    },
+    onError: (_error, _notificationId, context) => {
+      if (context?.previous !== undefined)
+        queryClient.setQueryData(queryKey, context.previous);
+    },
+    onSettled: () => {
+      return queryClient.invalidateQueries({ queryKey });
+    },
+  });
+  const markAllRead = useMutation<
+    Notification[],
+    Error,
+    string[],
+    NotificationMutationContext
+  >({
+    mutationFn: (notificationIds) =>
+      Promise.all(
+        notificationIds.map((notificationId) =>
+          readNotification(client, notificationId),
+        ),
+      ),
+    onMutate: async (notificationIds) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<NotificationList>(queryKey);
+      queryClient.setQueryData<NotificationList>(queryKey, (current) =>
+        removeNotifications(current, notificationIds),
+      );
+      return { previous };
+    },
+    onError: (_error, _notificationIds, context) => {
+      if (context?.previous !== undefined)
+        queryClient.setQueryData(queryKey, context.previous);
+    },
+    onSettled: () => {
+      return queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -175,8 +238,9 @@ export default function NotificationProvider({
       realtimeStatus: userId ? realtimeStatus : 'disconnected',
       refetch: query.refetch,
       markRead,
+      markAllRead,
     }),
-    [markRead, notifications, query, realtimeStatus, userId],
+    [markAllRead, markRead, notifications, query, realtimeStatus, userId],
   );
 
   return (

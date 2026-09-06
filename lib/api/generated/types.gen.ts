@@ -392,6 +392,13 @@ export type AnonymousSessionResponseDto = {
   rateio: AnonymousRateioResponseDto;
 };
 
+export type NotificationActorDto = {
+  memberId: string;
+  userId?: string | null;
+  displayName: string;
+  profileImageUrl?: string | null;
+};
+
 export type NotificationResponseDto = {
   id: string;
   userId: string;
@@ -404,6 +411,7 @@ export type NotificationResponseDto = {
   payload: {
     [key: string]: unknown;
   };
+  actor: NotificationActorDto | null;
   readAt?: {
     [key: string]: unknown;
   } | null;

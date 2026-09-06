@@ -11,6 +11,13 @@ const notificationTypeSchema = z.enum([
   'BALANCE_UPDATED',
 ]);
 
+const notificationActorSchema = z.object({
+  memberId: z.string(),
+  userId: z.string().nullable(),
+  displayName: z.string(),
+  profileImageUrl: z.string().nullable(),
+});
+
 const memberSchema = z.object({
   id: z.string(),
   userId: z.string().nullable(),
@@ -131,6 +138,7 @@ export const realtimeNotificationCreatedSchema = z.object({
   title: z.string().min(1),
   body: z.string().min(1),
   payload: z.unknown(),
+  actor: notificationActorSchema.nullable().optional(),
   readAt: z.string().nullable().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),

@@ -160,6 +160,7 @@ export type {
   InvitationResponseDto,
   InviteMemberDto,
   MemberResponseDto,
+  NotificationActorDto,
   NotificationListResponseDto,
   NotificationResponseDto,
   NotificationsControllerListData,

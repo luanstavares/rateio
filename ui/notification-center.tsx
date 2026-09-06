@@ -2,6 +2,7 @@
 
 import { BellIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
 import { Badge } from './components/ui/badge';
 import { Button } from './components/ui/button';
 import {
@@ -26,6 +27,17 @@ function notificationDate(value: string): string {
   }).format(date);
 }
 
+function initials(value: string): string {
+  const result = value
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+  return result || '?';
+}
+
 export default function NotificationCenter() {
   const { isLoggedIn } = useUser();
   const {
@@ -37,6 +49,7 @@ export default function NotificationCenter() {
     error,
     refetch,
     markRead,
+    markAllRead,
     realtimeStatus,
   } = useNotifications();
   const [open, setOpen] = useState(false);
@@ -52,7 +65,7 @@ export default function NotificationCenter() {
               ? `Notificações, ${unreadCount} não lidas`
               : 'Notificações'
           }
-          className="relative"
+          className="relative [&_svg]:size-6 [&_svg]:stroke-border "
           size="icon"
           type="button"
           variant="ghost"
@@ -61,7 +74,7 @@ export default function NotificationCenter() {
           {unreadCount > 0 && (
             <Badge
               aria-hidden="true"
-              className="absolute -right-1 -top-1 min-w-5 px-1"
+              className="absolute -right-1 -top-1 min-w-6 px-0.1"
               variant="default"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
@@ -86,6 +99,29 @@ export default function NotificationCenter() {
         </DrawerHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4">
+          {!isLoading && !isError && notifications.length > 1 && (
+            <div className="flex justify-end pt-4">
+              <Button
+                disabled={unreadCount === 0 || markAllRead.isPending}
+                size="sm"
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  markAllRead.mutate(
+                    notifications
+                      .filter((notification) => !notification.readAt)
+                      .map((notification) => notification.id),
+                  )
+                }
+              >
+                {markAllRead.isPending
+                  ? 'Marcando...'
+                  : unreadCount === 0
+                    ? 'Todas lidas'
+                    : 'Marcar todas como lidas'}
+              </Button>
+            </div>
+          )}
           {isLoading ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
               Carregando notificações...
@@ -129,8 +165,25 @@ export default function NotificationCenter() {
                           unread ? 'bg-primary' : 'bg-muted'
                         }`}
                       />
+                      <Avatar className="size-8">
+                        {notification.actor?.profileImageUrl && (
+                          <AvatarImage
+                            alt=""
+                            referrerPolicy="no-referrer"
+                            src={notification.actor.profileImageUrl}
+                          />
+                        )}
+                        <AvatarFallback>
+                          {initials(
+                            notification.actor?.displayName ?? 'Sistema',
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
                       <div className="min-w-0 flex-1">
                         <p className="font-medium">{notification.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {notification.actor?.displayName ?? 'Sistema'}
+                        </p>
                         <p className="mt-1 text-sm text-muted-foreground">
                           {notification.body}
                         </p>
@@ -160,6 +213,11 @@ export default function NotificationCenter() {
         {markRead.isError && (
           <p className="px-4 text-sm text-destructive" role="alert">
             {markRead.error.message}
+          </p>
+        )}
+        {markAllRead.isError && (
+          <p className="px-4 text-sm text-destructive" role="alert">
+            {markAllRead.error.message}
           </p>
         )}
         <DrawerFooter>

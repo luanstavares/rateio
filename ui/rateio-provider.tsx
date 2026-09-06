@@ -106,7 +106,7 @@ async function fetchRateioSession(
   rateioId: string,
 ): Promise<RateioSessionData> {
   const result = await client.get<RateioSessionData, { message?: string }>({
-    url: '/api/rateios/{id}/session',
+    url: '/rateios/{id}/session',
     path: { id: rateioId },
     responseStyle: 'fields',
     throwOnError: false,

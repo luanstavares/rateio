@@ -46,7 +46,12 @@ export default function DrawerMenu({ anchor, icon }: DrawerMenuProps) {
   return (
     <Drawer direction={anchor} open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button aria-label="Abrir menu" size="icon" variant="outline">
+        <Button
+          className="[&_svg]:size-6"
+          aria-label="Abrir menu"
+          size="icon"
+          variant="outline"
+        >
           {icon}
         </Button>
       </DrawerTrigger>
