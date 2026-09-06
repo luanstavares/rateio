@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { ClockUserIcon } from "@phosphor-icons/react";
-import type { ActivityEventResponseDto } from "../lib/api/generated";
+import type { RateioSessionActivityEvent } from "../lib/rateio/session-data";
 import { Button } from "./components/ui/button";
 import {
     Drawer,
@@ -17,7 +17,7 @@ import {
 } from "./components/ui/drawer";
 
 interface RateioActivityDrawerProps {
-    events: ActivityEventResponseDto[];
+    events: RateioSessionActivityEvent[];
 }
 
 function payloadString(
@@ -28,7 +28,7 @@ function payloadString(
     return typeof value === "string" && value.trim() ? value : null;
 }
 
-function eventDescription(event: ActivityEventResponseDto): string {
+function eventDescription(event: RateioSessionActivityEvent): string {
     const itemName = payloadString(event.payload, "name");
     const memberName = payloadString(event.payload, "displayName");
     const role = payloadString(event.payload, "role");

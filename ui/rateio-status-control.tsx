@@ -1,46 +1,35 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
 import { TrashIcon } from "@phosphor-icons/react";
-import {
-    changeRateioStatus,
-    type ChangeRateioStatusResult,
-} from "../app/actions/rateios";
 import type { RateioStatus } from "../lib/api/rateios";
 import { Button } from "./components/ui/button";
+import { useRateioMutations } from "./rateio-provider";
 
 interface RateioStatusControlProps {
-    rateioId: string;
     status: RateioStatus;
 }
 
 export default function RateioStatusControl({
-    rateioId,
     status,
 }: RateioStatusControlProps) {
-    const router = useRouter();
     const [error, setError] = useState<string | null>(null);
-    const [isPending, startTransition] = useTransition();
+    const { changeStatus } = useRateioMutations();
     const nextStatus: RateioStatus = status === "ACTIVE" ? "CLOSED" : "ACTIVE";
     const actionLabel =
         status === "ACTIVE" ? "Fechar rateio" : "Reabrir rateio";
 
-    function handleStatusChange() {
+    async function handleStatusChange() {
         setError(null);
-        startTransition(async () => {
-            const result: ChangeRateioStatusResult = await changeRateioStatus(
-                rateioId,
-                nextStatus,
-            );
+        try {
+            const result = await changeStatus.mutateAsync(nextStatus);
             if (!result.success) {
                 setError(result.error);
-                return;
             }
-
-            router.refresh();
-        });
+        } catch {
+            setError("Não foi possível alterar o status do rateio. Tente novamente.");
+        }
     }
 
     return (
@@ -53,11 +42,11 @@ export default function RateioStatusControl({
                 type="button"
                 variant={status === "ACTIVE" ? "destructive" : "outline"}
                 className="mt-4 w-full sm:w-auto"
-                disabled={isPending}
-                onClick={handleStatusChange}
+                disabled={changeStatus.isPending}
+                onClick={() => void handleStatusChange()}
             >
                 {status === "ACTIVE" && <TrashIcon />}
-                {isPending ? "Salvando..." : actionLabel}
+                {changeStatus.isPending ? "Salvando..." : actionLabel}
             </Button>
             {error ? (
                 <p

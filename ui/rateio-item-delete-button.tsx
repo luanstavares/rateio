@@ -1,13 +1,8 @@
 "use client";
 
 import { TrashIcon } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
-import {
-    removeExpenseItem,
-    type RemoveExpenseItemResult,
-} from "../app/actions/expenses";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -20,9 +15,9 @@ import {
     AlertDialogTrigger,
 } from "./components/ui/alert-dialog";
 import { Button } from "./components/ui/button";
+import { useRateioMutations } from "./rateio-provider";
 
 interface RateioItemDeleteButtonProps {
-    rateioId: string;
     expenseId: string;
     itemId: string;
     itemName: string;
@@ -32,7 +27,6 @@ interface RateioItemDeleteButtonProps {
 }
 
 export default function RateioItemDeleteButton({
-    rateioId,
     expenseId,
     itemId,
     itemName,
@@ -40,9 +34,8 @@ export default function RateioItemDeleteButton({
     currentMemberId,
     currentRole,
 }: RateioItemDeleteButtonProps) {
-    const router = useRouter();
     const [error, setError] = useState<string | null>(null);
-    const [isPending, startTransition] = useTransition();
+    const { removeItem } = useRateioMutations();
     const canDelete =
         currentRole === "OWNER" ||
         currentRole === "ADMIN" ||
@@ -50,20 +43,19 @@ export default function RateioItemDeleteButton({
 
     if (!canDelete) return null;
 
-    function handleDelete() {
+    async function handleDelete() {
         setError(null);
-        startTransition(async () => {
-            const result: RemoveExpenseItemResult = await removeExpenseItem(
-                rateioId,
+        try {
+            const result = await removeItem.mutateAsync({
                 expenseId,
                 itemId,
-            );
+            });
             if (!result.success) {
                 setError(result.error);
-                return;
             }
-            router.refresh();
-        });
+        } catch {
+            setError("Não foi possível remover o item agora. Tente novamente.");
+        }
     }
 
     return (
@@ -73,7 +65,7 @@ export default function RateioItemDeleteButton({
                     <Button
                         aria-label={`Remover item ${itemName}`}
                         className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        disabled={isPending}
+                        disabled={removeItem.isPending}
                         size="icon"
                         type="button"
                         variant="ghost"
@@ -100,16 +92,16 @@ export default function RateioItemDeleteButton({
                     <AlertDialogFooter>
                         <AlertDialogCancel
                             variant="secondary"
-                            disabled={isPending}
+                            disabled={removeItem.isPending}
                         >
                             Cancelar
                         </AlertDialogCancel>
                         <AlertDialogAction
-                            disabled={isPending}
-                            onClick={handleDelete}
+                            disabled={removeItem.isPending}
+                            onClick={() => void handleDelete()}
                             variant="destructive"
                         >
-                            {isPending ? "Removendo..." : "Remover item"}
+                            {removeItem.isPending ? "Removendo..." : "Remover item"}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

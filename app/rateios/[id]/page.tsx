@@ -1,13 +1,8 @@
 import Link from "next/link";
 
-import { CrownIcon } from "@phosphor-icons/react/ssr";
 import type { ApiClientError } from "../../../lib/api/errors";
 import { listApiAnonymousExpenses } from "../../../lib/api/expenses";
-import type {
-    AnonymousExpenseSessionResponseDto,
-    RateioDetailResponseDto,
-    RateioMemberResponseDto,
-} from "../../../lib/api/generated";
+import type { AnonymousExpenseSessionResponseDto } from "../../../lib/api/generated";
 import { getApiAnonymousRateio, getApiRateio } from "../../../lib/api/rateios";
 import {
     listApiAnonymousBalances,
@@ -18,22 +13,11 @@ import {
     getCurrentUser,
     getRefreshAwareAccessToken,
 } from "../../../lib/auth/server-session";
-import { formatMinorAmount } from "../../../lib/format";
+import { normalizeAnonymousSession, normalizeAuthenticatedSession } from "../../../lib/rateio/session-data";
 import ClearAnonymousSession from "../../../ui/clear-anonymous-session";
-import { Badge } from "../../../ui/components/ui/badge";
 import { Button } from "../../../ui/components/ui/button";
-import ManualExpenseDrawer, {
-    type ExpenseMemberOption,
-} from "../../../ui/manual-expense-drawer";
-import RateioActivityDrawer from "../../../ui/rateio-activity-drawer";
-import RateioMemberManagementDrawer from "../../../ui/rateio-member-management-drawer";
-import RateioRealtimeSession from "../../../ui/rateio-realtime-session";
-import type {
-    RateioSessionBalance,
-    RateioSessionItem,
-} from "../../../ui/rateio-session-layout";
-import RateioShareLinkDrawer from "../../../ui/rateio-share-link-drawer";
-import RateioStatusControl from "../../../ui/rateio-status-control";
+import RateioPageContent from "../../../ui/rateio-page-content";
+import RateioProvider from "../../../ui/rateio-provider";
 
 type RateioDetailPageProps = {
     params: Promise<{ id: string }>;
@@ -46,15 +30,6 @@ function searchParamValue(
     return Array.isArray(value) ? value[0] : value;
 }
 
-function claimReturnHref(rateioId: string): string {
-    const returnTo = encodeURIComponent(`/rateios/${rateioId}`);
-    return `/api/auth/google?returnTo=${returnTo}`;
-}
-
-function descriptionText(description: unknown): string | null {
-    return typeof description === "string" ? description : null;
-}
-
 function errorMessage(error: ApiClientError): string {
     if (error.kind === "api" && error.statusCode === 401) {
         return "Sua sessão expirou. Entre novamente para ver este rateio.";
@@ -65,178 +40,9 @@ function errorMessage(error: ApiClientError): string {
     return "Não foi possível carregar este rateio agora. Tente novamente.";
 }
 
-function countLabel(count: number, singular: string, plural: string): string {
-    return `${count} ${count === 1 ? singular : plural}`;
-}
-
-function statusClassName(status: RateioDetailResponseDto["status"]): string {
-    return status === "ACTIVE"
-        ? "border-primary/50 text-primary"
-        : "border-muted-foreground/50 text-muted-foreground";
-}
-
-function sessionItemsForRateio(
-    rateio: RateioDetailResponseDto,
-): RateioSessionItem[] {
-    return rateio.expenses.flatMap((expense) =>
-        expense.items.map((item) => {
-            const payerName = expense.payerMember?.user?.name;
-            return {
-                id: item.id,
-                expenseId: item.expenseId,
-                createdByMemberId: expense.createdByMemberId,
-                name: item.name,
-                amountMinor: String(item.baseAmountMinor),
-                payerName: typeof payerName === "string" ? payerName : null,
-            };
-        }),
-    );
-}
-
-function memberDisplayName(member: RateioMemberResponseDto): string {
-    const name: unknown = member.user?.name;
-    return typeof name === "string" && name.trim() ? name : "Participante";
-}
-
-function expenseMembersForRateio(
-    members: RateioMemberResponseDto[],
-): ExpenseMemberOption[] {
-    return members.map((member) => ({
-        id: member.id,
-        displayName: memberDisplayName(member),
-    }));
-}
-
-function sessionItemsForAnonymousRateio(
-    session: AnonymousExpenseSessionResponseDto,
-): RateioSessionItem[] {
-    const payerNames = new Map(
-        session.members.map((member) => [member.id, member.displayName]),
-    );
-    return session.expenses.flatMap((expense) =>
-        expense.items.map((item) => ({
-            id: item.id,
-            expenseId: item.expenseId,
-            createdByMemberId: expense.createdByMemberId,
-            name: item.name,
-            amountMinor: item.baseAmountMinor,
-            payerName: payerNames.get(expense.payerMemberId) ?? null,
-        })),
-    );
-}
-
-function AnonymousSessionView({
-    participant,
-    rateio,
-    expenseSession,
-    balances,
-    balancesError,
-    authError,
-}: {
-    participant: { displayName: string };
-    rateio: {
-        id: string;
-        title: string;
-        description?: unknown;
-        status: "ACTIVE" | "CLOSED";
-        baseCurrency: string;
-    };
-    expenseSession: AnonymousExpenseSessionResponseDto;
-    balances: RateioSessionBalance[];
-    balancesError: boolean;
-    authError: boolean;
-}) {
-    const description = descriptionText(rateio.description);
-    const isActive = rateio.status === "ACTIVE";
-
-    return (
-        <section className="mx-auto w-full max-w-5xl px-6 py-8 sm:px-10 sm:py-12">
-            <div className="rounded-lg border border-border bg-card p-6 sm:p-8">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-                            Sessão compartilhada
-                        </p>
-                        <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
-                            {rateio.title}
-                        </h1>
-                        <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-                            {description ?? "Sem descrição"}
-                        </p>
-                    </div>
-                    <p className="shrink-0 text-sm text-muted-foreground">
-                        {rateio.baseCurrency}
-                    </p>
-                </div>
-
-                <div className="mt-6 rounded-md border border-border p-4">
-                    <p className="text-sm text-muted-foreground">
-                        Você entrou como
-                    </p>
-                    <p className="mt-1 font-semibold">
-                        {participant.displayName}
-                    </p>
-                </div>
-
-                {authError ? (
-                    <div
-                        className="mt-4 rounded-md border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive"
-                        role="alert"
-                    >
-                        Não foi possível entrar com o Google agora. Sua sessão
-                        compartilhada continua disponível.
-                    </div>
-                ) : null}
-
-                <div className="mt-4 rounded-md border border-border bg-primary/5 p-4">
-                    <p className="text-sm text-muted-foreground">
-                        Quer guardar sua participação e este histórico na sua
-                        conta?
-                    </p>
-                    <Button
-                        asChild
-                        className="mt-4"
-                        variant="outline"
-                    >
-                        <a href={claimReturnHref(rateio.id)}>
-                            Vincular à minha conta Google
-                        </a>
-                    </Button>
-                </div>
-
-                {!isActive ? (
-                    <div className="mt-4 rounded-md border border-muted-foreground/40 bg-muted/40 p-4 text-sm text-muted-foreground">
-                        Este rateio está fechado para novas alterações.
-                    </div>
-                ) : null}
-            </div>
-
-            <RateioRealtimeSession
-                authenticated={false}
-                initial={{
-                    baseCurrency: rateio.baseCurrency,
-                    status: rateio.status,
-                    balances,
-                    balancesError,
-                    items: sessionItemsForAnonymousRateio(expenseSession),
-                    participantCount: expenseSession.members.length,
-                    totalAmountMinor: expenseSession.totalAmountMinor,
-                }}
-                rateioId={rateio.id}
-            />
-            <div className="mt-6 flex justify-end">
-                <ManualExpenseDrawer
-                    baseCurrency={rateio.baseCurrency}
-                    isActive={isActive}
-                    members={expenseSession.members.map((member) => ({
-                        id: member.id,
-                        displayName: member.displayName,
-                    }))}
-                    rateioId={rateio.id}
-                />
-            </div>
-        </section>
-    );
+function claimReturnHref(rateioId: string): string {
+    const returnTo = encodeURIComponent(`/rateios/${rateioId}`);
+    return `/api/auth/google?returnTo=${returnTo}`;
 }
 
 export default async function RateioDetailPage({
@@ -284,22 +90,22 @@ export default async function RateioDetailPage({
             totalAmountMinor: "0",
             expenses: [],
         };
+        const initialData = normalizeAnonymousSession(
+            anonymousResult.data.rateio,
+            anonymousExpensesResult?.data ?? fallbackSession,
+            anonymousBalancesResult?.data ?? [],
+            anonymousResult.data.participant.id,
+        );
         return (
-            <AnonymousSessionView
-                {...anonymousResult.data}
-                expenseSession={
-                    anonymousExpensesResult?.data ?? fallbackSession
-                }
-                balances={
-                    anonymousBalancesResult?.data?.map((balance) => ({
-                        memberId: balance.memberId,
-                        displayName: balance.displayName,
-                        balanceMinor: balance.balanceMinor,
-                    })) ?? []
-                }
-                balancesError={anonymousBalancesResult?.error !== undefined}
-                authError={authError === "oauth"}
-            />
+            <RateioProvider
+                initialData={initialData}
+                rateioId={id}
+            >
+                <RateioPageContent
+                    authError={authError === "oauth"}
+                    claimStatus={claimStatus}
+                />
+            </RateioProvider>
         );
     }
 
@@ -382,190 +188,24 @@ export default async function RateioDetailPage({
 
     if (!result?.data) return null;
 
-    const rateio = result.data;
-    const description = descriptionText(rateio.description);
-    const isOwner = currentUser?.sub === rateio.ownerId;
-    const currentMembership = rateio.members.find(
+    const currentMembership = result.data.members.find(
         (member) => member.userId === currentUser?.sub,
     );
-    const isActive = rateio.status === "ACTIVE";
+    const initialData = normalizeAuthenticatedSession(
+        result.data,
+        balancesResult?.data ?? [],
+        currentMembership?.id ?? null,
+        currentMembership?.role ?? null,
+    );
 
     return (
-        <section className="mx-auto w-full max-w-5xl px-6 py-8 sm:px-10 sm:py-12">
-            <div className="mb-6">
-                <Button
-                    asChild
-                    variant="ghost"
-                    className="-ml-4"
-                >
-                    <Link href="/rateios">← Meus rateios</Link>
-                </Button>
-            </div>
-
-            <div className="rounded-lg border border-border bg-card p-6 sm:p-8">
-                {claimStatus === "success" ? (
-                    <div
-                        className="mb-6 rounded-md border border-primary/40 bg-primary/5 p-4 text-sm text-primary"
-                        role="status"
-                    >
-                        Sua participação anônima foi vinculada à sua conta. Este
-                        rateio agora faz parte do seu histórico.
-                    </div>
-                ) : null}
-                {claimStatus === "error" ? (
-                    <div
-                        className="mb-6 rounded-md border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive"
-                        role="alert"
-                    >
-                        Não foi possível vincular sua participação anônima à
-                        conta. Sua sessão compartilhada não foi alterada; você
-                        pode tentar novamente.
-                        <a
-                            className="mt-2 block font-medium underline underline-offset-4"
-                            href={claimReturnHref(rateio.id)}
-                        >
-                            Tentar vincular novamente
-                        </a>
-                    </div>
-                ) : null}
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <div className="flex flex-wrap items-center gap-3">
-                            {isActive ? (
-                                <Badge variant="success">Ativo</Badge>
-                            ) : (
-                                <Badge variant="secondary">Fechado</Badge>
-                            )}
-
-                            {isOwner ? (
-                                <Badge variant="outline">
-                                    <CrownIcon /> Owner
-                                </Badge>
-                            ) : null}
-                        </div>
-                        <h1 className="mt-4 text-3xl font-bold sm:text-4xl">
-                            {rateio.title}
-                        </h1>
-                        <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-                            {description ?? "Sem descrição"}
-                        </p>
-                    </div>
-                    <p className="shrink-0 text-sm text-muted-foreground">
-                        {rateio.baseCurrency}
-                    </p>
-                </div>
-
-                {!isActive ? (
-                    <div className="mt-6 rounded-md border border-muted-foreground/40 bg-muted/40 p-4 text-sm text-muted-foreground">
-                        Este rateio está fechado para novas alterações.
-                    </div>
-                ) : null}
-
-                <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                    <div className="rounded-md border border-border p-4">
-                        <p className="text-xs text-muted-foreground">
-                            Total registrado
-                        </p>
-                        <p className="mt-2 text-2xl font-semibold">
-                            {formatMinorAmount(rateio.totalAmountMinor)}
-                        </p>
-                    </div>
-                    <div className="rounded-md border border-border p-4">
-                        <p className="text-xs text-muted-foreground">
-                            Participantes
-                        </p>
-                        <p className="mt-2 text-2xl font-semibold">
-                            {countLabel(
-                                rateio.members.length,
-                                "membro",
-                                "membros",
-                            )}
-                        </p>
-                    </div>
-                    <div className="rounded-md border border-border p-4">
-                        <p className="text-xs text-muted-foreground">
-                            Despesas
-                        </p>
-                        <p className="mt-2 text-2xl font-semibold">
-                            {countLabel(
-                                rateio.expenses.length,
-                                "despesa",
-                                "despesas",
-                            )}
-                        </p>
-                    </div>
-                </div>
-
-                {isOwner ? (
-                    <>
-                        <RateioStatusControl
-                            rateioId={rateio.id}
-                            status={rateio.status}
-                        />
-                        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-                            <RateioShareLinkDrawer rateioId={rateio.id} />
-                            {currentMembership ? (
-                                <RateioMemberManagementDrawer
-                                    currentMemberId={currentMembership.id}
-                                    currentRole={currentMembership.role}
-                                    members={rateio.members}
-                                    rateioId={rateio.id}
-                                />
-                            ) : null}
-                            {currentMembership &&
-                            (currentMembership.role === "OWNER" ||
-                                currentMembership.role === "ADMIN") ? (
-                                <RateioActivityDrawer
-                                    events={rateio.activityEvents}
-                                />
-                            ) : null}
-                        </div>
-                    </>
-                ) : null}
-                {!isOwner && currentMembership ? (
-                    <RateioMemberManagementDrawer
-                        currentMemberId={currentMembership.id}
-                        currentRole={currentMembership.role}
-                        members={rateio.members}
-                        rateioId={rateio.id}
-                    />
-                ) : null}
-                {!isOwner &&
-                currentMembership &&
-                (currentMembership.role === "OWNER" ||
-                    currentMembership.role === "ADMIN") ? (
-                    <RateioActivityDrawer events={rateio.activityEvents} />
-                ) : null}
-            </div>
-
-            <RateioRealtimeSession
-                authenticated
-                currentMemberId={currentMembership?.id}
-                currentRole={currentMembership?.role}
-                initial={{
-                    baseCurrency: rateio.baseCurrency,
-                    status: rateio.status,
-                    balances:
-                        balancesResult?.data?.map((balance) => ({
-                            memberId: balance.memberId,
-                            displayName: balance.name,
-                            balanceMinor: balance.balanceMinor,
-                        })) ?? [],
-                    balancesError: balancesResult?.error !== undefined,
-                    items: sessionItemsForRateio(rateio),
-                    participantCount: rateio.members.length,
-                    totalAmountMinor: rateio.totalAmountMinor,
-                }}
-                rateioId={rateio.id}
+        <RateioProvider
+            initialData={initialData}
+            rateioId={id}
+        >
+            <RateioPageContent
+                claimStatus={claimStatus}
             />
-            <div className="mt-6 flex justify-end">
-                <ManualExpenseDrawer
-                    baseCurrency={rateio.baseCurrency}
-                    isActive={isActive}
-                    members={expenseMembersForRateio(rateio.members)}
-                    rateioId={rateio.id}
-                />
-            </div>
-        </section>
+        </RateioProvider>
     );
 }

@@ -1,15 +1,11 @@
 "use client";
 
 import { XIcon } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 
-import {
-    createManualExpense,
-    type CreateManualExpenseInput,
-    type CreateManualExpenseResult,
-} from "../app/actions/expenses";
+import type { CreateManualExpenseInput } from "../app/actions/expenses";
 import { Button } from "./components/ui/button";
+import { useRateioMutations } from "./rateio-provider";
 import {
     Drawer,
     DrawerClose,
@@ -67,7 +63,6 @@ export default function ManualExpenseDrawer({
     members,
     isActive,
 }: ManualExpenseDrawerProps) {
-    const router = useRouter();
     const [open, setOpen] = useState(false);
     const [itemName, setItemName] = useState("");
     const [amount, setAmount] = useState("");
@@ -81,7 +76,7 @@ export default function ManualExpenseDrawer({
         {},
     );
     const [error, setError] = useState<string | null>(null);
-    const [isPending, startTransition] = useTransition();
+    const { addExpense } = useRateioMutations();
 
     const selectedMembers = useMemo(
         () => members.filter((member) => selectedMemberIds.includes(member.id)),
@@ -195,16 +190,15 @@ export default function ManualExpenseDrawer({
             allocations: allocationResult.allocations,
         };
 
-        startTransition(async () => {
-            const result: CreateManualExpenseResult =
-                await createManualExpense(input);
+        void addExpense.mutateAsync(input).then((result) => {
             if (!result.success) {
                 setError(result.error);
                 return;
             }
             resetForm();
             setOpen(false);
-            router.refresh();
+        }).catch(() => {
+            setError("Não foi possível adicionar o item agora. Tente novamente.");
         });
     }
 
@@ -467,10 +461,10 @@ export default function ManualExpenseDrawer({
                                 </Button>
                             </DrawerClose>
                             <Button
-                                disabled={isPending}
+                                disabled={addExpense.isPending}
                                 type="submit"
                             >
-                                {isPending
+                                {addExpense.isPending
                                     ? "Adicionando..."
                                     : "Adicionar item"}
                             </Button>

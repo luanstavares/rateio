@@ -98,7 +98,7 @@ export default function DrawerMenu({ anchor, icon }: DrawerMenuProps) {
                             {myAccount.label}
                         </Button>
                     </Link>
-                    <DrawerClose>
+                    <DrawerClose asChild>
                         <Button
                             className="w-full"
                             type="button"

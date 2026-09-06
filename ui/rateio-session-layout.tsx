@@ -17,7 +17,6 @@ export interface RateioSessionBalance {
 }
 
 export interface RateioSessionLayoutProps {
-    rateioId: string;
     items: RateioSessionItem[];
     totalAmountMinor: string | null;
     balances: RateioSessionBalance[];
@@ -33,10 +32,9 @@ function SessionItems({
     baseCurrency,
     currentMemberId,
     currentRole,
-    rateioId,
 }: Pick<
     RateioSessionLayoutProps,
-    "items" | "baseCurrency" | "currentMemberId" | "currentRole" | "rateioId"
+    "items" | "baseCurrency" | "currentMemberId" | "currentRole"
 >) {
     return (
         <section
@@ -101,7 +99,6 @@ function SessionItems({
                                             expenseId={item.expenseId}
                                             itemId={item.id}
                                             itemName={item.name}
-                                            rateioId={rateioId}
                                         />
                                     ) : null}
                                 </div>
@@ -218,7 +215,6 @@ function RateioBreakdown({
 }
 
 export default function RateioSessionLayout({
-    rateioId,
     items,
     totalAmountMinor,
     balances,
@@ -235,7 +231,6 @@ export default function RateioSessionLayout({
                 currentMemberId={currentMemberId}
                 currentRole={currentRole}
                 items={items}
-                rateioId={rateioId}
             />
             <RateioBreakdown
                 balances={balances}

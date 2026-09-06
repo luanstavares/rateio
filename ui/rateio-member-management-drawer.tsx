@@ -1,19 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
 import { UsersThreeIcon } from "@phosphor-icons/react";
-import {
-    changeRateioMemberRole,
-    removeRateioMember,
-    type ChangeMemberRoleResult,
-    type RemoveMemberResult,
-} from "../app/actions/rateios";
-import type { RateioMemberResponseDto } from "../lib/api/generated";
 import type { MembershipRole } from "../lib/api/rateios";
+import type { RateioSessionMember } from "../lib/rateio/session-data";
 import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
 import { Button } from "./components/ui/button";
+import { useRateioMutations } from "./rateio-provider";
 import {
     Drawer,
     DrawerClose,
@@ -26,14 +20,14 @@ import {
 } from "./components/ui/drawer";
 
 interface RateioMemberManagementDrawerProps {
-    rateioId: string;
-    members: RateioMemberResponseDto[];
+    members: RateioSessionMember[];
     currentMemberId: string;
     currentRole: MembershipRole;
 }
 
-function memberName(member: RateioMemberResponseDto): string {
+function memberName(member: RateioSessionMember): string {
     return (
+        optionalString(member.displayName) ??
         optionalString(member.user?.name) ??
         optionalString(member.user?.email) ??
         "Participante"
@@ -66,54 +60,50 @@ function roleLabel(role: MembershipRole): string {
 }
 
 export default function RateioMemberManagementDrawer({
-    rateioId,
     members,
     currentMemberId,
     currentRole,
 }: RateioMemberManagementDrawerProps) {
-    const router = useRouter();
     const [open, setOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isPending, startTransition] = useTransition();
+    const { changeMemberRole, removeMember } = useRateioMutations();
+    const isPending =
+        changeMemberRole.isPending || removeMember.isPending;
     const canManage = currentRole === "OWNER" || currentRole === "ADMIN";
     const canChangeRoles = currentRole === "OWNER";
 
-    function refreshAfter(result: ChangeMemberRoleResult | RemoveMemberResult) {
+    function handleResult(result: { success: true } | { success: false; error: string }) {
         if (!result.success) {
             setError(result.error);
             return;
         }
         setError(null);
-        router.refresh();
     }
 
     function handleRoleChange(memberId: string, role: MembershipRole) {
         setError(null);
-        startTransition(async () => {
-            const result = await changeRateioMemberRole(
-                rateioId,
-                memberId,
-                role,
-            );
-            refreshAfter(result);
-        });
+        void changeMemberRole
+            .mutateAsync({ memberId, role })
+            .then(handleResult)
+            .catch(() => {
+                setError("Não foi possível atualizar os membros agora. Tente novamente.");
+            });
     }
 
-    function handleRemove(member: RateioMemberResponseDto) {
+    function handleRemove(member: RateioSessionMember) {
         if (!window.confirm(`Remover ${memberName(member)} deste rateio?`))
             return;
 
         setError(null);
-        startTransition(async () => {
-            const result: RemoveMemberResult = await removeRateioMember(
-                rateioId,
-                member.id,
-            );
-            refreshAfter(result);
-        });
+        void removeMember
+            .mutateAsync(member.id)
+            .then(handleResult)
+            .catch(() => {
+                setError("Não foi possível atualizar os membros agora. Tente novamente.");
+            });
     }
 
-    function canRemove(member: RateioMemberResponseDto): boolean {
+    function canRemove(member: RateioSessionMember): boolean {
         if (member.id === currentMemberId || member.role === "OWNER")
             return false;
         return currentRole === "OWNER" || member.role === "PARTICIPANT";

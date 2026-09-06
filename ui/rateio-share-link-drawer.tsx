@@ -1,21 +1,16 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { CopyIcon, LinkIcon } from "@phosphor-icons/react";
-import {
-    createShareLink,
-    listShareLinks,
-    revokeShareLink,
-    type CreateShareLinkResult,
-    type RevokeShareLinkResult,
-    type ShareLinkMetadataResult,
-} from "../app/actions/rateios";
-import type {
-    ShareLinkCreatedResponseDto,
-    ShareLinkMetadataResponseDto,
-} from "../lib/api/generated";
+import { listShareLinks } from "../app/actions/rateios";
+import type { ShareLinkMetadataResponseDto } from "../lib/api/generated";
 import { Button } from "./components/ui/button";
+import {
+    rateioShareLinksQueryKey,
+    useRateioMutations,
+} from "./rateio-provider";
 import {
     Drawer,
     DrawerClose,
@@ -87,95 +82,76 @@ export default function RateioShareLinkDrawer({
     rateioId,
 }: RateioShareLinkDrawerProps) {
     const [open, setOpen] = useState(false);
-    const [links, setLinks] = useState<ShareLinkMetadataResponseDto[]>([]);
     const [shareUrl, setShareUrl] = useState<string | null>(null);
     const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">(
         "idle",
     );
     const [error, setError] = useState<string | null>(null);
-    const [isPending, startTransition] = useTransition();
+    const { createShareLink, revokeShareLink } = useRateioMutations();
+    const linksQuery = useQuery({
+        queryKey: rateioShareLinksQueryKey(rateioId),
+        queryFn: async () => {
+            const result = await listShareLinks(rateioId);
+            if (!result.success) throw new Error(result.error);
+            return result.data;
+        },
+        enabled: open,
+    });
+    const links = linksQuery.data ?? [];
+    const isPending =
+        linksQuery.isFetching ||
+        createShareLink.isPending ||
+        revokeShareLink.isPending;
 
     const activeLink = links.find((link) => link.status === "ACTIVE");
-
-    function loadLinks() {
-        setError(null);
-        startTransition(async () => {
-            const result: ShareLinkMetadataResult =
-                await listShareLinks(rateioId);
-            if (!result.success) {
-                setError(result.error);
-                return;
-            }
-            setLinks(result.data);
-        });
-    }
 
     function handleOpenChange(nextOpen: boolean) {
         setOpen(nextOpen);
         if (nextOpen) {
             setShareUrl(null);
             setCopyState("idle");
-            loadLinks();
+            setError(null);
         } else {
             setShareUrl(null);
             setCopyState("idle");
         }
     }
 
-    function handleCreate() {
+    async function handleCreate() {
         setError(null);
         setCopyState("idle");
-        startTransition(async () => {
-            const result: CreateShareLinkResult =
-                await createShareLink(rateioId);
+        try {
+            const result = await createShareLink.mutateAsync(undefined);
             if (!result.success) {
                 setError(result.error);
                 return;
             }
 
-            const created: ShareLinkCreatedResponseDto = result.data;
-            setLinks((currentLinks) => [
-                ...currentLinks.map((link) =>
-                    link.status === "ACTIVE"
-                        ? { ...link, status: "REVOKED" as const }
-                        : link,
-                ),
-                {
-                    id: created.id,
-                    rateioId: created.rateioId,
-                    status: created.status,
-                    createdAt: created.createdAt,
-                    revokedAt: created.revokedAt,
-                },
-            ]);
+            const created = result.data;
             setShareUrl(
                 `${window.location.origin}/rateios/entrar?token=${encodeURIComponent(created.token)}`,
             );
-        });
+        } catch {
+            setError("Não foi possível gerenciar o link agora. Tente novamente.");
+        }
     }
 
-    function handleRevoke() {
+    async function handleRevoke() {
         if (!activeLink) return;
 
         setError(null);
-        startTransition(async () => {
-            const result: RevokeShareLinkResult = await revokeShareLink(
-                rateioId,
-                activeLink.id,
-            );
+        try {
+            const result = await revokeShareLink.mutateAsync(activeLink.id);
             if (!result.success) {
                 setError(result.error);
                 return;
             }
 
-            setLinks((currentLinks) =>
-                currentLinks.map((link) =>
-                    link.id === result.data.id ? result.data : link,
-                ),
-            );
             setShareUrl(null);
             setCopyState("idle");
-        });
+        } catch {
+            setError("Não foi possível gerenciar o link agora. Tente novamente.");
+        }
     }
 
     async function handleCopy() {
@@ -222,12 +198,12 @@ export default function RateioShareLinkDrawer({
                     </p>
                 ) : null}
 
-                {error ? (
+                {error || linksQuery.error ? (
                     <div
                         className="rounded-md border border-destructive/50 p-4 text-sm text-destructive"
                         role="alert"
                     >
-                        {error}
+                        {error ?? linksQuery.error?.message}
                     </div>
                 ) : null}
 
@@ -276,7 +252,7 @@ export default function RateioShareLinkDrawer({
                             variant="ghost"
                             className="mt-3 text-destructive hover:bg-destructive/10 hover:text-destructive"
                             disabled={isPending}
-                            onClick={handleRevoke}
+                            onClick={() => void handleRevoke()}
                         >
                             <CloseIcon />
                             Revogar link atual
@@ -292,7 +268,7 @@ export default function RateioShareLinkDrawer({
                 <Button
                     type="button"
                     disabled={isPending}
-                    onClick={handleCreate}
+                    onClick={() => void handleCreate()}
                 >
                     <PlusIcon />
                     {activeLink ? "Regenerar link" : "Criar link"}
