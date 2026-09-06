@@ -1,15 +1,15 @@
 'use client';
 
-import Link from 'next/link';
 import { CrownIcon } from '@phosphor-icons/react';
+import Link from 'next/link';
 
 import { formatMinorAmount } from '../lib/format';
-import { useRateio } from './rateio-provider';
 import { Badge } from './components/ui/badge';
 import { Button } from './components/ui/button';
 import ManualExpenseDrawer from './manual-expense-drawer';
 import RateioActivityDrawer from './rateio-activity-drawer';
 import RateioMemberManagementDrawer from './rateio-member-management-drawer';
+import { useRateio } from './rateio-provider';
 import RateioRealtimeSession from './rateio-realtime-session';
 import RateioShareLinkDrawer from './rateio-share-link-drawer';
 import RateioStatusControl from './rateio-status-control';
@@ -212,11 +212,13 @@ export default function RateioPageContent({
           </>
         ) : null}
         {!isOwner && currentMember ? (
-          <RateioMemberManagementDrawer
-            currentMemberId={currentMember.id}
-            currentRole={currentMember.role}
-            members={members}
-          />
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <RateioMemberManagementDrawer
+              currentMemberId={currentMember.id}
+              currentRole={currentMember.role}
+              members={members}
+            />
+          </div>
         ) : null}
         {!isOwner &&
         currentMember &&

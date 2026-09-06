@@ -2,6 +2,15 @@ import { z } from 'zod';
 
 const timestampSchema = z.iso.datetime();
 
+const notificationTypeSchema = z.enum([
+  'INVITATION_CREATED',
+  'MEMBER_JOINED',
+  'ITEM_CREATED',
+  'ITEM_REMOVED',
+  'ROLE_CHANGED',
+  'BALANCE_UPDATED',
+]);
+
 const memberSchema = z.object({
   id: z.string(),
   userId: z.string().nullable(),
@@ -114,8 +123,24 @@ export const realtimeJoinResponseSchema = z.discriminatedUnion('event', [
   }),
 ]);
 
+export const realtimeNotificationCreatedSchema = z.object({
+  id: z.string().optional(),
+  userId: z.string().optional(),
+  rateioId: z.string().nullable().optional(),
+  type: notificationTypeSchema,
+  title: z.string().min(1),
+  body: z.string().min(1),
+  payload: z.unknown(),
+  readAt: z.string().nullable().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+
 export type RealtimeStateSnapshot = z.infer<typeof realtimeStateSnapshotSchema>;
 export type RealtimeJoinResponse = z.infer<typeof realtimeJoinResponseSchema>;
+export type RealtimeNotificationCreated = z.infer<
+  typeof realtimeNotificationCreatedSchema
+>;
 
 export type RealtimeConnectionStatus =
   'connecting' | 'connected' | 'reconnecting' | 'disconnected' | 'error';

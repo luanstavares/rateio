@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import ApiClientProvider from '../lib/api/api-client-provider';
 import UserProvider from '../ui/user-provider';
+import NotificationProvider from '../ui/notification-provider';
 import type { UserSession } from '../lib/auth/user-session';
 
 export default function Providers({
@@ -29,7 +30,9 @@ export default function Providers({
   return (
     <ApiClientProvider>
       <QueryClientProvider client={queryClient}>
-        <UserProvider initialUser={initialUser}>{children}</UserProvider>
+        <UserProvider initialUser={initialUser}>
+          <NotificationProvider>{children}</NotificationProvider>
+        </UserProvider>
       </QueryClientProvider>
     </ApiClientProvider>
   );

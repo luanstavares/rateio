@@ -3,6 +3,7 @@ import Link from 'next/link';
 //Local Components
 import BurgerMenu from './burger-menu';
 import Logo from './logo';
+import NotificationCenter from './notification-center';
 import UserMenu from './user-menu';
 
 export default function Navbar() {
@@ -21,7 +22,8 @@ export default function Navbar() {
       >
         <Logo glow="active" />
       </Link>
-      <div className="justify-self-end">
+      <div className="flex items-center gap-2 justify-self-end">
+        <NotificationCenter />
         <UserMenu />
       </div>
     </nav>
