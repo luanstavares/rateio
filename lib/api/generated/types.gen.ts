@@ -387,6 +387,24 @@ export type AnonymousJoinResponseDto = {
   rateio: AnonymousRateioResponseDto;
 };
 
+export type AuthenticatedShareLinkJoinDto = {
+  token: string;
+};
+
+export type AuthenticatedShareLinkJoinResponseDto = {
+  id: string;
+  rateioId: string;
+  userId: string;
+  role: 'OWNER' | 'ADMIN' | 'PARTICIPANT';
+  status: 'ACTIVE' | 'REMOVED';
+  joinedAt: string;
+  leftAt?: {
+    [key: string]: unknown;
+  } | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AnonymousSessionResponseDto = {
   participant: AnonymousParticipantResponseDto;
   rateio: AnonymousRateioResponseDto;
@@ -1752,6 +1770,53 @@ export type AnonymousShareLinksControllerJoinResponses = {
 
 export type AnonymousShareLinksControllerJoinResponse =
   AnonymousShareLinksControllerJoinResponses[keyof AnonymousShareLinksControllerJoinResponses];
+
+export type AnonymousShareLinksControllerJoinAuthenticatedData = {
+  body: AuthenticatedShareLinkJoinDto;
+  path?: never;
+  query?: never;
+  url: '/share-links/join/authenticated';
+};
+
+export type AnonymousShareLinksControllerJoinAuthenticatedErrors = {
+  /**
+   * The request is invalid or failed validation.
+   */
+  400: ApiErrorResponseDto;
+  /**
+   * Authentication is required or the credentials are invalid.
+   */
+  401: ApiErrorResponseDto;
+  /**
+   * The authenticated user is not allowed to perform this operation.
+   */
+  403: ApiErrorResponseDto;
+  /**
+   * The requested resource was not found.
+   */
+  404: ApiErrorResponseDto;
+  /**
+   * The request conflicts with the current resource state.
+   */
+  409: ApiErrorResponseDto;
+  /**
+   * An unexpected server error occurred.
+   */
+  500: ApiErrorResponseDto;
+};
+
+export type AnonymousShareLinksControllerJoinAuthenticatedError =
+  AnonymousShareLinksControllerJoinAuthenticatedErrors[keyof AnonymousShareLinksControllerJoinAuthenticatedErrors];
+
+export type AnonymousShareLinksControllerJoinAuthenticatedResponses = {
+  /**
+   * Authenticated rateio membership.
+   */
+  200: AuthenticatedShareLinkJoinResponseDto;
+};
+
+export type AnonymousShareLinksControllerJoinAuthenticatedResponse =
+  AnonymousShareLinksControllerJoinAuthenticatedResponses[keyof AnonymousShareLinksControllerJoinAuthenticatedResponses];
 
 export type AnonymousRateiosControllerGetData = {
   body?: never;

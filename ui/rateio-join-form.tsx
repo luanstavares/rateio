@@ -1,14 +1,17 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import {
+  joinRateioAuthenticated,
   joinRateioAnonymously,
+  type AuthenticatedJoinRateioResult,
   type JoinRateioResult,
 } from '../app/actions/rateios';
 import { Button } from './components/ui/button';
+import { useUser } from './user-provider';
 
 interface RateioJoinFormProps {
   initialToken: string;
@@ -16,15 +19,26 @@ interface RateioJoinFormProps {
 
 export default function RateioJoinForm({ initialToken }: RateioJoinFormProps) {
   const router = useRouter();
+  const { user } = useUser();
   const [token, setToken] = useState(initialToken);
-  const [displayName, setDisplayName] = useState('');
+  const [displayName, setDisplayName] = useState(user?.name ?? '');
   const [error, setError] = useState<string | null>(null);
+
   const joinRateioMutation = useMutation<
-    JoinRateioResult,
+    JoinRateioResult | AuthenticatedJoinRateioResult,
     Error,
-    { token: string; displayName: string }
+    { token: string; displayName?: string }
   >({
-    mutationFn: joinRateioAnonymously,
+    mutationFn: ({
+      token: submittedToken,
+      displayName: submittedDisplayName,
+    }) =>
+      user
+        ? joinRateioAuthenticated({ token: submittedToken })
+        : joinRateioAnonymously({
+            token: submittedToken,
+            displayName: submittedDisplayName ?? '',
+          }),
     onError: () => {
       setError('Não foi possível entrar neste rateio agora. Tente novamente.');
     },
@@ -37,12 +51,14 @@ export default function RateioJoinForm({ initialToken }: RateioJoinFormProps) {
       router.replace(`/rateios/${result.data.rateioId}`);
     },
   });
+
   const isPending = joinRateioMutation.isPending;
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    joinRateioMutation.mutate({ token, displayName });
+
+    joinRateioMutation.mutate(user ? { token } : { token, displayName });
   }
 
   return (
@@ -68,21 +84,27 @@ export default function RateioJoinForm({ initialToken }: RateioJoinFormProps) {
         </p>
       </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium" htmlFor="rateio-display-name">
-          Como devemos chamar você?
-        </label>
-        <input
-          autoComplete="name"
-          className="h-11 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          id="rateio-display-name"
-          maxLength={80}
-          onChange={(event) => setDisplayName(event.target.value)}
-          placeholder="Seu nome no rateio"
-          required
-          value={displayName}
-        />
-      </div>
+      {user ? (
+        <p className="rounded-md border border-border bg-background p-3 text-sm text-muted-foreground">
+          Você entrará usando sua conta{user.name ? ` (${user.name})` : ''}.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          <label className="text-sm font-medium" htmlFor="rateio-display-name">
+            Como devemos chamar você?
+          </label>
+          <input
+            autoComplete="name"
+            className="h-11 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            id="rateio-display-name"
+            maxLength={80}
+            onChange={(event) => setDisplayName(event.target.value)}
+            placeholder="Seu nome no rateio"
+            required
+            value={displayName}
+          />
+        </div>
+      )}
 
       {error ? (
         <p className="text-sm text-destructive" role="alert">
@@ -91,7 +113,11 @@ export default function RateioJoinForm({ initialToken }: RateioJoinFormProps) {
       ) : null}
 
       <Button className="w-full" disabled={isPending} type="submit">
-        {isPending ? 'Entrando...' : 'Entrar no rateio'}
+        {isPending
+          ? 'Entrando...'
+          : user
+            ? 'Entrar com minha conta'
+            : 'Entrar no rateio'}
       </Button>
     </form>
   );

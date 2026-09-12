@@ -21,8 +21,7 @@ export default async function JoinRateioPage({
         </p>
         <h1 className="text-3xl font-bold sm:text-4xl">Entrar em rateio</h1>
         <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-          Informe seu nome para acompanhar este rateio sem precisar criar uma
-          conta.
+          Use o link compartilhado para acompanhar este rateio.
         </p>
       </div>
 

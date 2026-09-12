@@ -7,11 +7,13 @@ import {
   createApiRateio,
   createApiShareLink,
   inviteApiRateioMember,
+  joinApiRateioAuthenticated,
   joinApiRateioAnonymously,
   listApiShareLinks,
   removeApiRateioMember,
   revokeApiShareLink,
   type AnonymousJoinInput,
+  type AuthenticatedShareLinkJoinInput,
   type CreateRateioInput,
   type InviteMemberInput,
   type MembershipRole,
@@ -77,6 +79,10 @@ export type JoinRateioResult =
       success: true;
       data: { rateioId: string; displayName: string };
     }
+  | { success: false; error: string };
+
+export type AuthenticatedJoinRateioResult =
+  | { success: true; data: { rateioId: string } }
   | { success: false; error: string };
 
 export type InviteMemberResult =
@@ -179,6 +185,13 @@ const anonymousJoinSchema = z.object({
     .length(64)
     .regex(/^[0-9a-f]+$/i),
   displayName: z.string().trim().min(1).max(80),
+});
+const authenticatedJoinSchema = z.object({
+  token: z
+    .string()
+    .trim()
+    .length(64)
+    .regex(/^[0-9a-f]+$/i),
 });
 
 export async function createRateio(
@@ -407,6 +420,44 @@ function safeJoinErrorMessage(error: ApiClientError): string {
     return 'Este link não é válido ou já foi revogado.';
   }
   return 'Não foi possível entrar neste rateio agora. Tente novamente.';
+}
+
+function safeAuthenticatedJoinErrorMessage(error: ApiClientError): string {
+  if (error.kind === 'api' && error.statusCode === 400) {
+    return 'Confira o link para entrar no rateio.';
+  }
+  if (error.kind === 'api' && error.statusCode === 401) {
+    return 'Sua sessão expirou. Entre novamente para continuar.';
+  }
+  if (error.kind === 'api' && error.statusCode === 404) {
+    return 'Este link não é válido ou já foi revogado.';
+  }
+  return 'Não foi possível entrar neste rateio agora. Tente novamente.';
+}
+
+export async function joinRateioAuthenticated(
+  input: AuthenticatedShareLinkJoinInput,
+): Promise<AuthenticatedJoinRateioResult> {
+  const accessToken = await getRequiredAccessToken();
+  if (!accessToken.success) return accessToken;
+
+  const parsed = authenticatedJoinSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: 'Confira o link para entrar.' };
+  }
+
+  const result = await joinApiRateioAuthenticated(
+    accessToken.token,
+    parsed.data,
+  );
+  if (result.error !== undefined) {
+    return {
+      success: false,
+      error: safeAuthenticatedJoinErrorMessage(result.error),
+    };
+  }
+
+  return { success: true, data: { rateioId: result.data.rateioId } };
 }
 
 export async function joinRateioAnonymously(

@@ -21,6 +21,9 @@ import type {
   AnonymousSettlementsControllerBalancesData,
   AnonymousSettlementsControllerBalancesErrors,
   AnonymousSettlementsControllerBalancesResponses,
+  AnonymousShareLinksControllerJoinAuthenticatedData,
+  AnonymousShareLinksControllerJoinAuthenticatedErrors,
+  AnonymousShareLinksControllerJoinAuthenticatedResponses,
   AnonymousShareLinksControllerJoinData,
   AnonymousShareLinksControllerJoinErrors,
   AnonymousShareLinksControllerJoinResponses,
@@ -625,6 +628,36 @@ export const anonymousShareLinksControllerJoin = <
     ThrowOnError
   >({
     url: '/share-links/join',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Join a rateio as an authenticated member
+ *
+ * Exchanges an active share-link token for an authenticated rateio membership using the logged-in account.
+ */
+export const anonymousShareLinksControllerJoinAuthenticated = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<
+    AnonymousShareLinksControllerJoinAuthenticatedData,
+    ThrowOnError
+  >,
+): RequestResult<
+  AnonymousShareLinksControllerJoinAuthenticatedResponses,
+  AnonymousShareLinksControllerJoinAuthenticatedErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AnonymousShareLinksControllerJoinAuthenticatedResponses,
+    AnonymousShareLinksControllerJoinAuthenticatedErrors,
+    ThrowOnError
+  >({
+    url: '/share-links/join/authenticated',
     ...options,
     headers: {
       'Content-Type': 'application/json',

@@ -2,6 +2,7 @@ import 'server-only';
 
 import {
   anonymousShareLinksControllerJoin,
+  anonymousShareLinksControllerJoinAuthenticated,
   anonymousRateiosControllerGet,
   rateiosControllerClaimAnonymousParticipant,
   rateiosControllerChangeStatus,
@@ -17,6 +18,8 @@ import {
   type AnonymousJoinDto,
   type AnonymousJoinResponseDto,
   type AnonymousSessionResponseDto,
+  type AuthenticatedShareLinkJoinDto,
+  type AuthenticatedShareLinkJoinResponseDto,
   type ClaimAnonymousParticipantDto,
   type ClaimAnonymousParticipantResponseDto,
   type ChangeRateioStatusDto,
@@ -39,6 +42,7 @@ export type CreateRateioInput = CreateRateioDto;
 export type ListRateiosQuery = RateiosControllerListData['query'];
 export type RateioStatus = ChangeRateioStatusDto['status'];
 export type AnonymousJoinInput = AnonymousJoinDto;
+export type AuthenticatedShareLinkJoinInput = AuthenticatedShareLinkJoinDto;
 export type MembershipRole = ChangeMemberRoleDto['role'];
 export type InviteMemberInput = InviteMemberDto;
 export type ClaimAnonymousParticipantInput = ClaimAnonymousParticipantDto;
@@ -125,6 +129,18 @@ export function joinApiRateioAnonymously(
     client: createServerApiClient(),
     body: input,
   }).then((result) => normalizeApiResult<AnonymousJoinResponseDto>(result));
+}
+
+export function joinApiRateioAuthenticated(
+  accessToken: string,
+  input: AuthenticatedShareLinkJoinInput,
+): Promise<ApiResult<AuthenticatedShareLinkJoinResponseDto>> {
+  return anonymousShareLinksControllerJoinAuthenticated({
+    client: createServerApiClient(accessToken),
+    body: input,
+  }).then((result) =>
+    normalizeApiResult<AuthenticatedShareLinkJoinResponseDto>(result),
+  );
 }
 
 export function getApiAnonymousRateio(
