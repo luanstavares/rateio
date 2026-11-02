@@ -62,7 +62,7 @@ export default function RateioJoinForm({ initialToken }: RateioJoinFormProps) {
   }
 
   return (
-    <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+    <form className="space-y-5" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <label className="text-sm font-medium" htmlFor="rateio-token">
           Código do link
