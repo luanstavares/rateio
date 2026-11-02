@@ -19,6 +19,7 @@ import {
 } from '../../../lib/rateio/session-data';
 import ClearAnonymousSession from '../../../ui/clear-anonymous-session';
 import { Button } from '../../../ui/components/ui/button';
+import GoogleSignInLink from '../../../ui/google-sign-in-link';
 import RateioPageContent from '../../../ui/rateio-page-content';
 import RateioProvider from '../../../ui/rateio-provider';
 
@@ -132,7 +133,7 @@ export default async function RateioDetailPage({
               </Button>
             ) : null}
             <Button asChild>
-              <a href="/api/auth/google">Entrar com Google</a>
+              <GoogleSignInLink>Entrar com Google</GoogleSignInLink>
             </Button>
           </div>
         </div>

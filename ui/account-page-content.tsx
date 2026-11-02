@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useUser } from './user-provider';
 import AccountAvatar from './account-avatar';
 import { Button } from './components/ui/button';
+import GoogleSignInLink from './google-sign-in-link';
 import SignOutButton from './sign-out-button';
+import { useUser } from './user-provider';
 
 export default function AccountPageContent() {
   const { user } = useUser();
@@ -45,7 +46,7 @@ export default function AccountPageContent() {
             Entre com o Google para acessar sua conta.
           </p>
           <Button asChild>
-            <a href="/api/auth/google">Entrar com Google</a>
+            <GoogleSignInLink>Entrar com Google</GoogleSignInLink>
           </Button>
         </div>
       )}

@@ -1,10 +1,11 @@
 import Link from 'next/link';
 
-import { getRefreshAwareAccessToken } from '../../lib/auth/server-session';
-import { listApiRateios } from '../../lib/api/rateios';
 import type { ApiClientError } from '../../lib/api/errors';
-import RateioCard from '../../ui/rateio-card';
+import { listApiRateios } from '../../lib/api/rateios';
+import { getRefreshAwareAccessToken } from '../../lib/auth/server-session';
 import { Button } from '../../ui/components/ui/button';
+import GoogleSignInLink from '../../ui/google-sign-in-link';
+import RateioCard from '../../ui/rateio-card';
 
 const PAGE_SIZE = 12;
 
@@ -56,7 +57,7 @@ export default async function RateiosPage({ searchParams }: RateiosPageProps) {
             Use sua conta do Google para criar e acompanhar seus grupos.
           </p>
           <Button asChild className="mt-5">
-            <a href="/api/auth/google">Entrar com Google</a>
+            <GoogleSignInLink>Entrar com Google</GoogleSignInLink>
           </Button>
         </div>
       ) : result?.error ? (

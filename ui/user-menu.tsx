@@ -14,6 +14,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from './components/ui/drawer';
+import GoogleSignInLink from './google-sign-in-link';
 import SignOutButton from './sign-out-button';
 import { useUser } from './user-provider';
 
@@ -65,9 +66,11 @@ export default function UserMenu() {
               </div>
             </>
           ) : (
-            <Button className="w-full">
-              <GoogleLogoIcon />
-              <Link href="/api/auth/google">Entrar com Google</Link>
+            <Button asChild className="w-full">
+              <GoogleSignInLink>
+                <GoogleLogoIcon />
+                Entrar com Google
+              </GoogleSignInLink>
             </Button>
           )}
         </div>

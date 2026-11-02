@@ -1,12 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
 
 import { createRateio, type CreateRateioResult } from '../app/actions/rateios';
 import type { CreateRateioInput } from '../lib/api/rateios';
 import { Button } from './components/ui/button';
+import GoogleSignInLink from './google-sign-in-link';
 import { useUser } from './user-provider';
 
 export default function RateioForm() {
@@ -95,12 +96,9 @@ export default function RateioForm() {
         {!isLoggedIn && (
           <p className="text-sm text-muted-foreground">
             É preciso entrar com o Google para salvar seu rateio.{' '}
-            <a
-              href="/api/auth/google"
-              className="font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-            >
+            <GoogleSignInLink className="font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
               Entrar com Google
-            </a>
+            </GoogleSignInLink>
           </p>
         )}
       </div>
