@@ -5,6 +5,10 @@ export const runtime = 'nodejs';
 
 export async function POST(): Promise<NextResponse> {
   const response = NextResponse.json({ success: true });
-  await logoutSession(response);
+  try {
+    await logoutSession(response);
+  } catch {
+    return NextResponse.json({ success: false }, { status: 503 });
+  }
   return response;
 }

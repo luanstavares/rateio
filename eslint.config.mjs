@@ -5,6 +5,11 @@ const eslintConfig = [
   {
     ignores: ['node_modules/**', '.next/**', 'next-env.d.ts'],
   },
+  {
+    rules: {
+      'no-alert': 'error',
+    },
+  },
 ];
 
 export default eslintConfig;

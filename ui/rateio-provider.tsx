@@ -1,5 +1,7 @@
 'use client';
 
+import { useUser } from './user-provider';
+
 import {
   useQuery,
   useQueryClient,
@@ -9,14 +11,7 @@ import {
 } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { io, type Socket } from 'socket.io-client';
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { getApiBaseUrl } from '../lib/api/config';
 import {
   realtimeJoinResponseSchema,
@@ -134,37 +129,32 @@ type ClientToServerEvents = {
 
 type RealtimeSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
-async function refreshAuthenticatedSession(): Promise<boolean> {
-  try {
-    const response = await fetch('/api/auth/refresh', {
-      method: 'POST',
-      credentials: 'same-origin',
-      cache: 'no-store',
-    });
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
-
 export default function RateioProvider({
   rateioId,
   initialData,
   children,
 }: RateioProviderProps) {
   const queryClient = useQueryClient();
+  const { userId, refreshSession } = useUser();
   const client = useApiClient('sameOrigin');
   const [realtimeStatus, setRealtimeStatus] =
     useState<RealtimeConnectionStatus>('connecting');
-  const refreshInFlight = useRef<Promise<boolean> | null>(null);
   const query = useQuery({
     queryKey: rateioSessionQueryKey(rateioId),
     queryFn: () => fetchRateioSession(client, rateioId),
     initialData,
+    enabled: initialData.mode !== 'authenticated' || userId !== null,
     placeholderData: (previous) => previous,
     structuralSharing: true,
   });
   const data = query.data ?? initialData;
+  const sessionMatches =
+    data.mode === 'anonymous' ||
+    (userId !== null &&
+      data.members.some(
+        (member) =>
+          member.id === data.currentMemberId && member.userId === userId,
+      ));
   const invalidateRateio = async () => {
     await queryClient.invalidateQueries({
       queryKey: rateioSessionQueryKey(rateioId),
@@ -260,6 +250,7 @@ export default function RateioProvider({
   );
 
   useEffect(() => {
+    if (!sessionMatches) return;
     let mounted = true;
     const socket: RealtimeSocket = io(`${getApiBaseUrl()}/rateios`, {
       autoConnect: false,
@@ -270,14 +261,8 @@ export default function RateioProvider({
       if (mounted) setRealtimeStatus(status);
     };
     const refreshAndReconnect = () => {
-      if (data.mode !== 'authenticated' || refreshInFlight.current) {
-        return;
-      }
-
-      const refresh = refreshAuthenticatedSession();
-      refreshInFlight.current = refresh;
-      void refresh.then((refreshed) => {
-        refreshInFlight.current = null;
+      if (data.mode !== 'authenticated') return;
+      void refreshSession().then((refreshed) => {
         if (!mounted || !refreshed) return;
         setMountedStatus('reconnecting');
         socket.connect();
@@ -325,7 +310,14 @@ export default function RateioProvider({
       mounted = false;
       socket.disconnect();
     };
-  }, [data.mode, queryClient, rateioId]);
+  }, [
+    data.mode,
+    queryClient,
+    rateioId,
+    userId,
+    refreshSession,
+    sessionMatches,
+  ]);
 
   const value = useMemo<RateioProviderValue>(
     () => ({
@@ -354,6 +346,11 @@ export default function RateioProvider({
       mutations,
     ],
   );
+
+  if (!sessionMatches)
+    return (
+      <p role="status">Sua sessão mudou. Atualizando o acesso ao rateio...</p>
+    );
 
   return (
     <RateioContext.Provider value={value}>{children}</RateioContext.Provider>

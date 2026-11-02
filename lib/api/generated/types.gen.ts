@@ -19,6 +19,7 @@ export type ApiErrorResponseDto = {
 };
 
 export type AuthTokenResponseDto = {
+  accessExpiresAt: string;
   accessToken: string;
   refreshToken: string;
   expiresAt: string;

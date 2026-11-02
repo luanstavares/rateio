@@ -16,7 +16,7 @@ export default async function RootLayout({
 }: {
   children: ReactNode;
 }) {
-  const initialUser = await getUserSession();
+  const initialUser = await getUserSession().catch(() => undefined);
 
   return (
     <html suppressHydrationWarning lang="pt-BR">

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { UsersThreeIcon } from '@phosphor-icons/react';
 import type { MembershipRole } from '../lib/api/rateios';
 import type { RateioSessionMember } from '../lib/rateio/session-data';
 import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
 import { Button } from './components/ui/button';
+import ConfirmationDialog from './confirmation-dialog';
 import { useRateioMutations } from './rateio-provider';
 import {
   Drawer,
@@ -65,47 +66,15 @@ export default function RateioMemberManagementDrawer({
   currentRole,
 }: RateioMemberManagementDrawerProps) {
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [roleChange, setRoleChange] = useState<{
+    member: RateioSessionMember;
+    role: MembershipRole;
+  } | null>(null);
+  const roleSelect = useRef<HTMLSelectElement | null>(null);
   const { changeMemberRole, removeMember } = useRateioMutations();
   const isPending = changeMemberRole.isPending || removeMember.isPending;
   const canManage = currentRole === 'OWNER' || currentRole === 'ADMIN';
   const canChangeRoles = currentRole === 'OWNER';
-
-  function handleResult(
-    result: { success: true } | { success: false; error: string },
-  ) {
-    if (!result.success) {
-      setError(result.error);
-      return;
-    }
-    setError(null);
-  }
-
-  function handleRoleChange(memberId: string, role: MembershipRole) {
-    setError(null);
-    void changeMemberRole
-      .mutateAsync({ memberId, role })
-      .then(handleResult)
-      .catch(() => {
-        setError(
-          'Não foi possível atualizar os membros agora. Tente novamente.',
-        );
-      });
-  }
-
-  function handleRemove(member: RateioSessionMember) {
-    if (!window.confirm(`Remover ${memberName(member)} deste rateio?`)) return;
-
-    setError(null);
-    void removeMember
-      .mutateAsync(member.id)
-      .then(handleResult)
-      .catch(() => {
-        setError(
-          'Não foi possível atualizar os membros agora. Tente novamente.',
-        );
-      });
-  }
 
   function canRemove(member: RateioSessionMember): boolean {
     if (member.id === currentMemberId || member.role === 'OWNER') return false;
@@ -129,15 +98,6 @@ export default function RateioMemberManagementDrawer({
         </DrawerHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4">
-          {error ? (
-            <div
-              className="mb-4 rounded-md border border-destructive/50 p-3 text-sm text-destructive"
-              role="alert"
-            >
-              {error}
-            </div>
-          ) : null}
-
           {members.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
               Nenhum participante ativo encontrado.
@@ -182,12 +142,17 @@ export default function RateioMemberManagementDrawer({
                               aria-label={`Papel de ${name}`}
                               className="h-9 min-w-0 flex-1 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
                               disabled={isPending}
-                              onChange={(event) =>
-                                handleRoleChange(
-                                  member.id,
-                                  event.target.value as MembershipRole,
-                                )
-                              }
+                              onChange={(event) => {
+                                const role = event.target.value;
+                                if (
+                                  (role === 'ADMIN' ||
+                                    role === 'PARTICIPANT') &&
+                                  role !== member.role
+                                ) {
+                                  roleSelect.current = event.currentTarget;
+                                  setRoleChange({ member, role });
+                                }
+                              }}
                               value={member.role}
                             >
                               <option value="ADMIN">Administrador</option>
@@ -196,15 +161,26 @@ export default function RateioMemberManagementDrawer({
                           </label>
                         ) : null}
                         {canRemove(member) ? (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                            disabled={isPending}
-                            onClick={() => handleRemove(member)}
-                          >
-                            Remover
-                          </Button>
+                          <ConfirmationDialog
+                            title={`Remover ${name}?`}
+                            description="Esta pessoa perderá o acesso ao rateio. Todas as despesas ativas serão divididas igualmente entre os participantes restantes, substituindo as divisões anteriores. O histórico e os valores já pagos serão preservados."
+                            confirmLabel="Remover participante"
+                            pendingLabel="Removendo..."
+                            errorMessage="Não foi possível remover o participante agora. Tente novamente."
+                            onConfirm={() =>
+                              removeMember.mutateAsync(member.id)
+                            }
+                            trigger={
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                disabled={isPending}
+                              >
+                                Remover
+                              </Button>
+                            }
+                          />
                         ) : null}
                       </div>
                     ) : null}
@@ -214,6 +190,33 @@ export default function RateioMemberManagementDrawer({
             </ul>
           )}
         </div>
+
+        <ConfirmationDialog
+          open={roleChange !== null}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) setRoleChange(null);
+          }}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            roleSelect.current?.focus();
+          }}
+          title="Alterar papel do participante?"
+          description={
+            roleChange
+              ? `${memberName(roleChange.member)} passará a ser ${roleLabel(roleChange.role).toLocaleLowerCase('pt-BR')}. ${roleChange.role === 'ADMIN' ? 'Essa pessoa poderá gerenciar itens e remover participantes.' : 'Essa pessoa perderá as permissões de administrador.'}`
+              : ''
+          }
+          confirmLabel="Alterar papel"
+          variant="default"
+          errorMessage="Não foi possível alterar o papel agora. Tente novamente."
+          onConfirm={() => {
+            if (!roleChange) return;
+            return changeMemberRole.mutateAsync({
+              memberId: roleChange.member.id,
+              role: roleChange.role,
+            });
+          }}
+        />
 
         <DrawerFooter>
           {isPending ? (

@@ -35,31 +35,38 @@ export const getCurrentUser = cache(
     if (!accessToken) return null;
 
     const result = await getAuthenticatedApiUser(accessToken);
-    return 'data' in result ? (result.data ?? null) : null;
+    if (result.data) return result.data;
+    if (result.error?.kind === 'api' && result.error.statusCode === 401)
+      return null;
+    throw new Error('Sessão temporariamente indisponível. Tente novamente.');
   },
 );
 
 export async function rotateSession(): Promise<NextResponse> {
-  const response = NextResponse.json({ success: false }, { status: 401 });
   const refreshToken = (await cookies()).get(REFRESH_TOKEN_COOKIE)?.value;
-  if (!refreshToken) {
-    clearSessionCookies(response);
-    return response;
-  }
-
-  const tokens = await refreshSessionTokens(refreshToken);
-  if (!tokens) {
-    clearSessionCookies(response);
-    return response;
-  }
-
-  const successResponse = NextResponse.json({ success: true });
-  setSessionCookies(successResponse, tokens);
-  return successResponse;
+  const result = await refreshSessionTokens(refreshToken);
+  if (result.kind !== 'success')
+    return NextResponse.json(
+      { success: false },
+      {
+        status: result.kind === 'invalid' ? 401 : 503,
+        headers: { 'cache-control': 'no-store' },
+      },
+    );
+  const response = NextResponse.json(
+    { success: true },
+    { headers: { 'cache-control': 'no-store' } },
+  );
+  setSessionCookies(response, result.tokens);
+  return response;
 }
 
 export async function logoutSession(response: NextResponse): Promise<void> {
   const refreshToken = (await cookies()).get(REFRESH_TOKEN_COOKIE)?.value;
-  if (refreshToken) await revokeApiSession(refreshToken);
+  if (refreshToken) {
+    const result = await revokeApiSession(refreshToken);
+    if (result.error)
+      throw new Error('Não foi possível encerrar a sessão. Tente novamente.');
+  }
   clearSessionCookies(response);
 }

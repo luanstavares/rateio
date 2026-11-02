@@ -13,7 +13,7 @@ export default function Providers({
   initialUser,
 }: {
   children: ReactNode;
-  initialUser: UserSession | null;
+  initialUser: UserSession | null | undefined;
 }) {
   const [queryClient] = useState(
     () =>

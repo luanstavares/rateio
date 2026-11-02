@@ -33,6 +33,7 @@ export function refreshApiSession(
   return authControllerRefresh({
     client: createServerApiClient(),
     body: { refreshToken },
+    signal: AbortSignal.timeout(10_000),
   }).then((result) => {
     const normalized = normalizeApiResult<AuthTokenResponseDto>(result);
     if ('error' in normalized) return normalized;
@@ -47,6 +48,7 @@ export function revokeApiSession(
   return authControllerLogout({
     client: createServerApiClient(),
     body: { refreshToken },
+    signal: AbortSignal.timeout(10_000),
   }).then((result) => {
     const normalized = normalizeApiResult<SuccessResponseDto>(result);
     if ('error' in normalized) return normalized;

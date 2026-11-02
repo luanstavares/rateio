@@ -1,5 +1,4 @@
 import 'server-only';
-
 import { refreshApiSession } from '../api/auth';
 import {
   authTokenResponseSchema,
@@ -7,28 +6,33 @@ import {
   type AuthTokenResponse,
 } from './session-cookies';
 
-const refreshTokenSchema = /^.{20,}$/;
-
-/**
- * Exchanges a refresh token exactly once and accepts only a live token pair.
- * Callers decide how the returned pair is written to the cookie boundary.
- */
+export type SessionRefreshResult =
+  | { kind: 'success'; tokens: AuthTokenResponse }
+  | { kind: 'invalid' }
+  | { kind: 'unavailable' };
 export async function refreshSessionTokens(
   refreshToken: string | undefined,
-): Promise<AuthTokenResponse | null> {
-  if (refreshToken === undefined || !refreshTokenSchema.test(refreshToken)) {
-    return null;
-  }
-
+): Promise<SessionRefreshResult> {
+  if (!refreshToken || refreshToken.length < 20) return { kind: 'invalid' };
   try {
     const result = await refreshApiSession(refreshToken);
-    if ('error' in result) return null;
-
-    const tokens = authTokenResponseSchema.safeParse(result.data);
-    return tokens.success && isCurrentAuthTokenResponse(tokens.data)
-      ? tokens.data
-      : null;
+    if (result.error)
+      return {
+        kind:
+          result.error.kind === 'api' &&
+          [400, 401].includes(result.error.statusCode)
+            ? 'invalid'
+            : 'unavailable',
+      };
+    const parsed = authTokenResponseSchema.safeParse(result.data);
+    if (
+      !parsed.success ||
+      !isCurrentAuthTokenResponse(parsed.data) ||
+      Date.parse(parsed.data.accessExpiresAt) <= Date.now()
+    )
+      return { kind: 'unavailable' };
+    return { kind: 'success', tokens: parsed.data };
   } catch {
-    return null;
+    return { kind: 'unavailable' };
   }
 }

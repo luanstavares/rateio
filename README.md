@@ -69,3 +69,35 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Persistent user session
+
+The root `UserProvider` exposes `useUser()` across page navigation. Its TanStack
+Query identity read revalidates on navigation, window focus, reconnect, and every
+60 seconds while active. Logout and explicit session refresh use shared TanStack
+mutations. BroadcastChannel synchronizes login/logout between tabs; browser locks
+serialize explicit refresh and logout when available. Backend transactional
+rotation also coordinates requests across web instances.
+
+Access cookies follow the API's `accessExpiresAt` and last at most one day.
+Refresh cookies follow the API's sliding 90-day expiry. Both remain HttpOnly,
+SameSite=Lax, and Secure in production. Tokens are never placed in React state or
+localStorage. The proxy renews expired, near-expiry, or legacy access JWTs before
+server components and actions run.
+
+A temporary refresh failure returns a retryable response and preserves cookies.
+Invalid refresh credentials remove authentication from the current request;
+automatic failures do not emit deletion cookies that could erase a concurrently
+renewed session. Explicit successful logout revokes the backend session and
+clears cookies. Invalid persisted cookies can remain until logout, expiry, or a
+successful login; they do not authorize backend access.
+
+Identity changes cancel outstanding queries, discard account data, refresh
+server-rendered pages, and disconnect authenticated rateio/notification sockets.
+If the backend is temporarily unavailable, the mounted user query retains its
+last successful identity and exposes an error rather than silently signing out.
+
+Run `npm run test:auth` for the focused infrastructure regressions. This uses
+Node's built-in test runner and the existing TypeScript dependency; it installs
+no browser or React test harness. Use the normal `npm run typecheck`,
+`npm run lint`, and `npm run build` checks as well.

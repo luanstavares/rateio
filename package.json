@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "api:generate": "openapi-ts",
-    "api:check": "npm run api:generate && git diff --exit-code -- lib/api/generated"
+    "api:check": "npm run api:generate && git diff --exit-code -- lib/api/generated",
+    "test:auth": "node --test scripts/auth-session.test.cjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

@@ -11,7 +11,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -88,12 +87,11 @@ export default function NotificationProvider({
 }: {
   children: ReactNode;
 }) {
-  const { userId } = useUser();
+  const { userId, refreshSession } = useUser();
   const client = useApiClient('sameOrigin');
   const queryClient = useQueryClient();
   const [realtimeStatus, setRealtimeStatus] =
     useState<RealtimeConnectionStatus>('disconnected');
-  const refreshInFlight = useRef<Promise<boolean> | null>(null);
   const queryKey = useMemo(() => notificationsQueryKey(userId), [userId]);
   const query = useQuery<NotificationList, Error>({
     queryKey,
@@ -171,17 +169,7 @@ export default function NotificationProvider({
       if (mounted) setRealtimeStatus(status);
     };
     const refreshAndReconnect = () => {
-      if (refreshInFlight.current) return;
-      const refresh = fetch('/api/auth/refresh', {
-        method: 'POST',
-        credentials: 'same-origin',
-        cache: 'no-store',
-      })
-        .then((response) => response.ok)
-        .catch(() => false);
-      refreshInFlight.current = refresh;
-      void refresh.then((refreshed) => {
-        refreshInFlight.current = null;
+      void refreshSession().then((refreshed) => {
         if (mounted && refreshed) socket.connect();
       });
     };
@@ -224,7 +212,7 @@ export default function NotificationProvider({
       mounted = false;
       socket.disconnect();
     };
-  }, [queryClient, queryKey, userId]);
+  }, [queryClient, queryKey, userId, refreshSession]);
   const notifications = query.data?.items ?? EMPTY_NOTIFICATIONS;
   const value = useMemo<NotificationProviderValue>(
     () => ({

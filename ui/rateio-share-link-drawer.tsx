@@ -7,6 +7,7 @@ import { CopyIcon, LinkIcon } from '@phosphor-icons/react';
 import { listShareLinks } from '../app/actions/rateios';
 import type { ShareLinkMetadataResponseDto } from '../lib/api/generated';
 import { Button } from './components/ui/button';
+import ConfirmationDialog from './confirmation-dialog';
 import {
   rateioShareLinksQueryKey,
   useRateioMutations,
@@ -123,35 +124,37 @@ export default function RateioShareLinkDrawer({
     try {
       const result = await createShareLink.mutateAsync(undefined);
       if (!result.success) {
-        setError(result.error);
-        return;
+        return result;
       }
 
       const created = result.data;
       setShareUrl(
         `${window.location.origin}/rateios/entrar?token=${encodeURIComponent(created.token)}`,
       );
+      return result;
     } catch {
-      setError('Não foi possível gerenciar o link agora. Tente novamente.');
+      return {
+        success: false,
+        error: 'Não foi possível gerenciar o link agora. Tente novamente.',
+      } as const;
     }
+  }
+
+  async function handleInitialCreate() {
+    const result = await handleCreate();
+    if (!result.success) setError(result.error);
   }
 
   async function handleRevoke() {
     if (!activeLink) return;
 
     setError(null);
-    try {
-      const result = await revokeShareLink.mutateAsync(activeLink.id);
-      if (!result.success) {
-        setError(result.error);
-        return;
-      }
-
+    const result = await revokeShareLink.mutateAsync(activeLink.id);
+    if (result.success) {
       setShareUrl(null);
       setCopyState('idle');
-    } catch {
-      setError('Não foi possível gerenciar o link agora. Tente novamente.');
     }
+    return result;
   }
 
   async function handleCopy() {
@@ -229,16 +232,25 @@ export default function RateioShareLinkDrawer({
                 regenerar.
               </p>
             )}
-            <Button
-              type="button"
-              variant="ghost"
-              className="mt-3 text-destructive hover:bg-destructive/10 hover:text-destructive"
-              disabled={isPending}
-              onClick={() => void handleRevoke()}
-            >
-              <CloseIcon />
-              Revogar link atual
-            </Button>
+            <ConfirmationDialog
+              title="Revogar link de entrada?"
+              description="Este link deixará de permitir novas entradas no rateio. Para compartilhar novamente, será necessário criar outro link."
+              confirmLabel="Revogar link"
+              pendingLabel="Revogando..."
+              errorMessage="Não foi possível revogar o link agora. Tente novamente."
+              onConfirm={handleRevoke}
+              trigger={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="mt-3 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  disabled={isPending}
+                >
+                  <CloseIcon />
+                  Revogar link atual
+                </Button>
+              }
+            />
           </div>
         ) : (
           <div className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
@@ -246,14 +258,30 @@ export default function RateioShareLinkDrawer({
           </div>
         )}
 
-        <Button
-          type="button"
-          disabled={isPending}
-          onClick={() => void handleCreate()}
-        >
-          <PlusIcon />
-          {activeLink ? 'Regenerar link' : 'Criar link'}
-        </Button>
+        {activeLink ? (
+          <ConfirmationDialog
+            title="Regenerar link de entrada?"
+            description="O link atual será invalidado. Compartilhe o novo link com quem ainda precisa entrar no rateio."
+            confirmLabel="Regenerar link"
+            pendingLabel="Regenerando..."
+            onConfirm={handleCreate}
+            trigger={
+              <Button type="button" disabled={isPending}>
+                <PlusIcon />
+                Regenerar link
+              </Button>
+            }
+          />
+        ) : (
+          <Button
+            type="button"
+            disabled={isPending}
+            onClick={() => void handleInitialCreate()}
+          >
+            <PlusIcon />
+            Criar link
+          </Button>
+        )}
 
         {links.length > 0 ? (
           <div>

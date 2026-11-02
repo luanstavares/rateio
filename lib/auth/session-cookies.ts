@@ -10,13 +10,14 @@ export const REFRESH_TOKEN_COOKIE = 'rateio_refresh_token';
 export const ANONYMOUS_SESSION_TOKEN_COOKIE = 'rateio_anonymous_session_token';
 
 export const OAUTH_STATE_MAX_AGE_SECONDS = 10 * 60;
-export const ACCESS_TOKEN_MAX_AGE_SECONDS = 15 * 60;
+export const ACCESS_TOKEN_MAX_AGE_SECONDS = 24 * 60 * 60;
 export const ANONYMOUS_SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
 const sessionCookieDomain = process.env.RATEIO_COOKIE_DOMAIN?.trim();
 
 export const authTokenResponseSchema = z.object({
   accessToken: z.string().min(1),
+  accessExpiresAt: z.iso.datetime(),
   refreshToken: z.string().min(20),
   expiresAt: z.iso.datetime(),
 });
@@ -118,7 +119,15 @@ export function setSessionCookies(
   response.cookies.set({
     name: ACCESS_TOKEN_COOKIE,
     value: tokens.accessToken,
-    ...sessionCookieOptions(ACCESS_TOKEN_MAX_AGE_SECONDS),
+    ...sessionCookieOptions(
+      Math.max(
+        0,
+        Math.min(
+          ACCESS_TOKEN_MAX_AGE_SECONDS,
+          Math.floor((Date.parse(tokens.accessExpiresAt) - Date.now()) / 1000),
+        ),
+      ),
+    ),
   });
   response.cookies.set({
     name: REFRESH_TOKEN_COOKIE,
