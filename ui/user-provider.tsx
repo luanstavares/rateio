@@ -1,7 +1,7 @@
 'use client';
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { readUserSession } from '../app/actions/auth';
 import {
   userSessionQueryKey,
@@ -16,6 +16,9 @@ interface UserContextValue {
   isRefreshing: boolean;
   isError: boolean;
   error: Error | null;
+  logout: () => Promise<void>;
+  isLoggingOut: boolean;
+  logoutError: Error | null;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -27,12 +30,24 @@ export default function UserProvider({
   children: ReactNode;
   initialUser: UserSession | null;
 }) {
+  const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: userSessionQueryKey,
     queryFn: readUserSession,
     initialData: initialUser,
     placeholderData: (previous) => previous,
     structuralSharing: true,
+  });
+  const logoutMutation = useMutation({
+    mutationFn: async (): Promise<void> => {
+      const response = await fetch('/api/auth/logout', { method: 'POST' });
+      if (!response.ok) throw new Error('Logout failed');
+    },
+    onSuccess: async () => {
+      await queryClient.cancelQueries({ queryKey: userSessionQueryKey });
+      queryClient.setQueryData<UserSession | null>(userSessionQueryKey, null);
+      await queryClient.invalidateQueries({ queryKey: userSessionQueryKey });
+    },
   });
   const user = query.data ?? null;
   const value = useMemo<UserContextValue>(
@@ -44,8 +59,21 @@ export default function UserProvider({
       isRefreshing: query.isFetching,
       isError: query.isError,
       error: query.error instanceof Error ? query.error : null,
+      logout: logoutMutation.mutateAsync,
+      isLoggingOut: logoutMutation.isPending,
+      logoutError:
+        logoutMutation.error instanceof Error ? logoutMutation.error : null,
     }),
-    [query.error, query.isError, query.isFetching, query.isLoading, user],
+    [
+      query.error,
+      query.isError,
+      query.isFetching,
+      query.isLoading,
+      logoutMutation.mutateAsync,
+      logoutMutation.isPending,
+      logoutMutation.error,
+      user,
+    ],
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

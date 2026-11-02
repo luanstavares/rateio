@@ -1,26 +1,21 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from './components/ui/button';
+import { useUser } from './user-provider';
 
 export default function SignOutButton() {
   const router = useRouter();
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { logout, isLoggingOut, logoutError } = useUser();
 
   async function signOut() {
-    if (pending) return;
-    setPending(true);
-    setError(null);
+    if (isLoggingOut) return;
     try {
-      const response = await fetch('/api/auth/logout', { method: 'POST' });
-      if (!response.ok) throw new Error('Logout failed');
+      await logout();
       router.replace('/');
       router.refresh();
     } catch {
-      setError('Não foi possível sair. Tente novamente.');
-      setPending(false);
+      return;
     }
   }
 
@@ -30,14 +25,14 @@ export default function SignOutButton() {
         type="button"
         variant="outline"
         className="w-full"
-        disabled={pending}
+        disabled={isLoggingOut}
         onClick={signOut}
       >
-        {pending ? 'Saindo...' : 'Sair da conta'}
+        {isLoggingOut ? 'Saindo...' : 'Sair da conta'}
       </Button>
-      {error && (
+      {logoutError && (
         <p role="alert" className="text-sm text-foreground">
-          {error}
+          Não foi possível sair. Tente novamente.
         </p>
       )}
     </div>
