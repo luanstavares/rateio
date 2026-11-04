@@ -21,6 +21,13 @@
   --input: #585858;
   --ring: #ffad33;
   --radius: 0.25rem;
+  --landing-paper: #f2eee5;
+  --landing-ink: #292720;
+  --landing-paper-muted: #706b60;
+  --landing-positive: #39774a;
+  --landing-lilac: #cabce0;
+  --landing-blue: #b8ceda;
+  --landing-sage: #b9cfaf;
 }
 
 @theme inline {
@@ -42,6 +49,13 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-landing-paper: var(--landing-paper);
+  --color-landing-ink: var(--landing-ink);
+  --color-landing-paper-muted: var(--landing-paper-muted);
+  --color-landing-positive: var(--landing-positive);
+  --color-landing-lilac: var(--landing-lilac);
+  --color-landing-blue: var(--landing-blue);
+  --color-landing-sage: var(--landing-sage);
   --font-sans: 'Signika Negative', sans-serif;
   --font-logo: 'Pacifico', cursive;
 }
