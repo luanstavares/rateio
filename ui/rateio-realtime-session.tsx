@@ -1,6 +1,7 @@
 'use client';
 
 import type { RealtimeConnectionStatus } from '../lib/realtime/contracts';
+import { participantProfile } from '../lib/rateio/participant-profile';
 import { useRateio } from './rateio-provider';
 import RateioSessionLayout, {
   type RateioSessionBalance,
@@ -32,6 +33,9 @@ function statusClassName(status: RealtimeConnectionStatus): string {
 
 export default function RateioRealtimeSession() {
   const { data, realtimeStatus } = useRateio();
+  const memberProfiles = new Map(
+    data.members.map((member) => [member.id, participantProfile(member)]),
+  );
   const memberNames = new Map(
     data.members.map((member) => [member.id, member.displayName]),
   );
@@ -60,6 +64,7 @@ export default function RateioRealtimeSession() {
     memberId: balance.memberId,
     displayName: balance.displayName,
     balanceMinor: balance.balanceMinor,
+    pictureUrl: memberProfiles.get(balance.memberId)?.pictureUrl ?? null,
   }));
 
   return (

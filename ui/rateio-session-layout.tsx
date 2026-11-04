@@ -1,5 +1,6 @@
 import { formatMinorAmount } from '../lib/format';
 import RateioItemDeleteButton from './rateio-item-delete-button';
+import ParticipantAvatar from './participant-avatar';
 
 export interface RateioSessionItem {
   id: string;
@@ -14,6 +15,7 @@ export interface RateioSessionBalance {
   memberId: string;
   displayName: string;
   balanceMinor: string;
+  pictureUrl?: string | null;
 }
 
 export interface RateioSessionLayoutProps {
@@ -164,12 +166,19 @@ function RateioBreakdown({
                   className="flex items-center justify-between gap-3"
                   key={balance.memberId}
                 >
-                  <p
-                    className="min-w-0 truncate text-sm font-medium"
-                    title={balance.displayName}
-                  >
-                    {balance.displayName}
-                  </p>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <ParticipantAvatar
+                      displayName={balance.displayName}
+                      pictureUrl={balance.pictureUrl}
+                      className="size-7"
+                    />
+                    <p
+                      className="min-w-0 break-words text-sm font-medium"
+                      title={balance.displayName}
+                    >
+                      {balance.displayName}
+                    </p>
+                  </div>
                   <span
                     className={`flex shrink-0 items-center gap-3 text-sm ${
                       isSettled
