@@ -191,3 +191,148 @@ test('browser refresh is shared across callers and serialized with logout operat
     else delete global.navigator;
   }
 });
+
+function googleStartRoute() {
+  return load('app/api/auth/google/route.ts', {
+    '../../../../lib/api/server-config': {
+      getServerApiBaseUrl: () => 'http://api:3000',
+    },
+    '../../../../lib/auth/session-cookies': cookies,
+  }).GET;
+}
+
+test('server API clients read the internal URL at runtime and preserve authorization', () => {
+  const previousInternal = process.env.API_INTERNAL_BASE_URL;
+  const previousPublic = process.env.NEXT_PUBLIC_API_BASE_URL;
+  try {
+    process.env.NEXT_PUBLIC_API_BASE_URL = 'https://public.example.com';
+    const serverConfig = load('lib/api/server-config.ts', {
+      './config': load('lib/api/config.ts'),
+    });
+    const { createServerApiClient } = load('lib/api/server-client.ts', {
+      './generated/client': { createClient: (options) => options },
+      './server-config': serverConfig,
+    });
+    process.env.API_INTERNAL_BASE_URL = 'http://api:3000/';
+    const client = createServerApiClient('server-token');
+    assert.equal(client.baseUrl, 'http://api:3000');
+    assert.equal(client.headers.Authorization, 'Bearer server-token');
+    process.env.API_INTERNAL_BASE_URL = 'http://another-api:3000';
+    assert.equal(createServerApiClient().baseUrl, 'http://another-api:3000');
+    delete process.env.API_INTERNAL_BASE_URL;
+    assert.equal(createServerApiClient().baseUrl, 'https://public.example.com');
+    process.env.API_INTERNAL_BASE_URL = 'ftp://api:3000';
+    assert.throws(() => serverConfig.getServerApiBaseUrl(), /HTTP or HTTPS/);
+    process.env.API_INTERNAL_BASE_URL = 'not-a-url';
+    assert.throws(() => serverConfig.getServerApiBaseUrl(), /valid URL/);
+  } finally {
+    if (previousInternal === undefined)
+      delete process.env.API_INTERNAL_BASE_URL;
+    else process.env.API_INTERNAL_BASE_URL = previousInternal;
+    if (previousPublic === undefined)
+      delete process.env.NEXT_PUBLIC_API_BASE_URL;
+    else process.env.NEXT_PUBLIC_API_BASE_URL = previousPublic;
+  }
+});
+
+test('Google sign-in redirects directly to Google while binding state and return path', async () => {
+  const originalFetch = global.fetch;
+  let state;
+  global.fetch = async (url, options) => {
+    assert.equal(url.origin, 'http://api:3000');
+    assert.equal(url.pathname, '/auth/google');
+    assert.equal(options.redirect, 'manual');
+    assert.equal(options.cache, 'no-store');
+    assert(options.signal instanceof AbortSignal);
+    state = url.searchParams.get('state');
+    assert.match(state, /^[A-Za-z0-9_-]{43}$/);
+    const googleUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    googleUrl.searchParams.set('state', state);
+    return new Response(null, {
+      status: 302,
+      headers: { location: googleUrl.href },
+    });
+  };
+  try {
+    const response = await googleStartRoute()(
+      new NextRequest(
+        'https://rateio.example.com/api/auth/google?returnTo=%2Fconta',
+      ),
+    );
+    const destination = new URL(response.headers.get('location'));
+    assert.equal(destination.origin, 'https://accounts.google.com');
+    assert.equal(destination.searchParams.get('state'), state);
+    assert.equal(response.cookies.get('rateio_oauth_state').value, state);
+    assert.equal(response.cookies.get('rateio_oauth_state').httpOnly, true);
+    assert.equal(
+      response.cookies.get('rateio_oauth_return_to').value,
+      '/conta',
+    );
+    assert.match(response.headers.get('cache-control'), /no-store/);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('Google sign-in fails closed for unavailable or invalid upstream redirects', async (t) => {
+  const cases = [
+    [
+      'network failure',
+      async () => {
+        throw new Error('API unavailable');
+      },
+    ],
+    ['non-redirect response', async () => new Response('{}', { status: 200 })],
+    ['missing location', async () => new Response(null, { status: 302 })],
+    [
+      'untrusted destination',
+      async (url) =>
+        new Response(null, {
+          status: 302,
+          headers: {
+            location: `https://attacker.example/?state=${url.searchParams.get('state')}`,
+          },
+        }),
+    ],
+    [
+      'insecure Google URL',
+      async (url) =>
+        new Response(null, {
+          status: 302,
+          headers: {
+            location: `http://accounts.google.com/?state=${url.searchParams.get('state')}`,
+          },
+        }),
+    ],
+    [
+      'mismatched state',
+      async () =>
+        new Response(null, {
+          status: 302,
+          headers: {
+            location:
+              'https://accounts.google.com/o/oauth2/v2/auth?state=wrong',
+          },
+        }),
+    ],
+  ];
+  for (const [name, fetchResult] of cases) {
+    await t.test(name, async () => {
+      const originalFetch = global.fetch;
+      global.fetch = fetchResult;
+      try {
+        const response = await googleStartRoute()(
+          new NextRequest('https://rateio.example.com/api/auth/google'),
+        );
+        assert.equal(response.status, 503);
+        assert.equal(response.headers.get('location'), null);
+        assert.equal(response.cookies.getAll().length, 0);
+        assert.deepEqual(await response.json(), {
+          error: 'Google sign-in is temporarily unavailable',
+        });
+      } finally {
+        global.fetch = originalFetch;
+      }
+    });
+  }
+});

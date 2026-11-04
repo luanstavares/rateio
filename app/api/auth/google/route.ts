@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiBaseUrl } from '../../../../lib/api/config';
+import { getServerApiBaseUrl } from '../../../../lib/api/server-config';
 import {
   OAUTH_STATE_MAX_AGE_SECONDS,
   setOAuthStateCookie,
@@ -24,13 +24,39 @@ function safeReturnTo(request: NextRequest): string {
   }
 }
 
-export function GET(request: NextRequest): NextResponse {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const state = randomBytes(32).toString('base64url');
   const returnTo = safeReturnTo(request);
-  const apiUrl = new URL('/auth/google', getApiBaseUrl());
-  apiUrl.searchParams.set('state', state);
+  let authorizationUrl: URL;
 
-  const response = NextResponse.redirect(apiUrl);
+  try {
+    const apiUrl = new URL('/auth/google', getServerApiBaseUrl());
+    apiUrl.searchParams.set('state', state);
+    const upstream = await fetch(apiUrl, {
+      redirect: 'manual',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(10_000),
+    });
+    const location = upstream.headers.get('location');
+    if (![302, 303, 307, 308].includes(upstream.status) || !location) {
+      throw new Error('Google sign-in redirect is unavailable');
+    }
+
+    authorizationUrl = new URL(location);
+    if (
+      authorizationUrl.origin !== 'https://accounts.google.com' ||
+      authorizationUrl.searchParams.get('state') !== state
+    ) {
+      throw new Error('Invalid Google sign-in redirect');
+    }
+  } catch {
+    return NextResponse.json(
+      { error: 'Google sign-in is temporarily unavailable' },
+      { status: 503, headers: { 'cache-control': 'no-store' } },
+    );
+  }
+
+  const response = NextResponse.redirect(authorizationUrl);
   setOAuthStateCookie(response, state);
   setOAuthReturnToCookie(response, returnTo);
   response.headers.set(

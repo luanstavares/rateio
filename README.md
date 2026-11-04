@@ -44,10 +44,24 @@ The check regenerates `lib/api/generated/` and fails when the generated output
 differs from the committed client. Review and commit regenerated output when
 the API contract intentionally changes; do not edit generated files by hand.
 
-`NEXT_PUBLIC_API_BASE_URL` controls runtime requests and defaults to
-`http://localhost:3000`. It is separate from `OPENAPI_SOURCE`, which is only
-used while generating `lib/api/generated/`. Generated files are disposable and
-must not be edited manually.
+`NEXT_PUBLIC_API_BASE_URL` controls browser requests and is embedded during
+`next build`. It defaults to `http://localhost:3000`. `API_INTERNAL_BASE_URL`
+controls Next.js server requests at runtime and falls back to the public API
+URL when omitted. The root Docker Compose deployment sets the internal URL to
+`http://api:3000`; never put that Docker-only hostname in a browser URL.
+
+Google sign-in starts at `/api/auth/google`. Next.js requests the authorization
+redirect from the internal API and sends the browser directly to Google. It
+preserves the state and return-path cookies; the browser never navigates to the
+internal API. Google must return to the frontend's `/api/auth/google/callback`
+route. Set the API's `GOOGLE_CALLBACK_URL` and the Google OAuth client's
+authorized redirect URI to the same public frontend callback URL, for example
+`https://rateio.example.com/api/auth/google/callback`. Next.js validates state
+and exchanges the code with the internal API before setting session cookies.
+
+`OPENAPI_SOURCE` is separate and is only used while generating
+`lib/api/generated/`. Generated files are disposable and must not be edited
+manually.
 
 Realtime browser sessions use the HttpOnly session cookies directly. When the
 frontend and API use sibling hosts in production, set
