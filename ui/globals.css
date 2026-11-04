@@ -81,6 +81,47 @@ a {
   text-decoration: none;
 }
 
+@property --rateio-border-sweep {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 45deg;
+}
+
+@utility rateio-card-outline {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    background: conic-gradient(
+      from 0deg,
+      color-mix(in srgb, var(--primary) 60%, transparent) 0deg
+        var(--rateio-border-sweep),
+      transparent var(--rateio-border-sweep)
+        calc(360deg - var(--rateio-border-sweep)),
+      color-mix(in srgb, var(--primary) 60%, transparent)
+        calc(360deg - var(--rateio-border-sweep)) 360deg
+    );
+    mask:
+      linear-gradient(white 0 0) content-box,
+      linear-gradient(white 0 0);
+    mask-composite: exclude;
+    transition: --rateio-border-sweep 700ms ease-in-out;
+  }
+
+  &:focus-visible::after {
+    --rateio-border-sweep: 180deg;
+  }
+
+  @media (hover: hover) {
+    &:hover::after {
+      --rateio-border-sweep: 180deg;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

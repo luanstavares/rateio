@@ -76,6 +76,12 @@ frontend and API use sibling hosts in production, set
 hosts. Leave it unset when both services use the exact same host. The API's
 `CORS_ORIGIN` must be the exact frontend origin, not `*`.
 
+Participant avatars show a green dot when that account is connected anywhere
+in Rate.io. Presence reuses the app-wide notification socket, applies across
+directory cards and balance rows, and clears on disconnect or account changes.
+It requires the API's `presence.watch` and `presence.state` events. Anonymous
+participants have no account-wide online indicator.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

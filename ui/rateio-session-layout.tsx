@@ -14,6 +14,7 @@ export interface RateioSessionItem {
 }
 
 export interface RateioSessionBalance {
+  userId?: string | null;
   memberId: string;
   displayName: string;
   balanceMinor: string;
@@ -181,6 +182,7 @@ function RateioBreakdown({
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <ParticipantAvatar
+                      userId={balance.userId}
                       displayName={balance.displayName}
                       pictureUrl={balance.pictureUrl}
                       className="size-7"

@@ -2,6 +2,10 @@ import { z } from 'zod';
 
 const timestampSchema = z.iso.datetime();
 
+export const presenceSnapshotSchema = z.object({
+  onlineUserIds: z.array(z.string().min(1)),
+});
+
 const notificationTypeSchema = z.enum([
   'INVITATION_CREATED',
   'MEMBER_JOINED',

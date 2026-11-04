@@ -24,6 +24,7 @@ const { participantProfile } = target.exports;
 test('uses the member name and stored Google picture URL', () => {
   assert.deepEqual(
     participantProfile({
+      userId: 'maria-id',
       displayName: 'Maria',
       user: {
         name: 'Maria Júlia',
@@ -31,6 +32,7 @@ test('uses the member name and stored Google picture URL', () => {
       },
     }),
     {
+      userId: 'maria-id',
       displayName: 'Maria',
       pictureUrl: 'https://lh3.googleusercontent.com/profile',
     },
@@ -41,11 +43,13 @@ test('supports directory members with only a nested user profile', () => {
   assert.deepEqual(
     participantProfile({
       user: {
+        id: 'luan-id',
         name: 'Luan',
         pictureUrl: 'https://lh3.googleusercontent.com/luan',
       },
     }),
     {
+      userId: 'luan-id',
       displayName: 'Luan',
       pictureUrl: 'https://lh3.googleusercontent.com/luan',
     },
@@ -56,6 +60,7 @@ test('keeps anonymous names and uses a missing-picture fallback', () => {
   assert.deepEqual(
     participantProfile({ displayName: 'Convidado', user: null }),
     {
+      userId: null,
       displayName: 'Convidado',
       pictureUrl: null,
     },
@@ -72,6 +77,7 @@ test('malformed and blank profile fields cannot become image URLs', () => {
     { user: { pictureUrl: ' ' } },
   ]) {
     assert.deepEqual(participantProfile(value), {
+      userId: null,
       displayName: 'Participante',
       pictureUrl: null,
     });

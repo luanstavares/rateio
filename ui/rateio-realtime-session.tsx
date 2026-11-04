@@ -37,6 +37,7 @@ export default function RateioRealtimeSession() {
       payerName: memberNames.get(expense.payerMemberId) ?? null,
     }));
   const balances: RateioSessionBalance[] = data.balances.map((balance) => ({
+    userId: memberProfiles.get(balance.memberId)?.userId ?? balance.userId,
     memberId: balance.memberId,
     displayName: balance.displayName,
     balanceMinor: balance.balanceMinor,

@@ -26,15 +26,18 @@ import {
 import { getRealtimeUrl } from '../lib/api/config';
 import {
   realtimeNotificationCreatedSchema,
+  presenceSnapshotSchema,
   type RealtimeConnectionStatus,
 } from '../lib/realtime/contracts';
 import { useUser } from './user-provider';
 import { io, type Socket } from 'socket.io-client';
+import { PresenceProvider } from './presence-context';
 
 export function notificationsQueryKey(userId: string | null) {
   return ['notifications', userId] as const;
 }
 const EMPTY_NOTIFICATIONS: Notification[] = [];
+const EMPTY_ONLINE_USERS: string[] = [];
 type NotificationMutationContext = {
   previous: NotificationList | undefined;
 };
@@ -92,6 +95,10 @@ export default function NotificationProvider({
   const queryClient = useQueryClient();
   const [realtimeStatus, setRealtimeStatus] =
     useState<RealtimeConnectionStatus>('disconnected');
+  const [presence, setPresence] = useState<{
+    userId: string | null;
+    onlineUserIds: string[];
+  }>({ userId: null, onlineUserIds: [] });
   const queryKey = useMemo(() => notificationsQueryKey(userId), [userId]);
   const query = useQuery<NotificationList, Error>({
     queryKey,
@@ -157,8 +164,12 @@ export default function NotificationProvider({
 
     type ServerToClientEvents = {
       'notification.created': (payload: unknown) => void;
+      'presence.state': (payload: unknown) => void;
     };
-    type NotificationSocket = Socket<ServerToClientEvents>;
+    type NotificationSocket = Socket<
+      ServerToClientEvents,
+      { 'presence.watch': () => void }
+    >;
     let mounted = true;
     const socket: NotificationSocket = io(getRealtimeUrl(), {
       autoConnect: false,
@@ -174,7 +185,18 @@ export default function NotificationProvider({
       });
     };
 
-    socket.on('connect', () => setMountedStatus('connected'));
+    socket.on('connect', () => {
+      setMountedStatus('connected');
+      socket.emit('presence.watch');
+    });
+    socket.on('presence.state', (payload) => {
+      if (!mounted) return;
+      const parsed = presenceSnapshotSchema.safeParse(payload);
+      setPresence({
+        userId,
+        onlineUserIds: parsed.success ? parsed.data.onlineUserIds : [],
+      });
+    });
     socket.on('notification.created', (payload) => {
       const parsed = realtimeNotificationCreatedSchema.safeParse(payload);
       if (!parsed.success) {
@@ -193,6 +215,7 @@ export default function NotificationProvider({
       );
     });
     socket.on('disconnect', (reason) => {
+      if (mounted) setPresence({ userId, onlineUserIds: [] });
       if (reason === 'io client disconnect') {
         setMountedStatus('disconnected');
         return;
@@ -207,9 +230,13 @@ export default function NotificationProvider({
     socket.io.on('reconnect_attempt', () => setMountedStatus('reconnecting'));
 
     setMountedStatus('connecting');
+    const presenceRefresh = setInterval(() => {
+      if (socket.connected) socket.emit('presence.watch');
+    }, 30_000);
     socket.connect();
     return () => {
       mounted = false;
+      clearInterval(presenceRefresh);
       socket.disconnect();
     };
   }, [queryClient, queryKey, userId, refreshSession]);
@@ -233,7 +260,15 @@ export default function NotificationProvider({
 
   return (
     <NotificationContext.Provider value={value}>
-      {children}
+      <PresenceProvider
+        onlineUserIds={
+          userId && presence.userId === userId && realtimeStatus === 'connected'
+            ? presence.onlineUserIds
+            : EMPTY_ONLINE_USERS
+        }
+      >
+        {children}
+      </PresenceProvider>
     </NotificationContext.Provider>
   );
 }
