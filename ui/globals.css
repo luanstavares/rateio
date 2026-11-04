@@ -108,7 +108,7 @@ a {
       linear-gradient(white 0 0) content-box,
       linear-gradient(white 0 0);
     mask-composite: exclude;
-    transition: --rateio-border-sweep 700ms ease-in-out;
+    transition: --rateio-border-sweep 450ms ease-in-out;
   }
 
   &:focus-visible::after {
