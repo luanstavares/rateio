@@ -1,6 +1,8 @@
 import { formatMinorAmount } from '../lib/format';
+import type { RealtimeConnectionStatus } from '../lib/realtime/contracts';
 import RateioItemDeleteButton from './rateio-item-delete-button';
 import ParticipantAvatar from './participant-avatar';
+import RateioRealtimeIndicator from './rateio-realtime-indicator';
 
 export interface RateioSessionItem {
   id: string;
@@ -27,6 +29,7 @@ export interface RateioSessionLayoutProps {
   baseCurrency: string;
   currentMemberId?: string;
   currentRole?: 'OWNER' | 'ADMIN' | 'PARTICIPANT';
+  realtimeStatus?: RealtimeConnectionStatus;
 }
 
 function SessionItems({
@@ -34,9 +37,14 @@ function SessionItems({
   baseCurrency,
   currentMemberId,
   currentRole,
+  realtimeStatus,
 }: Pick<
   RateioSessionLayoutProps,
-  'items' | 'baseCurrency' | 'currentMemberId' | 'currentRole'
+  | 'items'
+  | 'baseCurrency'
+  | 'currentMemberId'
+  | 'currentRole'
+  | 'realtimeStatus'
 >) {
   return (
     <section
@@ -48,9 +56,14 @@ function SessionItems({
         aria-hidden="true"
       />
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold" id="rateio-items-heading">
-          Itens da conta
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-semibold" id="rateio-items-heading">
+            Itens da conta
+          </h2>
+          {realtimeStatus ? (
+            <RateioRealtimeIndicator status={realtimeStatus} />
+          ) : null}
+        </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground">{baseCurrency}</span>
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
@@ -225,6 +238,7 @@ export default function RateioSessionLayout({
   baseCurrency,
   currentMemberId,
   currentRole,
+  realtimeStatus,
 }: RateioSessionLayoutProps) {
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)]">
@@ -233,6 +247,7 @@ export default function RateioSessionLayout({
         currentMemberId={currentMemberId}
         currentRole={currentRole}
         items={items}
+        realtimeStatus={realtimeStatus}
       />
       <RateioBreakdown
         balances={balances}
