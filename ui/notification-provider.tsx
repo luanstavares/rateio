@@ -23,7 +23,7 @@ import {
   type Notification,
   type NotificationList,
 } from '../lib/api/notifications';
-import { getApiBaseUrl } from '../lib/api/config';
+import { getRealtimeUrl } from '../lib/api/config';
 import {
   realtimeNotificationCreatedSchema,
   type RealtimeConnectionStatus,
@@ -160,7 +160,7 @@ export default function NotificationProvider({
     };
     type NotificationSocket = Socket<ServerToClientEvents>;
     let mounted = true;
-    const socket: NotificationSocket = io(`${getApiBaseUrl()}/rateios`, {
+    const socket: NotificationSocket = io(getRealtimeUrl(), {
       autoConnect: false,
       withCredentials: true,
       reconnection: true,

@@ -17,3 +17,8 @@ export function getApiBaseUrl(): string {
 
   return apiBaseUrl.replace(/\/+$/, '');
 }
+
+export function getRealtimeUrl(): string {
+  if (process.env.NODE_ENV !== 'development') return '/rateios';
+  return `${new URL(getApiBaseUrl()).origin}/rateios`;
+}

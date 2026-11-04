@@ -12,7 +12,7 @@ import {
 import type { ReactNode } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { getApiBaseUrl } from '../lib/api/config';
+import { getRealtimeUrl } from '../lib/api/config';
 import {
   realtimeJoinResponseSchema,
   realtimeStateSnapshotSchema,
@@ -252,7 +252,7 @@ export default function RateioProvider({
   useEffect(() => {
     if (!sessionMatches) return;
     let mounted = true;
-    const socket: RealtimeSocket = io(`${getApiBaseUrl()}/rateios`, {
+    const socket: RealtimeSocket = io(getRealtimeUrl(), {
       autoConnect: false,
       withCredentials: true,
       reconnection: true,

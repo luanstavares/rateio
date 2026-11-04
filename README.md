@@ -63,6 +63,13 @@ and exchanges the code with the internal API before setting session cookies.
 `lib/api/generated/`. Generated files are disposable and must not be edited
 manually.
 
+In production, realtime clients connect to the website's own `/rateios`
+namespace using the `/socket.io/` transport path. The root nginx configuration
+forwards polling requests and WebSocket upgrades on that path to `api:3000`.
+No separate public API hostname or Docker address is needed in the browser for
+realtime connections. During `next dev`, realtime clients use the origin from
+`NEXT_PUBLIC_API_BASE_URL` so a separately running local API remains supported.
+
 Realtime browser sessions use the HttpOnly session cookies directly. When the
 frontend and API use sibling hosts in production, set
 `RATEIO_COOKIE_DOMAIN=.example.com` so the browser can send the cookies to both

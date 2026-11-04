@@ -397,3 +397,59 @@ test('callback rejects external and protocol-relative return destinations', asyn
     assert.equal(response.headers.get('location'), '/');
   }
 });
+
+test('production realtime resolves to the public website even with a Docker API URL', () => {
+  const previousMode = process.env.NODE_ENV;
+  const previousPublic = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const previousLocation = Object.getOwnPropertyDescriptor(global, 'location');
+  let socket;
+  try {
+    process.env.NODE_ENV = 'production';
+    process.env.NEXT_PUBLIC_API_BASE_URL = 'http://api:3000';
+    Object.defineProperty(global, 'location', {
+      configurable: true,
+      value: new URL('https://rateio.example.com/rateios/example'),
+    });
+    const config = load('lib/api/config.ts');
+    const { io } = require('socket.io-client');
+    socket = io(config.getRealtimeUrl(), {
+      autoConnect: false,
+      forceNew: true,
+      withCredentials: true,
+    });
+    assert.equal(new URL(socket.io.uri).origin, 'https://rateio.example.com');
+    assert.equal(socket.nsp, '/rateios');
+    assert.equal(socket.io.opts.path, '/socket.io');
+    assert.equal(socket.io.opts.withCredentials, true);
+    assert.equal(socket.connected, false);
+    delete process.env.NEXT_PUBLIC_API_BASE_URL;
+    assert.equal(config.getRealtimeUrl(), '/rateios');
+  } finally {
+    socket?.disconnect();
+    if (previousMode === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousMode;
+    if (previousPublic === undefined)
+      delete process.env.NEXT_PUBLIC_API_BASE_URL;
+    else process.env.NEXT_PUBLIC_API_BASE_URL = previousPublic;
+    if (previousLocation)
+      Object.defineProperty(global, 'location', previousLocation);
+    else delete global.location;
+  }
+});
+
+test('development realtime keeps using the separately running local API', () => {
+  const previousMode = process.env.NODE_ENV;
+  const previousPublic = process.env.NEXT_PUBLIC_API_BASE_URL;
+  try {
+    process.env.NODE_ENV = 'development';
+    process.env.NEXT_PUBLIC_API_BASE_URL = 'http://localhost:3300/backend/';
+    const config = load('lib/api/config.ts');
+    assert.equal(config.getRealtimeUrl(), 'http://localhost:3300/rateios');
+  } finally {
+    if (previousMode === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousMode;
+    if (previousPublic === undefined)
+      delete process.env.NEXT_PUBLIC_API_BASE_URL;
+    else process.env.NEXT_PUBLIC_API_BASE_URL = previousPublic;
+  }
+});
