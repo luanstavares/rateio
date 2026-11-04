@@ -39,21 +39,25 @@ function SessionItems({
   return (
     <section
       aria-labelledby="rateio-items-heading"
-      className="order-first rounded-lg border border-border bg-card p-5 sm:p-6 lg:order-last"
+      className="relative order-first self-start overflow-hidden rounded-2xl border border-border bg-secondary px-6 py-8 sm:p-8 lg:order-last"
     >
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-            Conta compartilhada
-          </p>
-          <h2 className="mt-2 text-xl font-semibold" id="rateio-items-heading">
-            Itens da conta
-          </h2>
+      <div
+        className="absolute inset-x-6 top-0 h-px bg-primary/60 sm:inset-x-8"
+        aria-hidden="true"
+      />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-xl font-semibold" id="rateio-items-heading">
+          Itens da conta
+        </h2>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-muted-foreground">{baseCurrency}</span>
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+            {items.length} {items.length === 1 ? 'item' : 'itens'}
+          </span>
         </div>
-        <span className="text-sm text-muted-foreground">{baseCurrency}</span>
       </div>
 
-      <div className="mt-5 max-h-[min(60dvh,38rem)] overflow-y-auto scrollbar-none">
+      <div className="mt-6 max-h-[min(60dvh,38rem)] overflow-y-auto scrollbar-none">
         {items.length === 0 ? (
           <div className="rounded-md border border-dashed border-border p-6 text-center">
             <p className="font-medium">Nenhum item registrado</p>
@@ -65,17 +69,19 @@ function SessionItems({
           <ul className="space-y-3" aria-label="Itens registrados">
             {items.map((item) => (
               <li
-                className="flex items-start justify-between gap-4 rounded-md border border-border p-4"
+                className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background p-4"
                 key={item.id}
               >
                 <div className="min-w-0">
-                  <p className="truncate font-medium">{item.name}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
+                  <p className="truncate text-sm font-medium" title={item.name}>
+                    {item.name}
+                  </p>
+                  <p className="mt-1 break-words text-xs text-muted-foreground">
                     Pago por {item.payerName ?? 'participante'}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <span className="font-semibold">
+                  <span className="text-sm font-semibold tabular-nums">
                     {formatMinorAmount(item.amountMinor)}
                   </span>
                   {currentMemberId && currentRole ? (
@@ -110,43 +116,44 @@ function RateioBreakdown({
   return (
     <section
       aria-labelledby="rateio-breakdown-heading"
-      className="order-last rounded-lg border border-border bg-card p-5 sm:p-6 lg:order-first"
+      className="relative order-last self-start overflow-hidden rounded-2xl border border-border bg-secondary px-6 py-8 sm:p-8 lg:order-first"
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-        Visão geral
-      </p>
-      <h2 className="mt-2 text-xl font-semibold" id="rateio-breakdown-heading">
+      <div
+        className="absolute inset-x-6 top-0 h-px bg-primary/60 sm:inset-x-8"
+        aria-hidden="true"
+      />
+      <h2 className="sr-only" id="rateio-breakdown-heading">
         Cálculos e acertos
       </h2>
 
-      <div className="mt-5 rounded-md border border-border p-4">
-        <p className="text-sm text-muted-foreground">Total registrado</p>
-        <p className="mt-1 text-2xl font-semibold">
-          {totalAmountMinor === null
-            ? 'Indisponível'
-            : formatMinorAmount(totalAmountMinor)}
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
+        <div className="min-w-0">
+          <p className="text-sm text-muted-foreground">Total registrado</p>
+          <p className="mt-2 break-words text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl">
+            {totalAmountMinor === null
+              ? 'Indisponível'
+              : formatMinorAmount(totalAmountMinor)}
+          </p>
+        </div>
+        {participantCount !== undefined ? (
+          <p className="mb-1 text-xs text-muted-foreground">
+            {participantCount}{' '}
+            {participantCount === 1 ? 'participante' : 'participantes'}
+          </p>
+        ) : null}
       </div>
 
-      {participantCount !== undefined ? (
-        <div className="mt-3 rounded-md border border-border p-4">
-          <p className="text-sm text-muted-foreground">Participantes</p>
-          <p className="mt-1 text-lg font-semibold">{participantCount}</p>
-        </div>
-      ) : null}
-
-      <div className="mt-3 rounded-md border border-border p-4">
-        <p className="font-medium">Divisão e acertos</p>
+      <div className="mt-6 border-t border-border pt-6">
         {balancesError ? (
-          <p className="mt-2 text-sm text-muted-foreground" role="alert">
+          <p className="text-sm text-muted-foreground" role="alert">
             Não foi possível calcular os saldos agora.
           </p>
         ) : balances.length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Nenhum saldo calculado ainda.
           </p>
         ) : (
-          <ul className="mt-3 space-y-3" aria-label="Saldos dos participantes">
+          <ul className="space-y-5" aria-label="Saldos dos participantes">
             {balances.map((balance) => {
               const isCredit =
                 !balance.balanceMinor.startsWith('-') &&
@@ -154,29 +161,47 @@ function RateioBreakdown({
               const isSettled = balance.balanceMinor === '0';
               return (
                 <li
-                  className="flex items-center justify-between gap-4"
+                  className="flex items-center justify-between gap-3"
                   key={balance.memberId}
                 >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">
-                      {balance.displayName}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
+                  <p
+                    className="min-w-0 truncate text-sm font-medium"
+                    title={balance.displayName}
+                  >
+                    {balance.displayName}
+                  </p>
+                  <span
+                    className={`flex shrink-0 items-center gap-3 text-sm ${
+                      isSettled
+                        ? 'text-muted-foreground'
+                        : isCredit
+                          ? 'text-landing-sage'
+                          : 'text-primary'
+                    }`}
+                  >
+                    <span className="text-xs">
                       {isSettled ? 'Acertado' : isCredit ? 'Recebe' : 'Deve'}
-                    </p>
-                  </div>
-                  <span className="shrink-0 font-semibold">
-                    {formatMinorAmount(
-                      balance.balanceMinor.startsWith('-')
-                        ? balance.balanceMinor.slice(1)
-                        : balance.balanceMinor,
-                    )}
+                    </span>
+                    <span className="min-w-20 text-right font-semibold tabular-nums">
+                      {formatMinorAmount(
+                        balance.balanceMinor.startsWith('-')
+                          ? balance.balanceMinor.slice(1)
+                          : balance.balanceMinor,
+                      )}
+                    </span>
                   </span>
                 </li>
               );
             })}
           </ul>
         )}
+      </div>
+      <div className="mt-7 flex items-center gap-2 border-t border-border pt-4 text-xs text-muted-foreground">
+        <span
+          className={`size-1.5 shrink-0 rounded-full ${balancesError || balances.length === 0 ? 'bg-muted-foreground' : 'bg-landing-sage'}`}
+          aria-hidden="true"
+        />
+        Divisão e acertos do grupo.
       </div>
     </section>
   );

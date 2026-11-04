@@ -119,7 +119,7 @@ export default function LandingPage() {
       >
         <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-3 md:gap-10">
           {DETAILS.map(({ icon: Icon, title, description }) => (
-            <div key={title}>
+            <div key={title} className="flex flex-col items-center text-center">
               <Icon
                 size={26}
                 className="mb-6 text-primary"
