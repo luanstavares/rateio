@@ -84,7 +84,7 @@ a {
 @property --rateio-border-sweep {
   syntax: '<angle>';
   inherits: false;
-  initial-value: 45deg;
+  initial-value: 0deg;
 }
 
 @utility rateio-card-outline {
