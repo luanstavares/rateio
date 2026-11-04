@@ -42,10 +42,20 @@ function safeReturnTo(request: NextRequest): string {
   }
 }
 
+function relativeRedirect(destination: URL): NextResponse {
+  return new NextResponse(null, {
+    status: 307,
+    headers: {
+      location: `${destination.pathname}${destination.search}`,
+      'cache-control': 'private, no-store',
+    },
+  });
+}
+
 function errorRedirect(request: NextRequest, returnTo: string): NextResponse {
   const destination = new URL(returnTo, request.url);
   destination.searchParams.set('authError', 'oauth');
-  return NextResponse.redirect(destination);
+  return relativeRedirect(destination);
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -105,7 +115,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     destination.searchParams.set('claim', claimSucceeded ? 'success' : 'error');
   }
 
-  const successResponse = NextResponse.redirect(destination);
+  const successResponse = relativeRedirect(destination);
   clearOAuthStateCookie(successResponse);
   clearOAuthReturnToCookie(successResponse);
   setSessionCookies(successResponse, tokens.data);

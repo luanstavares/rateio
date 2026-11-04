@@ -336,3 +336,64 @@ test('Google sign-in fails closed for unavailable or invalid upstream redirects'
     });
   }
 });
+
+function googleCallbackRoute() {
+  return load('app/api/auth/google/callback/route.ts', {
+    '../../../../../lib/api/generated': {
+      authControllerGoogleCallback: async () => ({ data: pair }),
+    },
+    '../../../../../lib/api/server-client': {
+      createServerApiClient: () => ({}),
+    },
+    '../../../../../lib/api/errors': {
+      normalizeApiResult: (result) => result,
+    },
+    '../../../../../lib/api/rateios': {},
+    '../../../../../lib/auth/session-cookies': cookies,
+  }).GET;
+}
+
+function callbackRequest(returnTo, state = 'valid-state') {
+  return new NextRequest(
+    `http://localhost:3000/api/auth/google/callback?code=test-code&state=${state}`,
+    {
+      headers: {
+        host: 'rateio.example.com',
+        'x-forwarded-host': 'rateio.example.com',
+        'x-forwarded-proto': 'https',
+        cookie: `rateio_oauth_state=valid-state; rateio_oauth_return_to=${encodeURIComponent(returnTo)}`,
+      },
+    },
+  );
+}
+
+test('callback keeps redirects relative behind a reverse proxy', async () => {
+  const response = await googleCallbackRoute()(
+    callbackRequest('/conta?tab=settings'),
+  );
+  assert.equal(response.headers.get('location'), '/conta?tab=settings');
+  assert.equal(
+    response.cookies.get('rateio_access_token').value,
+    pair.accessToken,
+  );
+  assert.equal(response.cookies.get('rateio_access_token').httpOnly, true);
+  assert.match(response.headers.get('cache-control'), /no-store/);
+});
+
+test('callback errors preserve a relative return path without authenticating', async () => {
+  const response = await googleCallbackRoute()(
+    callbackRequest('/conta?tab=settings', 'wrong-state'),
+  );
+  assert.equal(
+    response.headers.get('location'),
+    '/conta?tab=settings&authError=oauth',
+  );
+  assert.equal(response.cookies.get('rateio_access_token'), undefined);
+});
+
+test('callback rejects external and protocol-relative return destinations', async () => {
+  for (const returnTo of ['https://attacker.example', '//attacker.example']) {
+    const response = await googleCallbackRoute()(callbackRequest(returnTo));
+    assert.equal(response.headers.get('location'), '/');
+  }
+});
