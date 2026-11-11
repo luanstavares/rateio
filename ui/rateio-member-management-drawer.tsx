@@ -2,7 +2,6 @@
 
 import { useRef, useState } from 'react';
 
-import { UsersThreeIcon } from '@phosphor-icons/react';
 import type { MembershipRole } from '../lib/api/rateios';
 import type { RateioSessionMember } from '../lib/rateio/session-data';
 import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
@@ -17,13 +16,15 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from './components/ui/drawer';
 
 interface RateioMemberManagementDrawerProps {
   members: RateioSessionMember[];
   currentMemberId: string;
   currentRole: MembershipRole;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCloseAutoFocus: (event: Event) => void;
 }
 
 function memberName(member: RateioSessionMember): string {
@@ -64,8 +65,10 @@ export default function RateioMemberManagementDrawer({
   members,
   currentMemberId,
   currentRole,
+  open,
+  onOpenChange,
+  onCloseAutoFocus,
 }: RateioMemberManagementDrawerProps) {
-  const [open, setOpen] = useState(false);
   const [roleChange, setRoleChange] = useState<{
     member: RateioSessionMember;
     role: MembershipRole;
@@ -82,14 +85,11 @@ export default function RateioMemberManagementDrawer({
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button type="button" variant="outline" className="w-full sm:w-auto">
-          <UsersThreeIcon />
-          Gerenciar participantes
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent className="max-h-[90vh] p-0">
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent
+        className="max-h-[90vh] p-0"
+        onCloseAutoFocus={onCloseAutoFocus}
+      >
         <DrawerHeader>
           <DrawerTitle>Participantes</DrawerTitle>
           <DrawerDescription>

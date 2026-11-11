@@ -7,12 +7,9 @@ import { formatMinorAmount } from '../lib/format';
 import { Badge } from './components/ui/badge';
 import { Button } from './components/ui/button';
 import ManualExpenseDrawer from './manual-expense-drawer';
-import RateioActivityDrawer from './rateio-activity-drawer';
-import RateioMemberManagementDrawer from './rateio-member-management-drawer';
+import RateioActionsMenu from './rateio-actions-menu';
 import { useRateio } from './rateio-provider';
 import RateioRealtimeSession from './rateio-realtime-session';
-import RateioShareLinkDrawer from './rateio-share-link-drawer';
-import RateioStatusControl from './rateio-status-control';
 
 interface RateioPageContentProps {
   claimStatus?: string;
@@ -118,7 +115,11 @@ export default function RateioPageContent({
         </Button>
       </div>
 
-      <div className="rounded-lg border border-border bg-card p-6 sm:p-8">
+      <div className="relative rounded-2xl border border-border bg-secondary px-6 py-8 sm:p-8">
+        <div
+          className="absolute inset-x-6 top-0 h-px bg-primary/60 sm:inset-x-8"
+          aria-hidden="true"
+        />
         {claimStatus === 'success' ? (
           <div
             className="mb-6 rounded-md border border-primary/40 bg-primary/5 p-4 text-sm text-primary"
@@ -144,8 +145,8 @@ export default function RateioPageContent({
           </div>
         ) : null}
 
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-          <div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-3">
               {isActive ? (
                 <Badge variant="success">Ativo</Badge>
@@ -158,17 +159,20 @@ export default function RateioPageContent({
                 </Badge>
               ) : null}
             </div>
-            <h1 className="mt-4 text-3xl font-bold sm:text-4xl">
-              {rateio.title}
-            </h1>
-            <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-              {rateio.description ?? 'Sem descrição'}
-            </p>
           </div>
-          <p className="shrink-0 text-sm text-muted-foreground">
-            {rateio.baseCurrency}
-          </p>
+          <div className="flex shrink-0 items-center gap-3">
+            <p className="text-xs text-muted-foreground">
+              {rateio.baseCurrency}
+            </p>
+            {currentMember ? <RateioActionsMenu /> : null}
+          </div>
         </div>
+        <h1 className="mt-4 break-words text-3xl font-bold sm:text-4xl">
+          {rateio.title}
+        </h1>
+        <p className="mt-3 break-words text-sm text-muted-foreground sm:text-base">
+          {rateio.description ?? 'Sem descrição'}
+        </p>
 
         {!isActive ? (
           <div className="mt-6 rounded-md border border-muted-foreground/40 bg-muted/40 p-4 text-sm text-muted-foreground">
@@ -196,35 +200,6 @@ export default function RateioPageContent({
             </p>
           </div>
         </div>
-
-        {isOwner && currentMember ? (
-          <>
-            <RateioStatusControl status={rateio.status} />
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-              <RateioShareLinkDrawer rateioId={rateio.id} />
-              <RateioMemberManagementDrawer
-                currentMemberId={currentMember.id}
-                currentRole={currentMember.role}
-                members={members}
-              />
-              <RateioActivityDrawer events={data.activityEvents} />
-            </div>
-          </>
-        ) : null}
-        {!isOwner && currentMember ? (
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <RateioMemberManagementDrawer
-              currentMemberId={currentMember.id}
-              currentRole={currentMember.role}
-              members={members}
-            />
-          </div>
-        ) : null}
-        {!isOwner &&
-        currentMember &&
-        (currentMember.role === 'OWNER' || currentMember.role === 'ADMIN') ? (
-          <RateioActivityDrawer events={data.activityEvents} />
-        ) : null}
       </div>
 
       <RateioRealtimeSession />

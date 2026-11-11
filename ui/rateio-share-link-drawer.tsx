@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { CopyIcon, LinkIcon } from '@phosphor-icons/react';
+import { CopyIcon } from '@phosphor-icons/react';
 import { listShareLinks } from '../app/actions/rateios';
 import type { ShareLinkMetadataResponseDto } from '../lib/api/generated';
 import { Button } from './components/ui/button';
@@ -18,11 +18,13 @@ import {
   DrawerContent,
   DrawerDescription,
   DrawerTitle,
-  DrawerTrigger,
 } from './components/ui/drawer';
 
 interface RateioShareLinkDrawerProps {
   rateioId: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCloseAutoFocus: (event: Event) => void;
 }
 
 function formatCreatedAt(createdAt: string): string {
@@ -81,8 +83,10 @@ function CloseIcon() {
 
 export default function RateioShareLinkDrawer({
   rateioId,
+  open,
+  onOpenChange,
+  onCloseAutoFocus,
 }: RateioShareLinkDrawerProps) {
-  const [open, setOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>(
     'idle',
@@ -107,15 +111,10 @@ export default function RateioShareLinkDrawer({
   const activeLink = links.find((link) => link.status === 'ACTIVE');
 
   function handleOpenChange(nextOpen: boolean) {
-    setOpen(nextOpen);
-    if (nextOpen) {
-      setShareUrl(null);
-      setCopyState('idle');
-      setError(null);
-    } else {
-      setShareUrl(null);
-      setCopyState('idle');
-    }
+    onOpenChange(nextOpen);
+    setShareUrl(null);
+    setCopyState('idle');
+    setError(null);
   }
 
   async function handleCreate() {
@@ -172,13 +171,10 @@ export default function RateioShareLinkDrawer({
 
   return (
     <Drawer open={open} onOpenChange={handleOpenChange}>
-      <DrawerTrigger asChild>
-        <Button type="button" variant="outline" className="w-full sm:w-auto">
-          <LinkIcon />
-          Gerenciar link de entrada
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent className="max-h-[90vh] overflow-y-auto px-8">
+      <DrawerContent
+        className="max-h-[90vh] overflow-y-auto px-8"
+        onCloseAutoFocus={onCloseAutoFocus}
+      >
         <DrawerTitle>Link de entrada</DrawerTitle>
         <DrawerDescription>
           Crie um link para seus amigos entrarem neste rateio sem criar uma

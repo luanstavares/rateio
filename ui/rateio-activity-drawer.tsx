@@ -1,8 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
-import { ClockUserIcon } from '@phosphor-icons/react';
 import type { RateioSessionActivityEvent } from '../lib/rateio/session-data';
 import { Button } from './components/ui/button';
 import {
@@ -13,11 +10,13 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from './components/ui/drawer';
 
 interface RateioActivityDrawerProps {
   events: RateioSessionActivityEvent[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCloseAutoFocus: (event: Event) => void;
 }
 
 function payloadString(
@@ -70,18 +69,16 @@ function eventDate(value: string): string {
 
 export default function RateioActivityDrawer({
   events,
+  open,
+  onOpenChange,
+  onCloseAutoFocus,
 }: RateioActivityDrawerProps) {
-  const [open, setOpen] = useState(false);
-
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button className="w-full sm:w-auto" type="button" variant="outline">
-          <ClockUserIcon />
-          Histórico de atividades
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent className="max-h-[90vh] p-0">
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent
+        className="max-h-[90vh] p-0"
+        onCloseAutoFocus={onCloseAutoFocus}
+      >
         <DrawerHeader>
           <DrawerTitle>Histórico de atividades</DrawerTitle>
           <DrawerDescription>
